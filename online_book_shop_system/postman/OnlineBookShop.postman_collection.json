@@ -1,0 +1,19 @@
+{
+	"info": {
+		"_postman_id": "22e02fcc-c8f8-4315-bb8d-8b6f4ffc8e5b",
+		"name": "New Collection",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "49212231",
+		"_collection_link": "https://khanhpedayy-5596907.postman.co/workspace/Nguy%E1%BB%85n-Nam-Kh%C3%A1nh's-Workspace~dde890c7-d62e-4e9b-8c17-b4166f32d169/collection/49212231-22e02fcc-c8f8-4315-bb8d-8b6f4ffc8e5b?action=share&source=collection_link&creator=49212231"
+	},
+	"item": [
+		{
+			"name": "New Request",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		}
+	]
+}
