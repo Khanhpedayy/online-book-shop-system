@@ -1,5 +1,8 @@
 package com.example.onlinebookshop;
 
+import com.example.onlinebookshop.Controller.BookController;
+import com.example.onlinebookshop.Entity.Book;
+import com.example.onlinebookshop.Service.BookService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

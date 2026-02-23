@@ -1,5 +1,8 @@
 package com.example.onlinebookshop;
 
+import com.example.onlinebookshop.Entity.Book;
+import com.example.onlinebookshop.Repository.BookRepository;
+import com.example.onlinebookshop.Service.BookServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

@@ -1,5 +1,7 @@
-package com.example.onlinebookshop;
+package com.example.onlinebookshop.Controller;
 
+import com.example.onlinebookshop.Entity.Order;
+import com.example.onlinebookshop.Service.OrderService;
 import com.example.onlinebookshop.dto.OrderRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;

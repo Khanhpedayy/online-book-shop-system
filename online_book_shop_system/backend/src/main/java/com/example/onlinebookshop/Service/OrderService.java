@@ -1,5 +1,6 @@
-package com.example.onlinebookshop;
+package com.example.onlinebookshop.Service;
 
+import com.example.onlinebookshop.Entity.Order;
 import com.example.onlinebookshop.dto.OrderRequest;
 
 import java.util.List;
