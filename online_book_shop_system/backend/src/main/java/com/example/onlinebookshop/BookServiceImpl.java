@@ -3,7 +3,7 @@ package com.example.onlinebookshop;
 import com.example.onlinebookshop.Book;
 import com.example.onlinebookshop.BookRepository;
 import com.example.onlinebookshop.BookService;
-import org.springframework.stereotype   .Service;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
