@@ -1,5 +1,6 @@
-package com.example.onlinebookshop;
+package com.example.onlinebookshop.Repository;
 
+import com.example.onlinebookshop.Entity.Order;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

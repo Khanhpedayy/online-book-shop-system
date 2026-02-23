@@ -1,5 +1,10 @@
-package com.example.onlinebookshop;
+package com.example.onlinebookshop.Service;
 
+import com.example.onlinebookshop.Repository.BookRepository;
+import com.example.onlinebookshop.Entity.Book;
+import com.example.onlinebookshop.Entity.Order;
+import com.example.onlinebookshop.Entity.OrderItem;
+import com.example.onlinebookshop.Repository.OrderRepository;
 import com.example.onlinebookshop.dto.OrderItemRequest;
 import com.example.onlinebookshop.dto.OrderRequest;
 import org.springframework.stereotype.Service;

@@ -1,4 +1,4 @@
-package com.example.onlinebookshop;
+package com.example.onlinebookshop.Entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
