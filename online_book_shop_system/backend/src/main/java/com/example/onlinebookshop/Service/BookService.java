@@ -1,17 +1,18 @@
 package com.example.onlinebookshop.Service;
 
-import com.example.onlinebookshop.Entity.Book;
+import com.example.onlinebookshop.dto.BookVariantDTO;
+
 import java.util.List;
 
 public interface BookService {
 
-    Book createBook(Book book);
+    BookVariantDTO createBookVariant(BookVariantDTO dto);
 
-    List<Book> getAllBooks();
+    List<BookVariantDTO> getAllBookVariants();
 
-    Book getBookById(Long id);
+    BookVariantDTO getBookVariantById(Long id);
 
-    Book updateBook(Long id, Book book);
+    BookVariantDTO updateBookVariant(Long id, BookVariantDTO dto);
 
-    void deleteBook(Long id);
+    void deleteBookVariant(Long id);
 }

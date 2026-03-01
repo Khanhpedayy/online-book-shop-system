@@ -11,8 +11,8 @@ import java.util.List;
 @AllArgsConstructor
 public class OrderRequest {
     private List<OrderItemRequest> items;
-    private String email;           // required for guest
+    private String email;
     private String shippingAddress;
     private String recipientName;
-    private Long customerId;        // optional, for logged-in customer
+    private Long customerId;  // user_id - required, must be logged in
 }

@@ -1,8 +1,8 @@
 package com.example.onlinebookshop;
 
-import com.example.onlinebookshop.Config.JacksonConfig;
 import com.example.onlinebookshop.Controller.OrderController;
 import com.example.onlinebookshop.Entity.Order;
+import com.example.onlinebookshop.Entity.User;
 import com.example.onlinebookshop.Service.OrderService;
 import com.example.onlinebookshop.dto.OrderItemRequest;
 import com.example.onlinebookshop.dto.OrderRequest;
@@ -15,16 +15,16 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(OrderController.class)
-@Import(JacksonConfig.class)
+@Import(com.example.onlinebookshop.Config.JacksonConfig.class)
 class OrderControllerTest {
 
     @Autowired
@@ -40,16 +40,18 @@ class OrderControllerTest {
     void placeOrder_shouldReturn201AndOrder() throws Exception {
         OrderRequest request = new OrderRequest(
                 List.of(new OrderItemRequest(1L, 2)),
-                "guest@example.com",
+                "customer@example.com",
                 "123 Main St",
                 "John Doe",
-                null
+                1L
         );
         Order order = new Order();
-        order.setOrderId(1L);
-        order.setEmail("guest@example.com");
-        order.setTotalAmount(79.98);
-        order.setStatus("PENDING");
+        order.setId(1L);
+        order.setTotalAmount(BigDecimal.valueOf(79.98));
+        order.setStatus("NEW");
+        User user = new User();
+        user.setId(1L);
+        order.setUser(user);
 
         when(orderService.placeOrder(any(OrderRequest.class))).thenReturn(order);
 
@@ -57,9 +59,9 @@ class OrderControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.orderId").value(1))
-                .andExpect(jsonPath("$.email").value("guest@example.com"))
-                .andExpect(jsonPath("$.totalAmount").value(79.98));
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.totalAmount").value(79.98))
+                .andExpect(jsonPath("$.status").value("NEW"));
 
         verify(orderService).placeOrder(any(OrderRequest.class));
     }
@@ -67,14 +69,12 @@ class OrderControllerTest {
     @Test
     void getOrderById_shouldReturn200AndOrder() throws Exception {
         Order order = new Order();
-        order.setOrderId(1L);
-        order.setEmail("guest@example.com");
+        order.setId(1L);
         when(orderService.getOrderById(1L)).thenReturn(order);
 
         mockMvc.perform(get("/api/orders/1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.orderId").value(1))
-                .andExpect(jsonPath("$.email").value("guest@example.com"));
+                .andExpect(jsonPath("$.id").value(1));
 
         verify(orderService).getOrderById(1L);
     }
@@ -82,15 +82,16 @@ class OrderControllerTest {
     @Test
     void getOrdersByCustomerId_shouldReturn200AndList() throws Exception {
         Order order = new Order();
-        order.setOrderId(1L);
-        order.setCustomerId(1L);
+        order.setId(1L);
+        User user = new User();
+        user.setId(1L);
+        order.setUser(user);
         when(orderService.getOrdersByCustomerId(1L)).thenReturn(List.of(order));
 
         mockMvc.perform(get("/api/orders/customer/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$[0].orderId").value(1))
-                .andExpect(jsonPath("$[0].customerId").value(1));
+                .andExpect(jsonPath("$[0].id").value(1));
 
         verify(orderService).getOrdersByCustomerId(1L);
     }

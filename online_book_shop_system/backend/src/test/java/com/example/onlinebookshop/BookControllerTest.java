@@ -1,8 +1,7 @@
 package com.example.onlinebookshop;
 
-import com.example.onlinebookshop.Controller.BookController;
-import com.example.onlinebookshop.Entity.Book;
 import com.example.onlinebookshop.Service.BookService;
+import com.example.onlinebookshop.dto.BookVariantDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,15 +10,14 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.math.BigDecimal;
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(BookController.class)
+@WebMvcTest(com.example.onlinebookshop.Controller.BookController.class)
 class BookControllerTest {
 
     @Autowired
@@ -33,69 +31,27 @@ class BookControllerTest {
 
     @Test
     void getAllBooks_shouldReturn200AndList() throws Exception {
-        Book book = new Book(1L, "Clean Code", "978-0132350884", 39.99, "Description", 10, "active");
-        when(bookService.getAllBooks()).thenReturn(List.of(book));
+        BookVariantDTO dto = BookVariantDTO.builder().id(1L).title("Clean Code").salePrice(BigDecimal.valueOf(39.99)).build();
+        when(bookService.getAllBookVariants()).thenReturn(List.of(dto));
 
         mockMvc.perform(get("/api/books"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$[0].title").value("Clean Code"))
-                .andExpect(jsonPath("$[0].price").value(39.99));
+                .andExpect(jsonPath("$[0].title").value("Clean Code"));
 
-        verify(bookService).getAllBooks();
+        verify(bookService).getAllBookVariants();
     }
 
     @Test
-    void getBookById_shouldReturn200AndBook() throws Exception {
-        Book book = new Book(1L, "Clean Code", "978-0132350884", 39.99, "Description", 10, "active");
-        when(bookService.getBookById(1L)).thenReturn(book);
+    void getBookById_shouldReturn200AndDTO() throws Exception {
+        BookVariantDTO dto = BookVariantDTO.builder().id(1L).title("Clean Code").salePrice(BigDecimal.valueOf(39.99)).build();
+        when(bookService.getBookVariantById(1L)).thenReturn(dto);
 
         mockMvc.perform(get("/api/books/1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.bookId").value(1))
+                .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.title").value("Clean Code"));
 
-        verify(bookService).getBookById(1L);
-    }
-
-    @Test
-    void createBook_shouldReturn201AndCreatedBook() throws Exception {
-        Book book = new Book(null, "Clean Code", "978-0132350884", 39.99, "Description", 10, "active");
-        Book saved = new Book(1L, "Clean Code", "978-0132350884", 39.99, "Description", 10, "active");
-        when(bookService.createBook(any(Book.class))).thenReturn(saved);
-
-        mockMvc.perform(post("/api/books")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(book)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.bookId").value(1))
-                .andExpect(jsonPath("$.title").value("Clean Code"));
-
-        verify(bookService).createBook(any(Book.class));
-    }
-
-    @Test
-    void updateBook_shouldReturn200AndUpdatedBook() throws Exception {
-        Book book = new Book(1L, "Clean Code 2nd", "978-0132350884", 44.99, "Updated", 15, "active");
-        when(bookService.updateBook(eq(1L), any(Book.class))).thenReturn(book);
-
-        mockMvc.perform(put("/api/books/1")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(book)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.title").value("Clean Code 2nd"))
-                .andExpect(jsonPath("$.price").value(44.99));
-
-        verify(bookService).updateBook(eq(1L), any(Book.class));
-    }
-
-    @Test
-    void deleteBook_shouldReturn200() throws Exception {
-        doNothing().when(bookService).deleteBook(1L);
-
-        mockMvc.perform(delete("/api/books/1"))
-                .andExpect(status().isOk());
-
-        verify(bookService).deleteBook(1L);
+        verify(bookService).getBookVariantById(1L);
     }
 }

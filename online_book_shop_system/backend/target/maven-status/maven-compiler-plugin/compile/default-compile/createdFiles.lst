@@ -1,16 +1,3 @@
-com\example\onlinebookshop\GlobalExceptionHandler.class
-com\example\onlinebookshop\Order.class
-com\example\onlinebookshop\OrderController.class
-com\example\onlinebookshop\dto\OrderItemRequest.class
-com\example\onlinebookshop\OrderRepository.class
-com\example\onlinebookshop\Book.class
 com\example\onlinebookshop\dto\OrderRequest.class
-com\example\onlinebookshop\OrderServiceImpl.class
-com\example\onlinebookshop\OrderService.class
+com\example\onlinebookshop\dto\OrderItemRequest.class
 com\example\onlinebookshop\OnlineBookShopApplication.class
-com\example\onlinebookshop\BookRepository.class
-com\example\onlinebookshop\OrderItem.class
-com\example\onlinebookshop\BookController.class
-com\example\onlinebookshop\BookService.class
-com\example\onlinebookshop\BookServiceImpl.class
-com\example\onlinebookshop\OrderItemRepository.class
