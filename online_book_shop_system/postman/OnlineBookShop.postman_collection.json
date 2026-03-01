@@ -30,19 +30,7 @@
       "name": "Orders",
       "item": [
         {
-          "name": "Place order (Guest checkout)",
-          "request": {
-            "method": "POST",
-            "header": [{"key": "Content-Type", "value": "application/json"}],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"items\": [{\"bookId\": 1, \"quantity\": 2}],\n  \"email\": \"guest@example.com\",\n  \"shippingAddress\": \"123 Main St, City\",\n  \"recipientName\": \"John Doe\"\n}"
-            },
-            "url": "{{baseUrl}}/api/orders"
-          }
-        },
-        {
-          "name": "Place order (Customer)",
+          "name": "Place order (Customer - login required)",
           "request": {
             "method": "POST",
             "header": [{"key": "Content-Type", "value": "application/json"}],
@@ -68,9 +56,83 @@
             "header": [],
             "url": "{{baseUrl}}/api/orders/customer/1"
           }
+        },
+        {
+          "name": "Checkout from cart",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"customer@example.com\",\n  \"shippingAddress\": \"123 Main St\",\n  \"recipientName\": \"John Doe\",\n  \"customerId\": 1\n}"
+            },
+            "url": "{{baseUrl}}/api/orders/from-cart/{{cartId}}"
+          }
         }
+      ]
+    },
+    {
+      "name": "Cart",
+      "item": [
+        {
+          "name": "Create cart (customer only)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"customerId\": 1\n}"},
+            "url": "{{baseUrl}}/api/cart"
+          }
+        },
+        {
+          "name": "Get or create customer cart",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/cart/customer/1"
+          }
+        },
+        {
+          "name": "Get cart",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/cart/{{cartId}}"
+          }
+        },
+        {
+          "name": "Add to cart",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"bookId\": 1,\n  \"quantity\": 2\n}"
+            },
+            "url": "{{baseUrl}}/api/cart/{{cartId}}/items"
+          }
+        },
+        {
+          "name": "Update cart item",
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"quantity\": 3\n}"},
+            "url": "{{baseUrl}}/api/cart/{{cartId}}/items/1"
+          }
+        },
+        {
+          "name": "Remove from cart",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/api/cart/{{cartId}}/items/1"
+          }
+        },
       ]
     }
   ],
-  "variable": [{"key": "baseUrl", "value": "http://localhost:8080"}]
+  "variable": [
+    {"key": "baseUrl", "value": "http://localhost:8080"},
+    {"key": "cartId", "value": "paste-from-get-customer-cart-response"}
+  ]
 }

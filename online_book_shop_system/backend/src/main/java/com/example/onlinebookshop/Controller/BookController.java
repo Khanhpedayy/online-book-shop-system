@@ -1,7 +1,7 @@
 package com.example.onlinebookshop.Controller;
 
-import com.example.onlinebookshop.Entity.Book;
 import com.example.onlinebookshop.Service.BookService;
+import com.example.onlinebookshop.dto.BookVariantDTO;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,34 +16,28 @@ public class BookController {
         this.bookService = bookService;
     }
 
-    // CREATE
     @PostMapping
-    public Book createBook(@RequestBody Book book) {
-        return bookService.createBook(book);
+    public BookVariantDTO createBook(@RequestBody BookVariantDTO dto) {
+        return bookService.createBookVariant(dto);
     }
 
-    // READ ALL
     @GetMapping
-    public List<Book> getAllBooks() {
-        return bookService.getAllBooks();
+    public List<BookVariantDTO> getAllBooks() {
+        return bookService.getAllBookVariants();
     }
 
-    // READ ONE
     @GetMapping("/{id}")
-    public Book getBookById(@PathVariable Long id) {
-        return bookService.getBookById(id);
+    public BookVariantDTO getBookById(@PathVariable Long id) {
+        return bookService.getBookVariantById(id);
     }
 
-    // UPDATE
     @PutMapping("/{id}")
-    public Book updateBook(@PathVariable Long id,
-                           @RequestBody Book book) {
-        return bookService.updateBook(id, book);
+    public BookVariantDTO updateBook(@PathVariable Long id, @RequestBody BookVariantDTO dto) {
+        return bookService.updateBookVariant(id, dto);
     }
 
-    // DELETE
     @DeleteMapping("/{id}")
     public void deleteBook(@PathVariable Long id) {
-        bookService.deleteBook(id);
+        bookService.deleteBookVariant(id);
     }
 }

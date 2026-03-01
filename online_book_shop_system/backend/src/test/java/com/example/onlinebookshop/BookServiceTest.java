@@ -1,8 +1,11 @@
 package com.example.onlinebookshop;
 
-import com.example.onlinebookshop.Entity.Book;
-import com.example.onlinebookshop.Repository.BookRepository;
+import com.example.onlinebookshop.Entity.BookInfo;
+import com.example.onlinebookshop.Entity.BookVariant;
+import com.example.onlinebookshop.Repository.BookInfoRepository;
+import com.example.onlinebookshop.Repository.BookVariantRepository;
 import com.example.onlinebookshop.Service.BookServiceImpl;
+import com.example.onlinebookshop.dto.BookVariantDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,6 +13,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,84 +26,52 @@ import static org.mockito.Mockito.*;
 class BookServiceTest {
 
     @Mock
-    private BookRepository bookRepository;
+    private BookVariantRepository variantRepository;
+
+    @Mock
+    private BookInfoRepository bookInfoRepository;
 
     @InjectMocks
     private BookServiceImpl bookService;
 
-    private Book book;
+    private BookInfo bookInfo;
+    private BookVariant variant;
 
     @BeforeEach
     void setUp() {
-        book = new Book(1L, "Clean Code", "978-0132350884", 39.99,
-                "A Handbook of Agile Software Craftsmanship", 10, "active");
+        bookInfo = new BookInfo(1L, null, "978-0132350884", null, "Clean Code", null, "clean-code", null, null, "ACTIVE", null, null);
+        variant = new BookVariant(1L, bookInfo, "SKU-001", BigDecimal.valueOf(39.99), BigDecimal.valueOf(39.99), true, null, null);
     }
 
     @Test
-    void createBook_shouldReturnSavedBook() {
-        when(bookRepository.save(any(Book.class))).thenReturn(book);
+    void getAllBookVariants_shouldReturnList() {
+        when(variantRepository.findAllActiveWithBook()).thenReturn(List.of(variant));
 
-        Book result = bookService.createBook(book);
-
-        assertThat(result).isNotNull();
-        assertThat(result.getTitle()).isEqualTo("Clean Code");
-        assertThat(result.getPrice()).isEqualTo(39.99);
-        verify(bookRepository).save(book);
-    }
-
-    @Test
-    void getAllBooks_shouldReturnListOfBooks() {
-        when(bookRepository.findAll()).thenReturn(List.of(book));
-
-        List<Book> result = bookService.getAllBooks();
+        List<BookVariantDTO> result = bookService.getAllBookVariants();
 
         assertThat(result).hasSize(1);
         assertThat(result.get(0).getTitle()).isEqualTo("Clean Code");
-        verify(bookRepository).findAll();
+        verify(variantRepository).findAllActiveWithBook();
     }
 
     @Test
-    void getBookById_whenExists_shouldReturnBook() {
-        when(bookRepository.findById(1L)).thenReturn(Optional.of(book));
+    void getBookVariantById_whenExists_shouldReturnDTO() {
+        when(variantRepository.findById(1L)).thenReturn(Optional.of(variant));
 
-        Book result = bookService.getBookById(1L);
+        BookVariantDTO result = bookService.getBookVariantById(1L);
 
         assertThat(result).isNotNull();
-        assertThat(result.getBookId()).isEqualTo(1L);
+        assertThat(result.getId()).isEqualTo(1L);
         assertThat(result.getTitle()).isEqualTo("Clean Code");
-        verify(bookRepository).findById(1L);
+        verify(variantRepository).findById(1L);
     }
 
     @Test
-    void getBookById_whenNotExists_shouldThrowException() {
-        when(bookRepository.findById(999L)).thenReturn(Optional.empty());
+    void getBookVariantById_whenNotExists_shouldThrowException() {
+        when(variantRepository.findById(999L)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> bookService.getBookById(999L))
+        assertThatThrownBy(() -> bookService.getBookVariantById(999L))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining("Book not found");
-    }
-
-    @Test
-    void updateBook_whenExists_shouldReturnUpdatedBook() {
-        Book updated = new Book(1L, "Clean Code 2nd Ed", "978-0132350884", 44.99,
-                "Updated description", 15, "active");
-        when(bookRepository.findById(1L)).thenReturn(Optional.of(book));
-        when(bookRepository.save(any(Book.class))).thenReturn(updated);
-
-        Book result = bookService.updateBook(1L, updated);
-
-        assertThat(result.getTitle()).isEqualTo("Clean Code 2nd Ed");
-        assertThat(result.getPrice()).isEqualTo(44.99);
-        verify(bookRepository).findById(1L);
-        verify(bookRepository).save(any(Book.class));
-    }
-
-    @Test
-    void deleteBook_shouldCallRepository() {
-        doNothing().when(bookRepository).deleteById(1L);
-
-        bookService.deleteBook(1L);
-
-        verify(bookRepository).deleteById(1L);
     }
 }

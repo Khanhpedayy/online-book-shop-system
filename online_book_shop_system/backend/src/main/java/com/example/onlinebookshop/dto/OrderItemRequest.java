@@ -8,6 +8,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderItemRequest {
-    private Long bookId;
+    private Long variantId;  // book_variants.id (was bookId)
     private Integer quantity;
 }

@@ -2,6 +2,7 @@ package com.example.onlinebookshop.Controller;
 
 import com.example.onlinebookshop.Entity.Order;
 import com.example.onlinebookshop.Service.OrderService;
+import com.example.onlinebookshop.dto.CheckoutRequest;
 import com.example.onlinebookshop.dto.OrderRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -27,6 +28,15 @@ public class OrderController {
     @ResponseStatus(HttpStatus.CREATED)
     public Order placeOrder(@RequestBody OrderRequest request) {
         return orderService.placeOrder(request);
+    }
+
+    /**
+     * Checkout from cart. Converts cart items to order and clears cart.
+     */
+    @PostMapping("/from-cart/{userId}")
+    @ResponseStatus(HttpStatus.CREATED)
+    public Order checkoutFromCart(@PathVariable Long userId, @RequestBody CheckoutRequest request) {
+        return orderService.placeOrderFromCart(userId, request);
     }
 
     @GetMapping("/{id}")
