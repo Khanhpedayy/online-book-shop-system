@@ -1,0 +1,3 @@
+com\example\onlinebookshop\dto\OrderRequest.class
+com\example\onlinebookshop\dto\OrderItemRequest.class
+com\example\onlinebookshop\OnlineBookShopApplication.class
