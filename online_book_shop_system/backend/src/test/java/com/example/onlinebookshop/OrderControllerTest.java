@@ -8,7 +8,7 @@ import com.example.onlinebookshop.dto.OrderItemRequest;
 import com.example.onlinebookshop.dto.OrderRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
@@ -24,6 +24,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(OrderController.class)
+@AutoConfigureMockMvc(addFilters = false)
 @Import(com.example.onlinebookshop.Config.JacksonConfig.class)
 class OrderControllerTest {
 
@@ -43,8 +44,7 @@ class OrderControllerTest {
                 "customer@example.com",
                 "123 Main St",
                 "John Doe",
-                1L
-        );
+                1L);
         Order order = new Order();
         order.setId(1L);
         order.setTotalAmount(BigDecimal.valueOf(79.98));
@@ -56,8 +56,8 @@ class OrderControllerTest {
         when(orderService.placeOrder(any(OrderRequest.class))).thenReturn(order);
 
         mockMvc.perform(post("/api/orders")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.totalAmount").value(79.98))
