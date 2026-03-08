@@ -40,8 +40,10 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/books/**").permitAll()
                         // Admin-only endpoints
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        // Staff & Admin endpoints (shipping)
+                        .requestMatchers("/api/staff/**").hasAnyRole("STAFF", "ADMIN", "MANAGER")
                         // Static resources
-                        .requestMatchers("/", "/index.html", "/login.html", "/admin.html",
+                        .requestMatchers("/", "/index.html", "/login.html", "/admin.html", "/shipping.html",
                                 "/css/**", "/js/**", "/images/**", "/favicon.ico")
                         .permitAll()
                         // All other requests require authentication
