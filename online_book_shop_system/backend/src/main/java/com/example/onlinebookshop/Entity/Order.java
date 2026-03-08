@@ -11,7 +11,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "orders")
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+@JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
 @Getter
 @Setter
 @NoArgsConstructor
@@ -53,8 +53,38 @@ public class Order {
     @Column(name = "ship_line2", length = 255)
     private String shipLine2;
 
+    @Column(name = "carrier", length = 100)
+    private String carrier;
+
+    @Column(name = "tracking_code", length = 120)
+    private String trackingCode;
+
+    @Column(name = "staff_note", length = 500)
+    private String staffNote;
+
+    @Column(name = "cancel_reason", length = 300)
+    private String cancelReason;
+
     @Column(name = "placed_at", nullable = false)
     private LocalDateTime placedAt = LocalDateTime.now();
+
+    @Column(name = "confirmed_at")
+    private LocalDateTime confirmedAt;
+
+    @Column(name = "packed_at")
+    private LocalDateTime packedAt;
+
+    @Column(name = "shipped_at")
+    private LocalDateTime shippedAt;
+
+    @Column(name = "delivered_at")
+    private LocalDateTime deliveredAt;
+
+    @Column(name = "completed_at")
+    private LocalDateTime completedAt;
+
+    @Column(name = "cancelled_at")
+    private LocalDateTime cancelledAt;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
