@@ -41,6 +41,15 @@ public class Order {
     @Column(name = "subtotal_amount", nullable = false, precision = 18, scale = 2)
     private BigDecimal subtotalAmount = BigDecimal.ZERO;
 
+    @Column(name = "shipping_fee", nullable = false, precision = 18, scale = 2)
+    private BigDecimal shippingFee = BigDecimal.ZERO;
+
+    @Column(name = "discount_amount", nullable = false, precision = 18, scale = 2)
+    private BigDecimal discountAmount = BigDecimal.ZERO;
+
+    @Column(name = "currency", nullable = false, length = 10)
+    private String currency = "VND";
+
     @Column(name = "ship_name", nullable = false, length = 150)
     private String shipName;
 

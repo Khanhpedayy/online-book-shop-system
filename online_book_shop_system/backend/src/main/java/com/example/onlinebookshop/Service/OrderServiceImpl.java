@@ -62,8 +62,11 @@ public class OrderServiceImpl implements OrderService {
         for (OrderItemRequest itemReq : request.getItems()) {
             BookVariant variant = variantRepository.findById(itemReq.getVariantId())
                     .orElseThrow(() -> new RuntimeException("Book not found: " + itemReq.getVariantId()));
-            if (!variant.getIsActive() || (variant.getBook() != null && !"ACTIVE".equalsIgnoreCase(variant.getBook().getStatus()))) {
-                throw new IllegalArgumentException("Book is not available: " + (variant.getBook() != null ? variant.getBook().getTitle() : variant.getSku()));
+            if (variant.getBook() == null || variant.getBook().getId() == null) {
+                throw new IllegalArgumentException("Book variant must have an associated book: " + itemReq.getVariantId());
+            }
+            if (!variant.getIsActive() || !"ACTIVE".equalsIgnoreCase(variant.getBook().getStatus())) {
+                throw new IllegalArgumentException("Book is not available: " + variant.getBook().getTitle());
             }
 
             int qty = itemReq.getQuantity() != null && itemReq.getQuantity() > 0 ? itemReq.getQuantity() : 1;
@@ -74,6 +77,7 @@ public class OrderServiceImpl implements OrderService {
             OrderItem item = new OrderItem();
             item.setOrder(order);
             item.setVariant(variant);
+            item.setBookId(variant.getBook().getId());
             item.setTitleSnapshot(variant.getBook() != null ? variant.getBook().getTitle() : variant.getSku());
             item.setSkuSnapshot(variant.getSku());
             item.setUnitPrice(unitPrice);

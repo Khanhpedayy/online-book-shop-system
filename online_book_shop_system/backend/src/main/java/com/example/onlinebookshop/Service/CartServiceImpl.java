@@ -50,7 +50,9 @@ public class CartServiceImpl implements CartService {
         int qty = request.getQuantity() != null && request.getQuantity() > 0 ? request.getQuantity() : 1;
         Long copyId = request.getCopyId();
 
-        Optional<CartItem> existing = cartItemRepository.findByUser_IdAndVariant_IdAndCopyId(userId, request.getVariantId(), copyId);
+        Optional<CartItem> existing = copyId == null
+                ? cartItemRepository.findByUser_IdAndVariant_IdAndCopyIdIsNull(userId, request.getVariantId())
+                : cartItemRepository.findByUser_IdAndVariant_IdAndCopyId(userId, request.getVariantId(), copyId);
         if (existing.isPresent()) {
             CartItem item = existing.get();
             item.setQuantity(item.getQuantity() + qty);
@@ -69,7 +71,7 @@ public class CartServiceImpl implements CartService {
     @Override
     @Transactional
     public CartItem updateItem(Long userId, Long variantId, UpdateCartItemRequest request) {
-        CartItem item = cartItemRepository.findByUser_IdAndVariant_IdAndCopyId(userId, variantId, null)
+        CartItem item = cartItemRepository.findByUser_IdAndVariant_IdAndCopyIdIsNull(userId, variantId)
                 .orElseThrow(() -> new RuntimeException("Cart item not found for variant: " + variantId));
 
         int qty = request.getQuantity() != null ? request.getQuantity() : item.getQuantity();
@@ -85,7 +87,7 @@ public class CartServiceImpl implements CartService {
     @Override
     @Transactional
     public void removeItem(Long userId, Long variantId) {
-        CartItem item = cartItemRepository.findByUser_IdAndVariant_IdAndCopyId(userId, variantId, null)
+        CartItem item = cartItemRepository.findByUser_IdAndVariant_IdAndCopyIdIsNull(userId, variantId)
                 .orElseThrow(() -> new RuntimeException("Cart item not found for variant: " + variantId));
         cartItemRepository.delete(item);
     }

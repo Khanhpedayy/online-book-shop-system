@@ -29,6 +29,12 @@ public class OrderItem {
     @JoinColumn(name = "variant_id", nullable = false)
     private BookVariant variant;
 
+    @Column(name = "book_id")
+    private Long bookId;
+
+    @Column(name = "copy_id")
+    private Long copyId;
+
     @Column(name = "title_snapshot", nullable = false, length = 255)
     private String titleSnapshot;
 

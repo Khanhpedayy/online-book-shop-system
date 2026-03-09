@@ -39,8 +39,11 @@ class BookServiceTest {
 
     @BeforeEach
     void setUp() {
-        bookInfo = new BookInfo(1L, null, "978-0132350884", null, "Clean Code", null, "clean-code", null, null, "ACTIVE", null, null);
-        variant = new BookVariant(1L, bookInfo, "SKU-001", BigDecimal.valueOf(39.99), BigDecimal.valueOf(39.99), true, null, null);
+        bookInfo = new BookInfo(1L, null, "978-0132350884", null, "Clean Code", null,
+                "clean-code", null,
+                null, "ACTIVE", null, null);
+        variant = new BookVariant(1L, bookInfo, "SKU-001", BigDecimal.valueOf(39.99),
+                BigDecimal.valueOf(39.99), true, null, null);
     }
 
     @Test
