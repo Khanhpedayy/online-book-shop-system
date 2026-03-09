@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Book Details</title>
+    <style>
+        body{
+            font-family:Segoe UI;
+            background:#f8f6f1;
+            padding:40px;
+        }
+
+        .container{
+            max-width:900px;
+            margin:auto;
+            display:flex;
+            gap:40px;
+        }
+
+        img{
+            width:260px;
+            border-radius:8px;
+        }
+
+        .book-info h1{
+            margin-top:0;
+        }
+
+        .price{
+            font-size:22px;
+            color:#b45309;
+            font-weight:bold;
+        }
+
+        .btn{
+            background:#c9a227;
+            border:none;
+            padding:10px 16px;
+            border-radius:6px;
+            cursor:pointer;
+            margin-top:20px;
+        }
+    </style>
+</head>
+
+<body>
+
+<a href="index.html">Back to Books</a>
+
+<div class="container">
+    <img id="bookImage">
+
+    <div class="book-info">
+        <h1 id="title"></h1>
+        <p id="author"></p>
+        <p class="price" id="price"></p>
+        <p id="description"></p>
+
+        <button class="btn">Add to Cart</button>
+    </div>
+</div>
+
+<script src="book.js"></script>
+
+</body>
+</html>
