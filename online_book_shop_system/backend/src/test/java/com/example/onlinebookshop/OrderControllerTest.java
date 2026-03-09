@@ -1,6 +1,6 @@
 package com.example.onlinebookshop;
 
-import com.example.onlinebookshop.Controller.OrderController;
+import com.example.onlinebookshop.controller.OrderController;
 import com.example.onlinebookshop.Entity.Order;
 import com.example.onlinebookshop.Entity.User;
 import com.example.onlinebookshop.Service.OrderService;

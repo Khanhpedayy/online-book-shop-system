@@ -9,6 +9,18 @@
       "name": "Books",
       "item": [
         {
+          "name": "Create book",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Clean Code\",\n  \"sku\": \"SKU-001\",\n  \"salePrice\": 39.99,\n  \"status\": \"ACTIVE\"\n}"
+            },
+            "url": "{{baseUrl}}/api/books"
+          }
+        },
+        {
           "name": "List all books",
           "request": {
             "method": "GET",
@@ -36,7 +48,7 @@
             "header": [{"key": "Content-Type", "value": "application/json"}],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"items\": [{\"bookId\": 1, \"quantity\": 1}],\n  \"email\": \"customer@example.com\",\n  \"shippingAddress\": \"456 Oak Ave\",\n  \"recipientName\": \"Jane Doe\",\n  \"customerId\": 1\n}"
+              "raw": "{\n  \"items\": [{\"variantId\": 1, \"quantity\": 1}],\n  \"email\": \"customer@example.com\",\n  \"shippingAddress\": \"456 Oak Ave\",\n  \"recipientName\": \"Jane Doe\",\n  \"customerId\": 1\n}"
             },
             "url": "{{baseUrl}}/api/orders"
           }
@@ -66,7 +78,7 @@
               "mode": "raw",
               "raw": "{\n  \"email\": \"customer@example.com\",\n  \"shippingAddress\": \"123 Main St\",\n  \"recipientName\": \"John Doe\",\n  \"customerId\": 1\n}"
             },
-            "url": "{{baseUrl}}/api/orders/from-cart/{{cartId}}"
+            "url": "{{baseUrl}}/api/orders/from-cart/1"
           }
         }
       ]
@@ -75,28 +87,11 @@
       "name": "Cart",
       "item": [
         {
-          "name": "Create cart (customer only)",
-          "request": {
-            "method": "POST",
-            "header": [{"key": "Content-Type", "value": "application/json"}],
-            "body": {"mode": "raw", "raw": "{\n  \"customerId\": 1\n}"},
-            "url": "{{baseUrl}}/api/cart"
-          }
-        },
-        {
-          "name": "Get or create customer cart",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": "{{baseUrl}}/api/cart/customer/1"
-          }
-        },
-        {
           "name": "Get cart",
           "request": {
             "method": "GET",
             "header": [],
-            "url": "{{baseUrl}}/api/cart/{{cartId}}"
+            "url": "{{baseUrl}}/api/cart/user/1"
           }
         },
         {
@@ -106,9 +101,9 @@
             "header": [{"key": "Content-Type", "value": "application/json"}],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"bookId\": 1,\n  \"quantity\": 2\n}"
+              "raw": "{\n  \"variantId\": 1,\n  \"quantity\": 2\n}"
             },
-            "url": "{{baseUrl}}/api/cart/{{cartId}}/items"
+            "url": "{{baseUrl}}/api/cart/user/1/items"
           }
         },
         {
@@ -117,7 +112,7 @@
             "method": "PUT",
             "header": [{"key": "Content-Type", "value": "application/json"}],
             "body": {"mode": "raw", "raw": "{\n  \"quantity\": 3\n}"},
-            "url": "{{baseUrl}}/api/cart/{{cartId}}/items/1"
+            "url": "{{baseUrl}}/api/cart/user/1/items/1"
           }
         },
         {
@@ -125,14 +120,13 @@
           "request": {
             "method": "DELETE",
             "header": [],
-            "url": "{{baseUrl}}/api/cart/{{cartId}}/items/1"
+            "url": "{{baseUrl}}/api/cart/user/1/items/1"
           }
         },
       ]
     }
   ],
   "variable": [
-    {"key": "baseUrl", "value": "http://localhost:8080"},
-    {"key": "cartId", "value": "paste-from-get-customer-cart-response"}
+    {"key": "baseUrl", "value": "http://localhost:8080"}
   ]
 }
