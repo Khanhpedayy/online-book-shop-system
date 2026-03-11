@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Quản lý đơn hàng | Staff</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+    </style>
+</head>
+
+<body class="bg-light">
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+        <a class="navbar-brand fw-semibold" th:href="@{/staff/dashboard}">Staff Panel</a>
+        <div class="ms-auto d-flex gap-2">
+            <a class="btn btn-outline-light btn-sm" th:href="@{/staff/dashboard}">Dashboard</a>
+            <a class="btn btn-outline-light btn-sm" th:href="@{/logout}">Đăng xuất</a>
+        </div>
+    </div>
+</nav>
+
+<main class="container py-4">
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+        <div>
+            <h1 class="h4 mb-1">Quản lý đơn hàng</h1>
+            <div class="text-muted">Xem danh sách, lọc, tìm kiếm và mở chi tiết.</div>
+        </div>
+    </div>
+
+    <!-- Filter / Search -->
+    <div class="card border-0 shadow-sm mb-3">
+        <div class="card-body">
+            <form method="get" th:action="@{/staff/orders}" class="row g-2 align-items-end">
+                <div class="col-12 col-md-3">
+                    <label class="form-label small text-muted">Trạng thái đơn</label>
+                    <select class="form-select form-select-sm" name="status">
+                        <option value="" th:selected="${filter.status == null or filter.status == ''}">Tất cả</option>
+                        <option th:selected="${filter.status == 'NEW'}">NEW</option>
+                        <option th:selected="${filter.status == 'CONFIRMED'}">CONFIRMED</option>
+                        <option th:selected="${filter.status == 'PACKED'}">PACKED</option>
+                        <option th:selected="${filter.status == 'SHIPPED'}">SHIPPED</option>
+                        <option th:selected="${filter.status == 'DELIVERED'}">DELIVERED</option>
+                        <option th:selected="${filter.status == 'COMPLETED'}">COMPLETED</option>
+                        <option th:selected="${filter.status == 'CANCELLED'}">CANCELLED</option>
+                    </select>
+                </div>
+
+                <div class="col-12 col-md-3">
+                    <label class="form-label small text-muted">Thanh toán</label>
+                    <select class="form-select form-select-sm" name="paymentStatus">
+                        <option value="" th:selected="${filter.paymentStatus == null or filter.paymentStatus == ''}">Tất cả</option>
+                        <option th:selected="${filter.paymentStatus == 'PENDING'}">PENDING</option>
+                        <option th:selected="${filter.paymentStatus == 'PAID'}">PAID</option>
+                        <option th:selected="${filter.paymentStatus == 'FAILED'}">FAILED</option>
+                        <option th:selected="${filter.paymentStatus == 'REFUNDED'}">REFUNDED</option>
+                    </select>
+                </div>
+
+                <div class="col-12 col-md-3">
+                    <label class="form-label small text-muted">Giao hàng</label>
+                    <select class="form-select form-select-sm" name="delivery">
+                        <option value="" th:selected="${filter.delivery == null or filter.delivery == ''}">Tất cả</option>
+                        <option value="NOT_SHIPPED" th:selected="${filter.delivery == 'NOT_SHIPPED'}">Chưa ship</option>
+                        <option value="IN_TRANSIT" th:selected="${filter.delivery == 'IN_TRANSIT'}">Đang giao</option>
+                        <option value="DELIVERED" th:selected="${filter.delivery == 'DELIVERED'}">Đã giao</option>
+                    </select>
+                </div>
+
+                <div class="col-12 col-md-3">
+                    <label class="form-label small text-muted">Tìm kiếm</label>
+                    <input class="form-control form-control-sm" name="q" placeholder="mã đơn / tên / sđt" th:value="${filter.q}" />
+                </div>
+
+                <div class="col-12 col-md-3">
+                    <label class="form-label small text-muted">Sắp xếp</label>
+                    <select class="form-select form-select-sm" name="sort">
+                        <option value="placedAtDesc" th:selected="${filter.sort == null or filter.sort == '' or filter.sort == 'placedAtDesc'}">Mới nhất</option>
+                        <option value="placedAtAsc" th:selected="${filter.sort == 'placedAtAsc'}">Cũ nhất</option>
+                        <option value="totalDesc" th:selected="${filter.sort == 'totalDesc'}">Tổng tiền giảm dần</option>
+                        <option value="totalAsc" th:selected="${filter.sort == 'totalAsc'}">Tổng tiền tăng dần</option>
+                    </select>
+                </div>
+
+                <div class="col-12 col-md-3 d-flex gap-2">
+                    <button class="btn btn-sm btn-primary" type="submit">Lọc</button>
+                    <a class="btn btn-sm btn-outline-secondary" th:href="@{/staff/orders}">Reset</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead>
+                    <tr class="text-muted small">
+                        <th>ID</th>
+                        <th>Mã đơn</th>
+                        <th>Khách</th>
+                        <th>Trạng thái</th>
+                        <th>Thanh toán</th>
+                        <th class="text-end">Tổng tiền</th>
+                        <th>Chi tiết</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    <tr th:each="o : ${orders}">
+                        <td class="mono" th:text="${o.id}">1</td>
+                        <td class="mono" th:text="${o.orderCode}">ODR-0001</td>
+
+                        <td>
+                            <div class="fw-semibold" th:text="${o.shipName}">Nguyễn Văn A</div>
+                            <div class="text-muted small" th:text="${o.shipPhone}">0909...</div>
+                        </td>
+
+                        <td>
+                            <span class="badge text-bg-secondary" th:text="${o.status}">NEW</span>
+                        </td>
+
+                        <td>
+                            <span class="badge text-bg-light border" th:text="${o.paymentStatus}">PENDING</span>
+                        </td>
+
+                        <td class="text-end mono"
+                            th:text="${#numbers.formatDecimal(o.totalAmount, 0, 'COMMA', 0, 'POINT')} + ' VND'">
+                            0 VND
+                        </td>
+
+                        <td>
+                            <a class="btn btn-sm btn-outline-primary" th:href="@{/staff/orders/{id}(id=${o.id})}">Mở</a>
+                        </td>
+                    </tr>
+
+                    <tr th:if="${orders == null or #lists.isEmpty(orders)}">
+                        <td colspan="7" class="text-center text-muted py-4">
+                            Chưa có đơn hàng nào.
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>
+</body>
+</html>
