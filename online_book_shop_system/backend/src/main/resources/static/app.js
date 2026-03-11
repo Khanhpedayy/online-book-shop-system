@@ -56,7 +56,8 @@ function renderBooks(books){
         const div=document.createElement('div');
         div.className='book';
 
-        const cover='https://covers.openlibrary.org/b/isbn/'+(b.isbn||'0385533229')+'-M.jpg';
+        const cover = 'https://covers.openlibrary.org/b/isbn/'+(b.isbn||'0385533229')+'-M.jpg';
+            //b.coverUrl || "/images/default-book.png";
 
         div.innerHTML=`
         <a href="book.html?id=${b.id}">
@@ -70,7 +71,7 @@ function renderBooks(books){
                 </a>
             </div>
 
-            <div class="book-price">$${b.salePrice}</div>
+            <div class="book-price">$${b.salePrice ?? b.price ?? (b.variant?.salePrice ?? 0)}</div>
 
             <div class="book-actions">
                 <button data-add="${b.id}" class="btn">Add to Cart</button>
@@ -190,35 +191,20 @@ if (orderForm) {
 
 }
 
-function loadBooksByCategory(categoryId){
+async function loadBooksByCategory(categoryId){
 
-    fetch(`/api/books/category/${categoryId}`)
-        .then(res => res.json())
-        .then(books => {
+    const res = await fetch(`/api/books/category/${categoryId}`);
+    const books = await res.json();
 
-            const container = document.getElementById("booksContainer");
-            container.innerHTML = "";
+    currentBooks = books;
 
-            books.forEach(book => {
+    if(productCount)
+        productCount.textContent = books.length + " products";
 
-                const price = book.price || book.variants?.[0]?.salePrice || 0;
+    renderBooks(books);
 
-                const card = `
-        <div class="book">
-            <img class="book-cover" src="${book.imageUrl || 'https://via.placeholder.com/200x300'}">
-            <div class="book-info">
-                <div class="book-title">${book.title}</div>
-                <div class="book-price">$${price}</div>
-            </div>
-        </div>
-        `;
-
-                container.innerHTML += card;
-
-            });
-
-        });
 }
+
 async function loadCategories(){
 
     const res = await fetch("/api/categories");
@@ -226,16 +212,30 @@ async function loadCategories(){
 
     const list = document.getElementById("categoryList");
 
-    list.innerHTML = "";
+    list.innerHTML = `
+        <li>
+            <a href="#" onclick="loadBooks()">All Books</a>
+        </li>
+    `;
 
     categories.forEach(cat => {
 
-        const li = document.createElement("li");
-        li.textContent = cat.name;
-
-        list.appendChild(li);
+        list.innerHTML += `
+            <li>
+                <a href="#" onclick="loadBooksByCategory(${cat.id})">
+                    ${cat.name}
+                </a>
+            </li>
+        `;
 
     });
+
 }
 
-loadCategories();
+if(booksContainer)
+    loadBooks();
+
+loadCart();
+
+if(document.getElementById("categoryList"))
+    loadCategories();

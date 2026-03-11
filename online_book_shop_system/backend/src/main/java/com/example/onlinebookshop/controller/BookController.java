@@ -1,5 +1,7 @@
 package com.example.onlinebookshop.controller;
 
+import com.example.onlinebookshop.Entity.BookInfo;
+import com.example.onlinebookshop.Repository.BookInfoRepository;
 import com.example.onlinebookshop.Service.BookService;
 import com.example.onlinebookshop.dto.BookVariantDTO;
 import org.springframework.web.bind.annotation.*;
@@ -11,9 +13,12 @@ import java.util.List;
 public class BookController {
 
     private final BookService bookService;
+    private final BookInfoRepository bookInfoRepository;
 
-    public BookController(BookService bookService) {
+    public BookController(BookService bookService,
+                          BookInfoRepository bookInfoRepository) {
         this.bookService = bookService;
+        this.bookInfoRepository = bookInfoRepository;
     }
 
     @PostMapping
@@ -29,6 +34,11 @@ public class BookController {
     @GetMapping("/{id}")
     public BookVariantDTO getBookById(@PathVariable Long id) {
         return bookService.getBookVariantById(id);
+    }
+
+    @GetMapping("/category/{id}")
+    public List<BookInfo> getBooksByCategory(@PathVariable Long id) {
+        return bookInfoRepository.findByCategoryId(id);
     }
 
     @PutMapping("/{id}")
