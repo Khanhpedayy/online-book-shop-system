@@ -75,16 +75,18 @@ public class AuthController {
         boolean isCustomer = authentication.getAuthorities().stream()
                 .anyMatch(a -> "ROLE_CUSTOMER".equals(a.getAuthority()));
 
-        if (isStaff || isManager) {
+        if (isStaff) {
             return "redirect:/staff/dashboard";
         }
-
+        if (isManager) {
+            return "redirect:/pages/inventory-overview.html";
+        }
         if (isAdmin) {
             return "redirect:/admin-entry";
         }
 
         if (isCustomer) {
-            return "redirect:/index.html";
+            return "redirect:/login";
         }
 
         return "redirect:/login?error";
