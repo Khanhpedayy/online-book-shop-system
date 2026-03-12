@@ -38,35 +38,38 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
                 .authenticationProvider(authenticationProvider())
+//                .authorizeHttpRequests(auth -> auth
+//                        .requestMatchers("/", "/index.html").permitAll()
+//                        .requestMatchers("/login", "/login.html", "/post-login", "/admin-entry").permitAll()
+//                        .requestMatchers("/perform-login").permitAll()
+//                        .requestMatchers("/css/**", "/js/**", "/images/**", "/favicon.ico").permitAll()
+//
+//                        .requestMatchers("/api/auth/**").permitAll()
+//                        .requestMatchers(HttpMethod.GET, "/api/books/**").permitAll()
+//
+//                        .requestMatchers("/staff/**").hasAnyRole("STAFF", "MANAGER", "ADMIN")
+//                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+//
+//                        .anyRequest().authenticated()
+//                )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/index.html").permitAll()
-                        .requestMatchers("/login", "/login.html", "/post-login", "/admin-entry").permitAll()
-                        .requestMatchers("/perform-login").permitAll()
-                        .requestMatchers("/css/**", "/js/**", "/images/**", "/favicon.ico").permitAll()
-
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/books/**").permitAll()
-
-                        .requestMatchers("/staff/**").hasAnyRole("STAFF", "MANAGER", "ADMIN")
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
-
-                        .anyRequest().authenticated()
-                )
-                .formLogin(form -> form
-                        .loginPage("/login")
-                        .loginProcessingUrl("/perform-login")
-                        .usernameParameter("email")
-                        .passwordParameter("password")
-                        .defaultSuccessUrl("/post-login", true)
-                        .failureUrl("/login?error")
-                        .permitAll()
-                )
-                .logout(logout -> logout
-                        .logoutUrl("/logout")
-                        .logoutSuccessUrl("/login?logout")
-                        .permitAll()
-                )
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                        .anyRequest().permitAll()
+                );
+//                .formLogin(form -> form
+//                        .loginPage("/login")
+//                        .loginProcessingUrl("/perform-login")
+//                        .usernameParameter("email")
+//                        .passwordParameter("password")
+//                        .defaultSuccessUrl("/post-login", true)
+//                        .failureUrl("/login?error")
+//                        .permitAll()
+//                )
+//                .logout(logout -> logout
+//                        .logoutUrl("/logout")
+//                        .logoutSuccessUrl("/login?logout")
+//                        .permitAll()
+//                )
+//                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

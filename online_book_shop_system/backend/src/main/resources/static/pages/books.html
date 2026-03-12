@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Quản lý Sách — Quản trị BookStore</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/app.css">
+</head>
+
+<body>
+    <div id="app-layout">
+        <div id="sidebar-slot"></div>
+        <div class="main-area">
+            <div id="header-slot"></div>
+            <main class="content-area p-4">
+                <!-- Page Header -->
+                <div class="d-flex justify-content-between align-items-start mb-4">
+                    <div>
+                        <h2 class="fw-bold mb-1"><i class="bi bi-book me-2"></i>Quản lý Sách</h2>
+                        <p class="text-muted mb-0">Tạo mới, chỉnh sửa và quản lý sách cũng như trạng thái hiển thị.</p>
+                    </div>
+                    <a href="book-form.html" class="btn btn-primary d-flex align-items-center gap-2">
+                        <i class="bi bi-plus-lg"></i> Tạo Sách
+                    </a>
+                </div>
+
+                <!-- Filters -->
+                <div class="card mb-4">
+                    <div class="card-body py-3">
+                        <div class="row g-3">
+                            <div class="col-md-5">
+                                <input type="text" class="form-control" id="searchInput"
+                                    placeholder="Tìm kiếm theo tiêu đề hoặc ISBN…" oninput="renderBooks()">
+                            </div>
+                            <div class="col-md-3">
+                                <select class="form-select" id="statusFilter" onchange="renderBooks()">
+                                    <option value="">Tất cả Trạng thái</option>
+                                    <option value="ACTIVE">Hoạt động</option>
+                                    <option value="HIDDEN">Ẩn</option>
+                                    <option value="DRAFT">Bản nháp</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Table -->
+                <div class="card">
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th style="width:60px"></th>
+                                        <th>Tiêu đề</th>
+                                        <th style="width:140px">ISBN</th>
+                                        <th style="width:140px">Danh mục</th>
+                                        <th style="width:100px">Trạng thái</th>
+                                        <th style="width:60px"></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="booksTableBody">
+                                    <tr>
+                                        <td colspan="6" class="text-center py-5 text-muted">Đang tải…</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center px-3 py-2 border-top"
+                            id="paginationArea"></div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/utils.js"></script>
+    <script src="../js/layout.js"></script>
+    <script>
+        let allBooks = [];
+        let currentPage = 1;
+        const pageSize = 10;
+
+        const statusConfig = {
+            ACTIVE: { color: 'success', label: 'Hoạt động' },
+            HIDDEN: { color: 'secondary', label: 'Ẩn' },
+            DRAFT: { color: 'warning', label: 'Bản nháp' },
+        };
+
+        async function init() {
+            try {
+                allBooks = await api.get('/management/books');
+            } catch (e) {
+                allBooks = [];
+            }
+            renderBooks();
+        }
+
+        function getFiltered() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const status = document.getElementById('statusFilter').value;
+            return (allBooks || []).filter(b => {
+                const matchSearch = !search ||
+                    (b.title || '').toLowerCase().includes(search) ||
+                    (b.isbn13 || '').includes(search);
+                const matchStatus = !status || b.status === status;
+                return matchSearch && matchStatus;
+            });
+        }
+
+        function renderBooks() {
+            const filtered = getFiltered();
+            const totalPages = Math.ceil(filtered.length / pageSize);
+            if (currentPage > totalPages) currentPage = 1;
+            const start = (currentPage - 1) * pageSize;
+            const pageData = filtered.slice(start, start + pageSize);
+
+            const tbody = document.getElementById('booksTableBody');
+            if (pageData.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center py-5 text-muted">Không tìm thấy sách</td></tr>';
+            } else {
+                tbody.innerHTML = pageData.map(b => {
+                    const st = statusConfig[b.status] || { color: 'secondary', label: b.status };
+                    const coverUrl = b.coverImageUrl;
+                    const coverHtml = coverUrl
+                        ? `<img src="${coverUrl}" alt="Bìa sách" style="width:40px;height:56px;object-fit:cover;border-radius:4px">`
+                        : `<div style="width:40px;height:56px;background:#f1f5f9;border-radius:4px;display:flex;align-items:center;justify-content:center"><i class="bi bi-journal-bookmark"></i></div>`;
+                    const categoryTag = b.categoryName ? `<span class="badge bg-light text-dark border">${b.categoryName}</span>` : '<span class="text-muted">—</span>';
+
+                    return `<tr>
+                <td>${coverHtml}</td>
+                <td>
+                    <a href="book-detail.html?id=${b.id}" class="fw-semibold text-dark text-decoration-none">${b.title}</a>
+                    ${b.subtitle ? `<div class="text-muted small text-truncate" style="max-width:300px">${b.subtitle}</div>` : ''}
+                    ${b.publisherName ? `<div class="text-muted small">${b.publisherName}${b.publicationYear ? ' • ' + b.publicationYear : ''}</div>` : ''}
+                </td>
+                <td class="font-monospace small">${b.isbn13 || '<span class="text-muted">—</span>'}</td>
+                <td>${categoryTag}</td>
+                <td><span class="badge bg-${st.color}">${st.label}</span></td>
+                <td>
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-light" data-bs-toggle="dropdown"><i class="bi bi-three-dots-vertical"></i></button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="book-detail.html?id=${b.id}"><i class="bi bi-eye me-2"></i>Xem chi tiết</a></li>
+                            <li><a class="dropdown-item" href="book-form.html?id=${b.id}"><i class="bi bi-pencil me-2"></i>Chỉnh sửa</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            ${b.status !== 'ACTIVE' ? `<li><a class="dropdown-item" href="javascript:void(0)" onclick="changeBookStatus(${b.id},'ACTIVE')"><i class="bi bi-check-circle me-2"></i>Xuất bản (Hoạt động)</a></li>` : ''}
+                            ${b.status !== 'HIDDEN' ? `<li><a class="dropdown-item" href="javascript:void(0)" onclick="changeBookStatus(${b.id},'HIDDEN')"><i class="bi bi-eye-slash me-2"></i>Ẩn khỏi Cửa hàng</a></li>` : ''}
+                            ${b.status !== 'DRAFT' ? `<li><a class="dropdown-item" href="javascript:void(0)" onclick="changeBookStatus(${b.id},'DRAFT')"><i class="bi bi-pencil-square me-2"></i>Chuyển thành Bản nháp</a></li>` : ''}
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" href="javascript:void(0)" onclick="deleteBook(${b.id},'${(b.title || '').replace(/'/g, "\\'")}')"><i class="bi bi-trash me-2"></i>Xóa</a></li>
+                        </ul>
+                    </div>
+                </td>
+            </tr>`;
+                }).join('');
+            }
+
+            // Pagination
+            const pagArea = document.getElementById('paginationArea');
+            pagArea.innerHTML = `
+        <span class="text-muted small">Hiển thị ${filtered.length === 0 ? 0 : start + 1}–${Math.min(start + pageSize, filtered.length)} trong tổng số ${filtered.length}</span>
+        <nav><ul class="pagination pagination-sm mb-0">
+            <li class="page-item ${currentPage === 1 ? 'disabled' : ''}"><a class="page-link" href="javascript:void(0)" onclick="goPage(${currentPage - 1})">‹</a></li>
+            ${Array.from({ length: totalPages }, (_, i) => `<li class="page-item ${currentPage === i + 1 ? 'active' : ''}"><a class="page-link" href="javascript:void(0)" onclick="goPage(${i + 1})">${i + 1}</a></li>`).join('')}
+            <li class="page-item ${currentPage === totalPages || totalPages === 0 ? 'disabled' : ''}"><a class="page-link" href="javascript:void(0)" onclick="goPage(${currentPage + 1})">›</a></li>
+        </ul></nav>`;
+        }
+
+        function goPage(p) { currentPage = p; renderBooks(); }
+
+        async function changeBookStatus(id, status) {
+            try {
+                await api.patch(`/management/books/${id}/status`, { status });
+                showToast(`Đã đổi trạng thái thành ${status}`, 'success');
+                allBooks = await api.get('/management/books');
+                renderBooks();
+            } catch (e) {
+                showToast('Thay đổi trạng thái thất bại', 'danger');
+            }
+        }
+
+        async function deleteBook(id, title) {
+            if (!confirm(`Bạn có chắc chắn muốn xóa "${title}"? Hành động này là xóa tạm (soft-delete) và có thể hoàn tác.`)) return;
+            try {
+                await api.delete(`/management/books/${id}`);
+                showToast('Đã xóa sách', 'success');
+                allBooks = await api.get('/management/books');
+                renderBooks();
+            } catch (e) {
+                showToast('Xóa thất bại', 'danger');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,1290 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard — Online Book Shop</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --bg: #0c0c18;
+            --bg-sidebar: #111122;
+            --bg-card: rgba(25, 25, 50, 0.9);
+            --bg-hover: rgba(255, 255, 255, 0.04);
+            --accent: #6c63ff;
+            --accent-hover: #7b73ff;
+            --accent-glow: rgba(108, 99, 255, 0.25);
+            --green: #2ed573;
+            --green-bg: rgba(46, 213, 115, 0.12);
+            --red: #ff4757;
+            --red-bg: rgba(255, 71, 87, 0.12);
+            --yellow: #ffa502;
+            --yellow-bg: rgba(255, 165, 2, 0.12);
+            --text: #f0f0f5;
+            --text2: #a0a0b8;
+            --text3: #6b6b80;
+            --border: rgba(255, 255, 255, 0.07);
+            --input-bg: rgba(255, 255, 255, 0.05);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* === SIDEBAR === */
+        .sidebar {
+            width: 260px;
+            background: var(--bg-sidebar);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            z-index: 100;
+        }
+
+        .sidebar-brand {
+            padding: 24px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .sidebar-brand .icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent), #63b3ff);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .sidebar-brand h2 {
+            font-size: 16px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--text), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .sidebar-brand small {
+            color: var(--text3);
+            font-size: 11px;
+            font-weight: 400;
+        }
+
+        .sidebar-nav {
+            padding: 16px 12px;
+            flex: 1;
+        }
+
+        .nav-label {
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--text3);
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            padding: 8px 12px;
+            margin-top: 8px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            border-radius: 10px;
+            color: var(--text2);
+            font-size: 13.5px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            margin-bottom: 2px;
+        }
+
+        .nav-item:hover {
+            background: var(--bg-hover);
+            color: var(--text);
+        }
+
+        .nav-item.active {
+            background: var(--accent);
+            color: white;
+            box-shadow: 0 2px 12px var(--accent-glow);
+        }
+
+        .nav-item .emoji {
+            font-size: 16px;
+            width: 22px;
+            text-align: center;
+        }
+
+        .sidebar-footer {
+            padding: 16px 20px;
+            border-top: 1px solid var(--border);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--accent), #63b3ff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .user-details .name {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .user-details .role {
+            font-size: 11px;
+            color: var(--text3);
+        }
+
+        .btn-logout {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: transparent;
+            color: var(--text2);
+            font-family: inherit;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-logout:hover {
+            border-color: var(--red);
+            color: var(--red);
+            background: var(--red-bg);
+        }
+
+        /* === MAIN === */
+        .main {
+            margin-left: 260px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .topbar {
+            padding: 20px 32px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .topbar h1 {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .topbar .breadcrumb {
+            font-size: 12px;
+            color: var(--text3);
+            margin-top: 2px;
+        }
+
+        /* Content */
+        .content {
+            padding: 28px 32px;
+            flex: 1;
+        }
+
+        /* Stats */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+
+        .stat-card:hover {
+            border-color: var(--accent);
+            box-shadow: 0 4px 20px var(--accent-glow);
+            transform: translateY(-2px);
+        }
+
+        .stat-card .label {
+            font-size: 12px;
+            color: var(--text3);
+            font-weight: 500;
+        }
+
+        .stat-card .value {
+            font-size: 28px;
+            font-weight: 700;
+            margin-top: 4px;
+        }
+
+        .stat-card .sub {
+            font-size: 11px;
+            color: var(--text3);
+            margin-top: 2px;
+        }
+
+        /* Toolbar */
+        .toolbar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 200px;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 10px 14px 10px 38px;
+            background: var(--input-bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text);
+            font-family: inherit;
+            font-size: 13px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .search-box input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        .search-box input::placeholder {
+            color: var(--text3);
+        }
+
+        .search-box .icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 14px;
+            color: var(--text3);
+        }
+
+        .filter-select {
+            padding: 10px 14px;
+            background: var(--input-bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text);
+            font-family: inherit;
+            font-size: 13px;
+            outline: none;
+            cursor: pointer;
+            min-width: 140px;
+        }
+
+        .filter-select option {
+            background: var(--bg-sidebar);
+            color: var(--text);
+        }
+
+        .btn {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-accent {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-accent:hover {
+            background: var(--accent-hover);
+            box-shadow: 0 4px 16px var(--accent-glow);
+            transform: translateY(-1px);
+        }
+
+        /* Table */
+        .table-wrapper {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead th {
+            padding: 14px 16px;
+            text-align: left;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text3);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            user-select: none;
+            transition: color 0.2s;
+            white-space: nowrap;
+        }
+
+        thead th:hover {
+            color: var(--accent);
+        }
+
+        thead th .sort-icon {
+            font-size: 10px;
+            margin-left: 4px;
+            opacity: 0.4;
+        }
+
+        thead th.sorted .sort-icon {
+            opacity: 1;
+            color: var(--accent);
+        }
+
+        tbody tr {
+            border-bottom: 1px solid var(--border);
+            transition: background 0.15s;
+        }
+
+        tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        tbody tr:hover {
+            background: var(--bg-hover);
+        }
+
+        tbody td {
+            padding: 14px 16px;
+            font-size: 13.5px;
+            vertical-align: middle;
+        }
+
+        .user-cell {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-cell .avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--accent), #63b3ff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .user-cell .info .name {
+            font-weight: 500;
+            font-size: 13.5px;
+        }
+
+        .user-cell .info .email {
+            font-size: 11.5px;
+            color: var(--text3);
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .badge-active {
+            background: var(--green-bg);
+            color: var(--green);
+        }
+
+        .badge-inactive {
+            background: var(--red-bg);
+            color: var(--red);
+        }
+
+        .badge-role {
+            background: rgba(108, 99, 255, 0.12);
+            color: var(--accent);
+        }
+
+        .badge-role.admin {
+            background: var(--yellow-bg);
+            color: var(--yellow);
+        }
+
+        .badge-role.manager {
+            background: rgba(99, 179, 255, 0.12);
+            color: #63b3ff;
+        }
+
+        .badge-role.staff {
+            background: rgba(46, 213, 115, 0.12);
+            color: var(--green);
+        }
+
+        /* Action buttons */
+        .actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        .btn-sm {
+            padding: 6px 10px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: transparent;
+            color: var(--text2);
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .btn-sm:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: rgba(108, 99, 255, 0.08);
+        }
+
+        .btn-sm.danger:hover {
+            border-color: var(--red);
+            color: var(--red);
+            background: var(--red-bg);
+        }
+
+        .btn-sm.success:hover {
+            border-color: var(--green);
+            color: var(--green);
+            background: var(--green-bg);
+        }
+
+        /* Empty */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text3);
+        }
+
+        .empty-state .icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
+
+        .empty-state p {
+            font-size: 14px;
+        }
+
+        /* === MODAL === */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .modal {
+            background: var(--bg-sidebar);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 480px;
+            padding: 32px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            animation: modalIn 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        @keyframes modalIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px) scale(0.97);
+            }
+
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+
+        .modal h2 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 24px;
+        }
+
+        .modal .form-group {
+            margin-bottom: 16px;
+        }
+
+        .modal label {
+            display: block;
+            font-size: 12px;
+            color: var(--text2);
+            font-weight: 500;
+            margin-bottom: 6px;
+        }
+
+        .modal input,
+        .modal select {
+            width: 100%;
+            padding: 10px 14px;
+            background: var(--input-bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text);
+            font-family: inherit;
+            font-size: 13px;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .modal input:focus,
+        .modal select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        .modal input.valid {
+            border-color: var(--green);
+            box-shadow: 0 0 0 1px var(--green);
+        }
+
+        .modal input.invalid {
+            border-color: var(--red);
+            box-shadow: 0 0 0 1px var(--red);
+        }
+
+        .error-msg {
+            color: var(--red);
+            font-size: 11px;
+            margin-top: 4px;
+            display: none;
+        }
+
+        .modal select option {
+            background: var(--bg-sidebar);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 24px;
+            justify-content: flex-end;
+        }
+
+        .btn-ghost {
+            padding: 10px 18px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: transparent;
+            color: var(--text2);
+            font-family: inherit;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-ghost:hover {
+            border-color: var(--text2);
+            color: var(--text);
+        }
+
+        /* Toast */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .toast {
+            padding: 14px 20px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 500;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+            animation: toastIn 0.35s ease, toastOut 0.3s ease 2.7s forwards;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toast.success {
+            background: #1a3a2a;
+            border: 1px solid rgba(46, 213, 115, 0.3);
+            color: var(--green);
+        }
+
+        .toast.error {
+            background: #3a1a1a;
+            border: 1px solid rgba(255, 71, 87, 0.3);
+            color: var(--red);
+        }
+
+        @keyframes toastIn {
+            from {
+                opacity: 0;
+                transform: translateX(40px);
+            }
+
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+
+        @keyframes toastOut {
+            to {
+                opacity: 0;
+                transform: translateX(40px);
+            }
+        }
+
+        /* Date formatter */
+        .date-text {
+            font-size: 12px;
+            color: var(--text3);
+        }
+
+        @media (max-width: 900px) {
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .sidebar {
+                width: 220px;
+            }
+
+            .main {
+                margin-left: 220px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <div class="icon">📚</div>
+            <div>
+                <h2>Book Shop</h2>
+                <small>Admin Panel</small>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="nav-label">Quản lý</div>
+            <a class="nav-item active" id="navAccounts">
+                <span class="emoji">👥</span> Quản lý tài khoản
+            </a>
+            <a class="nav-item" id="navReports" style="opacity: 0.5; cursor: default;">
+                <span class="emoji">📊</span> Báo cáo doanh thu
+                <span
+                    style="font-size:9px; background:var(--yellow-bg); color:var(--yellow); padding:2px 6px; border-radius:4px; margin-left:auto;">Sắp
+                    ra</span>
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <div class="user-avatar" id="adminAvatar">A</div>
+                <div class="user-details">
+                    <div class="name" id="adminName">Admin</div>
+                    <div class="role">Quản trị viên</div>
+                </div>
+            </div>
+            <button class="btn-logout" onclick="logout()">🚪 Đăng xuất</button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main">
+        <div class="topbar">
+            <div>
+                <h1>Quản lý Tài khoản</h1>
+                <div class="breadcrumb">Admin / Quản lý tài khoản</div>
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- Stats -->
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="label">Tổng người dùng</div>
+                    <div class="value" id="statTotal">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">Đang hoạt động</div>
+                    <div class="value" id="statActive" style="color: var(--green);">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">Bị vô hiệu hóa</div>
+                    <div class="value" id="statInactive" style="color: var(--red);">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">Admin & Staff</div>
+                    <div class="value" id="statStaff" style="color: var(--yellow);">0</div>
+                </div>
+            </div>
+
+            <!-- Toolbar -->
+            <div class="toolbar">
+                <div class="search-box">
+                    <span class="icon">🔍</span>
+                    <input type="text" id="searchInput" placeholder="Tìm kiếm theo tên hoặc email..."
+                        oninput="debounceSearch()">
+                </div>
+                <select class="filter-select" id="filterRole" onchange="loadUsers()">
+                    <option value="">Tất cả vai trò</option>
+                    <option value="ADMIN">Admin</option>
+                    <option value="MANAGER">Manager</option>
+                    <option value="STAFF">Staff</option>
+                    <option value="CUSTOMER">Customer</option>
+                </select>
+                <select class="filter-select" id="filterStatus" onchange="loadUsers()">
+                    <option value="">Tất cả trạng thái</option>
+                    <option value="ACTIVE">Hoạt động</option>
+                    <option value="INACTIVE">Vô hiệu hóa</option>
+                </select>
+                <button class="btn btn-accent" onclick="openModal()">+ Thêm tài khoản</button>
+            </div>
+
+            <!-- Table -->
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th onclick="sortBy('id')">ID <span class="sort-icon">↕</span></th>
+                            <th onclick="sortBy('fullName')">Người dùng <span class="sort-icon">↕</span></th>
+                            <th onclick="sortBy('roleCode')">Vai trò <span class="sort-icon">↕</span></th>
+                            <th onclick="sortBy('status')">Trạng thái <span class="sort-icon">↕</span></th>
+                            <th onclick="sortBy('phone')">Điện thoại <span class="sort-icon">↕</span></th>
+                            <th onclick="sortBy('createdAt')">Ngày tạo <span class="sort-icon">↕</span></th>
+                            <th>Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody id="userTableBody">
+                    </tbody>
+                </table>
+                <div class="empty-state" id="emptyState" style="display:none;">
+                    <div class="icon">📭</div>
+                    <p>Không tìm thấy người dùng nào</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this)closeModal()">
+        <div class="modal">
+            <h2 id="modalTitle">Thêm tài khoản mới</h2>
+            <form onsubmit="handleSubmit(event)">
+                <div class="form-group">
+                    <label for="mFullName">Họ và tên *</label>
+                    <input type="text" id="mFullName" required placeholder="Nguyễn Văn A"
+                        oninput="validateField('mFullName')">
+                    <div class="error-msg" id="err-mFullName"></div>
+                </div>
+                <div class="form-group">
+                    <label for="mEmail">Email *</label>
+                    <input type="email" id="mEmail" required placeholder="user@example.com"
+                        oninput="validateField('mEmail')">
+                    <div class="error-msg" id="err-mEmail"></div>
+                </div>
+                <div class="form-group">
+                    <label for="mPhone">Số điện thoại</label>
+                    <input type="tel" id="mPhone" placeholder="0901234567" oninput="validateField('mPhone')">
+                    <div class="error-msg" id="err-mPhone"></div>
+                </div>
+                <div class="form-group">
+                    <label for="mRole">Vai trò *</label>
+                    <select id="mRole" required onchange="validateField('mRole')">
+                        <option value="CUSTOMER">Customer</option>
+                        <option value="STAFF">Staff</option>
+                        <option value="MANAGER">Manager</option>
+                        <option value="ADMIN">Admin</option>
+                    </select>
+                </div>
+                <div class="form-group" id="passwordGroup">
+                    <label for="mPassword" id="passwordLabel">Mật khẩu * (≥ 8 ký tự, hoa, thường, số, đặc biệt)</label>
+                    <input type="password" id="mPassword" placeholder="••••••••" oninput="validateField('mPassword')">
+                    <div class="error-msg" id="err-mPassword"></div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-ghost" onclick="closeModal()">Hủy</button>
+                    <button type="submit" class="btn btn-accent" id="modalSubmitBtn">Tạo tài khoản</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        const API = '';
+        let allUsers = [];
+        let sortField = 'createdAt';
+        let sortDir = 'desc';
+        let editingId = null;
+        let searchTimeout = null;
+
+        // === Auth check ===
+        function getToken() { return localStorage.getItem('token'); }
+        function getUser() {
+            try { return JSON.parse(localStorage.getItem('user')); } catch { return null; }
+        }
+        function authHeaders() {
+           const token = getToken();
+           const headers = { 'Content-Type': 'application/json' };
+           if (token) {
+                headers['Authorization'] = 'Bearer ' + token;
+           }
+           return headers;
+        }
+        (function checkAdmin() {
+            const user = getUser();
+            const token = getToken();
+
+            if (!token || !user || user.role !== 'ADMIN') {
+                window.location.href = '/login';
+                return;
+            }
+
+            document.getElementById('adminName').textContent = user.fullName || 'Admin';
+            document.getElementById('adminAvatar').textContent = (user.fullName || 'A').charAt(0).toUpperCase();
+        })();
+
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = '/logout';
+        }
+
+        // === Load users ===
+        async function loadUsers() {
+            const search = document.getElementById('searchInput').value.trim();
+            const role = document.getElementById('filterRole').value;
+            const status = document.getElementById('filterStatus').value;
+
+            const params = new URLSearchParams();
+            if (search) params.append('search', search);
+            if (role) params.append('role', role);
+            if (status) params.append('status', status);
+
+            try {
+                const res = await fetch(API + '/api/admin/users?' + params.toString(), {
+                    headers: authHeaders()
+                });
+                if (res.status === 403) { toast('error', 'Bạn không có quyền truy cập'); return; }
+                if (res.status === 401) { logout(); return; }
+                allUsers = await res.json();
+                sortAndRender();
+            } catch (e) {
+                toast('error', 'Không thể kết nối server');
+            }
+        }
+
+        // === Sort ===
+        function sortBy(field) {
+            if (sortField === field) {
+                sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+            } else {
+                sortField = field;
+                sortDir = 'asc';
+            }
+            sortAndRender();
+        }
+        function sortAndRender() {
+            const sorted = [...allUsers].sort((a, b) => {
+                let va = a[sortField] || '';
+                let vb = b[sortField] || '';
+                if (typeof va === 'string') va = va.toLowerCase();
+                if (typeof vb === 'string') vb = vb.toLowerCase();
+                if (va < vb) return sortDir === 'asc' ? -1 : 1;
+                if (va > vb) return sortDir === 'asc' ? 1 : -1;
+                return 0;
+            });
+            renderTable(sorted);
+            updateStats();
+        }
+
+        // === Render ===
+        function renderTable(users) {
+            const tbody = document.getElementById('userTableBody');
+            const empty = document.getElementById('emptyState');
+
+            if (users.length === 0) {
+                tbody.innerHTML = '';
+                empty.style.display = 'block';
+                return;
+            }
+            empty.style.display = 'none';
+
+            tbody.innerHTML = users.map(u => `
+            <tr>
+                <td style="color:var(--text3); font-size:12px;">#${u.id}</td>
+                <td>
+                    <div class="user-cell">
+                        <div class="avatar">${(u.fullName || '?').charAt(0).toUpperCase()}</div>
+                        <div class="info">
+                            <div class="name">${esc(u.fullName)}</div>
+                            <div class="email">${esc(u.email)}</div>
+                        </div>
+                    </div>
+                </td>
+                <td><span class="badge badge-role ${u.roleCode?.toLowerCase()}">${esc(u.roleName || u.roleCode)}</span></td>
+                <td><span class="badge ${u.status === 'ACTIVE' ? 'badge-active' : 'badge-inactive'}">
+                    ${u.status === 'ACTIVE' ? '● Hoạt động' : '○ Vô hiệu hóa'}</span></td>
+                <td style="color:var(--text2); font-size:13px;">${esc(u.phone || '—')}</td>
+                <td><span class="date-text">${formatDate(u.createdAt)}</span></td>
+                <td>
+                    <div class="actions">
+                        <button class="btn-sm" onclick="openEdit(${u.id})" title="Chỉnh sửa">✏️</button>
+                        ${u.status === 'ACTIVE'
+                    ? `<button class="btn-sm danger" onclick="toggleStatus(${u.id}, '${esc(u.fullName)}')" title="Vô hiệu hóa">🔒</button>`
+                    : `<button class="btn-sm success" onclick="toggleStatus(${u.id}, '${esc(u.fullName)}')" title="Kích hoạt">🔓</button>`
+                }
+                    </div>
+                </td>
+            </tr>
+        `).join('');
+        }
+
+        function updateStats() {
+            document.getElementById('statTotal').textContent = allUsers.length;
+            document.getElementById('statActive').textContent = allUsers.filter(u => u.status === 'ACTIVE').length;
+            document.getElementById('statInactive').textContent = allUsers.filter(u => u.status !== 'ACTIVE').length;
+            document.getElementById('statStaff').textContent = allUsers.filter(u => ['ADMIN', 'STAFF', 'MANAGER'].includes(u.roleCode)).length;
+        }
+
+        // === Search debounce ===
+        function debounceSearch() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => loadUsers(), 350);
+        }
+
+        // === Modal ===
+        function resetValidation() {
+            ['mFullName', 'mEmail', 'mPhone', 'mPassword'].forEach(id => {
+                const el = document.getElementById(id);
+                const err = document.getElementById('err-' + id);
+                el.classList.remove('valid', 'invalid');
+                if (err) {
+                    err.textContent = '';
+                    err.style.display = 'none';
+                }
+            });
+        }
+
+        function validateField(fieldId) {
+            const el = document.getElementById(fieldId);
+            const err = document.getElementById('err-' + fieldId);
+            const val = el.value.trim();
+            let isValid = true;
+            let msg = '';
+
+            // Reset
+            el.classList.remove('valid', 'invalid');
+            if (err) { err.style.display = 'none'; err.innerHTML = ''; }
+
+            if (fieldId === 'mFullName') {
+                if (!val) {
+                    isValid = false; msg = 'Họ tên không được để trống';
+                } else {
+                    const isDup = allUsers.some(u => String(u.id) !== String(editingId) && u.fullName && u.fullName.trim().toLowerCase() === val.toLowerCase());
+                    if (isDup) {
+                        isValid = false; msg = 'Họ tên này đã tồn tại trong hệ thống';
+                    }
+                }
+            }
+
+            if (fieldId === 'mEmail') {
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!val) {
+                    isValid = false; msg = 'Email không được để trống';
+                } else if (!emailRegex.test(val)) {
+                    isValid = false; msg = 'Email không đúng định dạng';
+                } else {
+                    const isDup = allUsers.some(u => String(u.id) !== String(editingId) && u.email && u.email.trim().toLowerCase() === val.toLowerCase());
+                    if (isDup) {
+                        isValid = false; msg = 'Email này đã được sử dụng';
+                    }
+                }
+            }
+
+            if (fieldId === 'mPhone') {
+                const phoneRegex = /^[0-9]{10,11}$/;
+                if (val && !phoneRegex.test(val)) {
+                    isValid = false; msg = 'Số điện thoại phải từ 10-11 chữ số';
+                } else if (val) {
+                    const cleanPhone = val.replace(/\D/g, '');
+                    const isDup = allUsers.some(u => String(u.id) !== String(editingId) && u.phone && u.phone.replace(/\D/g, '') === cleanPhone);
+                    if (isDup) {
+                        isValid = false; msg = 'Số điện thoại này đã được sử dụng';
+                    }
+                }
+            }
+
+            if (fieldId === 'mPassword') {
+                if (!val && !editingId) {
+                    // Creating new user: required
+                    isValid = false; msg = 'Mật khẩu không được để trống';
+                } else if (val) {
+                    // MUST meet strong criteria
+                    const hasUpper = /[A-Z]/.test(val);
+                    const hasLower = /[a-z]/.test(val);
+                    const hasNumber = /[0-9]/.test(val);
+                    // Standard regex for special chars:
+                    const hasSpecial = /[!@#$%^&*(),.?":{}|<>\-_+=\[\]\\/;'~`]/.test(val);
+
+                    if (val.length < 8 || !hasUpper || !hasLower || !hasNumber || !hasSpecial) {
+                        isValid = false;
+                        msg = 'Mật khẩu yếu. Yêu cầu:<br>• Tối thiểu 8 ký tự<br>• Gồm chữ in HOA, in thường<br>• Gồm số và ký tự đặc biệt';
+                    }
+                } else if (!val && editingId) {
+                    // Editing, leave empty -> ignore
+                    isValid = true;
+                }
+            }
+
+            if (isValid) {
+                if (val || (!val && fieldId === 'mPhone')) el.classList.add('valid');
+            } else {
+                el.classList.add('invalid');
+                if (err) {
+                    err.innerHTML = msg;
+                    err.style.display = 'block';
+                }
+            }
+
+            return isValid;
+        }
+
+        function openModal() {
+            editingId = null;
+            resetValidation();
+            document.getElementById('modalTitle').textContent = 'Thêm tài khoản mới';
+            document.getElementById('modalSubmitBtn').textContent = 'Tạo tài khoản';
+            document.getElementById('mFullName').value = '';
+            document.getElementById('mEmail').value = '';
+            document.getElementById('mPhone').value = '';
+            document.getElementById('mRole').value = 'CUSTOMER';
+            document.getElementById('mPassword').value = '';
+            document.getElementById('passwordLabel').textContent = 'Mật khẩu * (≥ 8 ký tự, hoa, thường, số, đặc biệt)';
+            document.getElementById('modalOverlay').classList.add('active');
+        }
+
+        function openEdit(id) {
+            const user = allUsers.find(u => u.id === id);
+            if (!user) return;
+            editingId = id;
+            resetValidation();
+            document.getElementById('modalTitle').textContent = 'Chỉnh sửa tài khoản';
+            document.getElementById('modalSubmitBtn').textContent = 'Cập nhật';
+            document.getElementById('mFullName').value = user.fullName || '';
+            document.getElementById('mEmail').value = user.email || '';
+            document.getElementById('mPhone').value = user.phone || '';
+            document.getElementById('mRole').value = user.roleCode || 'CUSTOMER';
+            document.getElementById('mPassword').value = '';
+            document.getElementById('passwordLabel').textContent = 'Mật khẩu mới (bỏ trống nếu không đổi, nếu đổi phải ≥ 8 ký tự...)';
+
+            // Mark existing valid fields as green
+            validateField('mFullName');
+            validateField('mEmail');
+            if (user.phone) validateField('mPhone');
+
+            document.getElementById('modalOverlay').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('modalOverlay').classList.remove('active');
+        }
+
+        async function handleSubmit(e) {
+            e.preventDefault();
+
+            const isNameValid = validateField('mFullName');
+            const isEmailValid = validateField('mEmail');
+            const isPhoneValid = validateField('mPhone');
+            const isPasswordValid = validateField('mPassword');
+
+            if (!isNameValid || !isEmailValid || !isPhoneValid || !isPasswordValid) {
+                toast('error', 'Vui lòng kiểm tra lại thông tin không hợp lệ');
+                return;
+            }
+
+            const body = {
+                fullName: document.getElementById('mFullName').value.trim(),
+                email: document.getElementById('mEmail').value.trim(),
+                phone: document.getElementById('mPhone').value.trim() || null,
+                roleCode: document.getElementById('mRole').value,
+                password: document.getElementById('mPassword').value || null
+            };
+
+            const btn = document.getElementById('modalSubmitBtn');
+            const originalText = btn.textContent;
+            btn.disabled = true;
+            btn.textContent = 'Đang xử lý...';
+
+            try {
+                const url = editingId
+                    ? API + '/api/admin/users/' + editingId
+                    : API + '/api/admin/users';
+                const method = editingId ? 'PUT' : 'POST';
+
+                const res = await fetch(url, { method, headers: authHeaders(), body: JSON.stringify(body) });
+                const data = await res.json();
+
+                if (!res.ok) {
+                    toast('error', data.error || 'Thao tác thất bại');
+                    btn.disabled = false;
+                    btn.textContent = originalText;
+                    return;
+                }
+
+                toast('success', editingId ? 'Cập nhật thành công!' : 'Tạo tài khoản thành công!');
+                closeModal();
+                loadUsers();
+            } catch (err) {
+                toast('error', 'Không thể kết nối server');
+                btn.disabled = false;
+                btn.textContent = originalText;
+            } finally {
+                btn.disabled = false;
+                btn.textContent = originalText;
+            }
+        }
+
+        // === Toggle status ===
+        async function toggleStatus(id, name) {
+            const user = allUsers.find(u => u.id === id);
+            const action = user?.status === 'ACTIVE' ? 'vô hiệu hóa' : 'kích hoạt';
+            if (!confirm(`Bạn có chắc muốn ${action} tài khoản "${name}"?`)) return;
+
+            try {
+                const res = await fetch(API + '/api/admin/users/' + id + '/status', {
+                    method: 'PUT', headers: authHeaders()
+                });
+                const data = await res.json();
+                if (!res.ok) { toast('error', data.error || 'Thao tác thất bại'); return; }
+                toast('success', `Đã ${action} tài khoản "${name}"`);
+                loadUsers();
+            } catch (err) {
+                toast('error', 'Không thể kết nối server');
+            }
+        }
+
+        // === Helpers ===
+        function esc(s) { if (!s) return ''; const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+        function formatDate(dt) {
+            if (!dt) return '—';
+            const d = new Date(dt);
+            return d.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        }
+        function toast(type, msg) {
+            const c = document.getElementById('toastContainer');
+            const t = document.createElement('div');
+            t.className = 'toast ' + type;
+            t.innerHTML = `<span>${type === 'success' ? '✓' : '⚠'}</span> ${esc(msg)}`;
+            c.appendChild(t);
+            setTimeout(() => t.remove(), 3200);
+        }
+
+        // === Init ===
+        loadUsers();
+    </script>
+</body>
+
+</html>
