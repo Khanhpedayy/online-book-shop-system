@@ -7,7 +7,9 @@ import com.example.onlinebookshop.dto.OrderRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/orders")
@@ -20,23 +22,27 @@ public class OrderController {
     }
 
     /**
-     * Place order - supports both guest and customer.
-     * Guest: provide email, shippingAddress, recipientName, items.
-     * Customer: optionally provide customerId (can be added when auth exists).
-     */
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public Order placeOrder(@RequestBody OrderRequest request) {
-        return orderService.placeOrder(request);
-    }
-
-    /**
      * Checkout from cart. Converts cart items to order and clears cart.
      */
     @PostMapping("/from-cart/{userId}")
     @ResponseStatus(HttpStatus.CREATED)
-    public Order checkoutFromCart(@PathVariable Long userId, @RequestBody CheckoutRequest request) {
-        return orderService.placeOrderFromCart(userId, request);
+    public Map<String, Object> checkoutFromCart(
+            @PathVariable Long userId,
+            @RequestBody CheckoutRequest request
+    ) {
+        Order order = orderService.placeOrderFromCart(userId, request);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("orderId", order.getId());
+        response.put("totalAmount", order.getTotalAmount());
+
+        // 👇 xử lý payment luôn tại đây
+        if ("PAYOS".equalsIgnoreCase(request.getPaymentMethod())) {
+            String paymentUrl = orderService.createPayment(order);
+            response.put("paymentUrl", paymentUrl);
+        }
+
+        return response;
     }
 
     @GetMapping("/{id}")
@@ -47,5 +53,37 @@ public class OrderController {
     @GetMapping("/customer/{customerId}")
     public List<Order> getOrdersByCustomerId(@PathVariable Long customerId) {
         return orderService.getOrdersByCustomerId(customerId);
+    }
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public Map<String, Object> placeOrder(@RequestBody OrderRequest request) {
+
+        Order order = orderService.placeOrder(request);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("orderId", order.getId());
+
+        // nếu PayOS → trả payment URL
+        if ("PAYOS".equalsIgnoreCase(request.getPaymentMethod())) {
+            String paymentUrl = orderService.createPayment(order);
+            response.put("paymentUrl", paymentUrl);
+        }
+
+        return response;
+    }
+
+    @PostMapping("/{id}/repay")
+    public Map<String, Object> repay(@PathVariable Long id) {
+
+        Order order = orderService.getOrderById(id);
+
+        if (!"UNPAID".equals(order.getPaymentStatus())) {
+            throw new RuntimeException("Order already paid or not eligible!");
+        }
+
+        String paymentUrl = orderService.createPayment(order);
+
+        return Map.of("paymentUrl", paymentUrl);
     }
 }

@@ -41,9 +41,9 @@ class BookServiceTest {
     void setUp() {
         bookInfo = new BookInfo(1L, null, "978-0132350884", null, "Clean Code", null,
                 "clean-code", null,
-                null, "ACTIVE", null, null);
+                null, "ACTIVE",null, null, null, null, null);
         variant = new BookVariant(1L, bookInfo, "SKU-001", BigDecimal.valueOf(39.99),
-                BigDecimal.valueOf(39.99), true, null, null);
+                BigDecimal.valueOf(39.99),null, true, null, null);
     }
 
     @Test

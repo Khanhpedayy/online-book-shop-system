@@ -4,6 +4,7 @@ import com.example.onlinebookshop.Entity.BookInfo;
 import com.example.onlinebookshop.Entity.BookVariant;
 import com.example.onlinebookshop.Repository.BookInfoRepository;
 import com.example.onlinebookshop.Repository.BookVariantRepository;
+import com.example.onlinebookshop.dto.BookDetailDTO;
 import com.example.onlinebookshop.dto.BookVariantDTO;
 import org.springframework.stereotype.Service;
 
@@ -89,5 +90,48 @@ public class BookServiceImpl implements BookService {
                 .description(v.getBook() != null ? v.getBook().getShortDescription() : null)
                 .status(v.getBook() != null ? v.getBook().getStatus() : null)
                 .build();
+    }
+
+    @Override
+    public BookDetailDTO getBookDetail(Long id) {
+
+        BookInfo book = bookInfoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Book not found"));
+
+        List<BookVariant> variants = variantRepository.findByBookId(id);
+
+        List<BookVariantDTO> variantDTOs = variants.stream().map(v -> {
+
+            BookVariantDTO dto = new BookVariantDTO();
+
+            dto.setId(v.getId());
+            dto.setBookId(v.getBook().getId());
+            dto.setTitle(v.getBook().getTitle());
+            dto.setIsbn(v.getBook().getIsbn13());
+
+            dto.setSku(v.getSku());
+            dto.setFormat(v.getFormat());
+            dto.setSalePrice(v.getSalePrice());
+            dto.setListPrice(v.getListPrice());
+
+            dto.setDescription(v.getBook().getShortDescription());
+            dto.setStatus(v.getBook().getStatus());
+
+            return dto;
+
+        }).toList();
+
+        BookDetailDTO dto = new BookDetailDTO();
+
+        dto.setId(book.getId());
+        dto.setTitle(book.getTitle());
+        dto.setIsbn13(book.getIsbn13());
+        dto.setPublisherName(book.getPublisherName());
+        dto.setPublicationYear(book.getPublicationYear());
+        dto.setDescription(book.getDescription());
+
+        dto.setVariants(variantDTOs);
+
+        return dto;
     }
 }

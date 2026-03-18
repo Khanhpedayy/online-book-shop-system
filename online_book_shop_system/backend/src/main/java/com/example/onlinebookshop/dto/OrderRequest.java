@@ -14,5 +14,7 @@ public class OrderRequest {
     private String email;
     private String shippingAddress;
     private String recipientName;
+    private String phone;
+    private String paymentMethod;
     private Long customerId;  // user_id - required, must be logged in
 }

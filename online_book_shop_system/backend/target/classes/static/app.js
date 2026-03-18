@@ -416,8 +416,7 @@ function applyFilters(){
 
     const filters = {
         category: document.querySelector(".categories li.active")?.dataset.id,
-        author: document.getElementById("authorFilter").value,
-        publisher: document.getElementById("publisherFilter").value,
+        publisherName: document.getElementById("publisherFilter").value,
         minPrice: document.getElementById("minPrice").value,
         maxPrice: document.getElementById("maxPrice").value,
         format: document.getElementById("formatFilter").value,
@@ -455,3 +454,4 @@ document.addEventListener("DOMContentLoaded", () => {
     loadCategories();
 
 });
+

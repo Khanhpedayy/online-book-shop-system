@@ -46,6 +46,15 @@ public class BookInfo {
     @Column(name = "status", nullable = false, length = 20)
     private String status = "ACTIVE";
 
+    @Column(name = "publisher_name", length = 255)
+    private String publisherName;
+
+    @Column(name = "publication_year")
+    private Integer publicationYear;
+
+    @Column(name = "description", length = 2000)
+    private String description;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
