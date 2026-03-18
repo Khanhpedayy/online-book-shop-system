@@ -2,6 +2,7 @@ package com.example.onlinebookshop.Repository;
 
 import com.example.onlinebookshop.Entity.CartItem;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
@@ -14,4 +15,7 @@ public interface CartItemRepository extends JpaRepository<CartItem, Long> {
     Optional<CartItem> findByUser_IdAndVariant_IdAndCopyId(Long userId, Long variantId, Long copyId);
     /** Use when copyId is null (quantity-based cart item) */
     Optional<CartItem> findByUser_IdAndVariant_IdAndCopyIdIsNull(Long userId, Long variantId);
+    @Modifying
+    @Query("DELETE FROM CartItem c WHERE c.user.id = :userId")
+    void deleteByUserId(Long userId);
 }

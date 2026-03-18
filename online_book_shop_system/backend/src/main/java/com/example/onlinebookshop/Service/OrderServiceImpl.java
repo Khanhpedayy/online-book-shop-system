@@ -31,6 +31,9 @@ public class OrderServiceImpl implements OrderService {
         this.cartItemRepository = cartItemRepository;
     }
 
+
+
+
     @Override
     @Transactional
     public Order placeOrder(OrderRequest request) {
@@ -52,8 +55,13 @@ public class OrderServiceImpl implements OrderService {
         order.setUser(user);
         order.setStatus("NEW");
         order.setPaymentStatus("PENDING");
+        order.setPaymentMethod(request.getPaymentMethod());
         order.setShipName(request.getRecipientName() != null ? request.getRecipientName() : user.getFullName());
-        order.setShipPhone(user.getPhone() != null ? user.getPhone() : "");
+        order.setShipPhone(
+                request.getPhone() != null && !request.getPhone().isBlank()
+                        ? request.getPhone()
+                        : (user.getPhone() != null ? user.getPhone() : "")
+        );
         order.setShipLine1(request.getShippingAddress());
 
         BigDecimal total = BigDecimal.ZERO;
@@ -109,9 +117,9 @@ public class OrderServiceImpl implements OrderService {
                 .map(ci -> new OrderItemRequest(ci.getVariant().getId(), ci.getQuantity()))
                 .toList();
         OrderRequest orderRequest = new OrderRequest(items, request.getEmail(), request.getShippingAddress(),
-                request.getRecipientName(), request.getCustomerId());
+                request.getRecipientName(),request.getPhone(),request.getPaymentMethod() , request.getCustomerId());
         Order order = placeOrder(orderRequest);
-        cartItemRepository.deleteAll(cartItems);
+        cartItemRepository.deleteByUserId(userId);
         return order;
     }
 
@@ -122,9 +130,28 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() -> new RuntimeException("Order not found: " + id));
     }
 
+    public void updatePaymentStatus(Long orderId, String status) {
+        Order order = getOrderById(orderId);
+
+        if ("success".equalsIgnoreCase(status)) {
+            order.setPaymentStatus("PAID");
+            order.setStatus("CONFIRMED");
+        } else {
+            order.setPaymentStatus("FAILED");
+        }
+
+        orderRepository.save(order);
+    }
+
     @Override
     @Transactional(readOnly = true)
     public List<Order> getOrdersByCustomerId(Long customerId) {
         return orderRepository.findByUserIdAndDeletedAtIsNull(customerId);
+    }
+
+    @Override
+    public String createPayment(Order order) {
+        // Fake payment URL để test trước
+        return "http://localhost:5500/payment-result.html?status=success&orderId=" + order.getId();
     }
 }

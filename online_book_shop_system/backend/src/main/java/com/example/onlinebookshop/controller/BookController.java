@@ -1,6 +1,7 @@
 package com.example.onlinebookshop.controller;
 
 import com.example.onlinebookshop.Service.BookService;
+import com.example.onlinebookshop.dto.BookDetailDTO;
 import com.example.onlinebookshop.dto.BookVariantDTO;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,9 +28,13 @@ public class BookController {
     }
 
     @GetMapping("/{id}")
-    public BookVariantDTO getBookById(@PathVariable Long id) {
-        return bookService.getBookVariantById(id);
+    public BookDetailDTO getBookDetail(@PathVariable Long id) {
+        return bookService.getBookDetail(id);
     }
+//    @GetMapping("/{id}")
+//    public BookVariantDTO getBookById(@PathVariable Long id) {
+//        return bookService.getBookVariantById(id);
+//    }
 
     @PutMapping("/{id}")
     public BookVariantDTO updateBook(@PathVariable Long id, @RequestBody BookVariantDTO dto) {

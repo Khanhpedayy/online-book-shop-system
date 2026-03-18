@@ -10,4 +10,6 @@ public interface BookVariantRepository extends JpaRepository<BookVariant, Long> 
 
     @Query("SELECT v FROM BookVariant v JOIN FETCH v.book b WHERE v.deletedAt IS NULL AND b.deletedAt IS NULL AND v.isActive = true")
     List<BookVariant> findAllActiveWithBook();
+
+    List<BookVariant> findByBookId(Long bookId);
 }

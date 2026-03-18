@@ -55,8 +55,8 @@ class OrderServiceTest {
         user.setFullName("Test Customer");
         user.setStatus("ACTIVE");
 
-        bookInfo = new BookInfo(1L, null, null, null, "Clean Code", null, "slug", null, null, "ACTIVE", null, null);
-        variant = new BookVariant(1L, bookInfo, "SKU-001", BigDecimal.valueOf(39.99), BigDecimal.valueOf(39.99), true, null, null);
+        bookInfo = new BookInfo(1L, null, null, null, "Clean Code", null, "slug", null, null, "ACTIVE",null, null, null, null, null);
+        variant = new BookVariant(1L, bookInfo, "SKU-001", BigDecimal.valueOf(39.99), BigDecimal.valueOf(39.99),null, true, null, null);
 
         validRequest = new OrderRequest(
                 List.of(new OrderItemRequest(1L, 2)),

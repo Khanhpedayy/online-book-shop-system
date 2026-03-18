@@ -1,8 +1,8 @@
 const API = "/api"
 
 const USER_ID = 1
-const headerCartCount = document.getElementById('headerCartCount');
 
+const headerCartCount = document.getElementById("headerCartCount")
 
 async function apiGet(url){
     const r = await fetch(url)
@@ -28,33 +28,66 @@ async function loadBook(){
 
     if(!id) return
 
-    const book = await apiGet(API+"/books/"+id)
-
+    const book = await apiGet(API + "/books/" + id)
     document.getElementById("title").textContent = book.title
-    document.getElementById("author").textContent = "By " + book.author
-    document.getElementById("price").textContent = "$" + book.salePrice
-    document.getElementById("description").textContent = book.description
+    document.getElementById("breadcrumbTitle").textContent = book.title
+    document.getElementById("isbn").textContent = book.isbn13 || "N/A"
+    document.getElementById("publisherName").textContent = book.publisherName || "N/A"
+    document.getElementById("publicationYear").textContent = book.publicationYear || "N/A"
+    document.getElementById("description").textContent = book.description || ""
+    const variants = book.variants || []
+
+    const variantSelect = document.getElementById("variantSelect")
+
+    variantSelect.innerHTML = ""
+
+    let selectedVariant = null
+
+    variants.forEach(v => {
+
+        const option = document.createElement("option")
+
+        option.value = v.id
+        option.textContent = v.sku + " - $" + v.salePrice
+
+        variantSelect.appendChild(option)
+
+        if(!selectedVariant) selectedVariant = v
+
+    })
+
+    if(selectedVariant){
+
+        document.getElementById("price").textContent = "$" + selectedVariant.salePrice
+
+        document.getElementById("stockStatus").textContent =
+            selectedVariant.stockQuantity > 0
+                ? "In Stock (" + selectedVariant.stockQuantity + ")"
+                : "Out of Stock"
+
+    }
 
     const img =
         "https://covers.openlibrary.org/b/isbn/" +
-        (book.isbn || "0385533229") +
+        (book.isbn13 || "0385533229") +
         "-L.jpg"
 
     document.getElementById("bookImage").src = img
 
-    document.getElementById("addCartBtn").onclick = () =>
-        addToCart(book.id)
+    document.getElementById("addCartBtn").onclick = addToCart
 
     loadRelated(book.category)
 
 }
 
-async function addToCart(bookId){
+async function addToCart(){
+
+    const variantId = document.getElementById("variantSelect").value
 
     const qty = document.getElementById("qty").value
 
     await apiPost(`/api/cart/user/${USER_ID}/items`,{
-        variantId:bookId,
+        variantId:variantId,
         quantity:qty
     })
 
@@ -109,6 +142,24 @@ async function loadCart() {
         if (cartContainer) cartContainer.innerHTML = 'Error loading cart: ' + e.message.replace(/</g, '&lt;');
     }
 }
+
+async function loadCartCount(){
+
+    const items = await apiGet(`/api/cart/user/${USER_ID}`)
+
+    if(!Array.isArray(items)){
+        headerCartCount.textContent = "0"
+        return
+    }
+
+    let count = 0
+
+    items.forEach(i => count += i.quantity)
+
+    headerCartCount.textContent = count
+
+}
+
 function updateHeaderCart(total, count) {
     if (!headerCartCount) return;
     headerCartCount.textContent = '$ ' + (total != null ? Number(total).toFixed(2) : '0.00') + ' (' + (count || 0) + ')';

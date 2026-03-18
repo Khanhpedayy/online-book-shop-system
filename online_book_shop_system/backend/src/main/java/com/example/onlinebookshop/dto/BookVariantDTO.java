@@ -1,14 +1,13 @@
 package com.example.onlinebookshop.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.math.BigDecimal;
 
 @Data
 @Builder
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class BookVariantDTO {
@@ -17,6 +16,7 @@ public class BookVariantDTO {
     private String title;
     private String sku;
     private String isbn;
+    private String format;
     private BigDecimal salePrice;
     private BigDecimal listPrice;
     private String description;

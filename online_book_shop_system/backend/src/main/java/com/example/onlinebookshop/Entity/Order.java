@@ -30,10 +30,13 @@ public class Order {
     private User user;
 
     @Column(name = "status", nullable = false, length = 20)
-    private String status = "NEW";
+    private String status = "PENDING";        // thay NEW
 
     @Column(name = "payment_status", nullable = false, length = 20)
-    private String paymentStatus = "PENDING";
+    private String paymentStatus = "UNPAID";  // thay PENDING
+
+    @Column(name = "payment_method", length = 20)
+    private String paymentMethod; // COD, PAYOS
 
     @Column(name = "total_amount", nullable = false, precision = 18, scale = 2)
     private BigDecimal totalAmount = BigDecimal.ZERO;

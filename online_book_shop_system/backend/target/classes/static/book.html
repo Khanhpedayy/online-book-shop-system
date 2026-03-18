@@ -81,6 +81,34 @@
             color:#333;
         }
 
+        .breadcrumb{
+            max-width:1000px;
+            margin:20px auto;
+            font-size:14px;
+        }
+
+        .breadcrumb a{
+            text-decoration:none;
+            color:#555;
+        }
+
+        .breadcrumb a:hover{
+            color:#c9a227;
+        }
+
+        .variant{
+            margin-top:10px;
+        }
+
+        .variant select{
+            padding:6px;
+            margin-top:4px;
+        }
+
+        #stockStatus{
+            font-weight:bold;
+        }
+
         .container{
             max-width:1000px;
             margin:40px auto;
@@ -177,13 +205,18 @@
     <nav class="nav">
         <a href="index.html">Home</a>
         <a href="login.html">Login</a>
-        <a href="cart.html">
-            <i class="fa-solid fa-cart-shopping"></i>
-            <span id="headerCartCount">(0)</span>
+        <a href="cart.html" class="header-cart">
+            Cart (<span id="headerCartCount">0</span>)
         </a>
     </nav>
 
 </header>
+
+<div class="breadcrumb">
+    <a href="index.html">Home</a> /
+    <span id="breadcrumbCategory">Books</span> /
+    <span id="breadcrumbTitle"></span>
+</div>
 
 <div class="container">
 
@@ -193,9 +226,22 @@
 
         <h1 id="title"></h1>
 
-        <p id="author"></p>
-
         <p class="price" id="price"></p>
+
+        <p><b>ISBN:</b> <span id="isbn"></span></p>
+
+        <p><b>Publisher:</b> <span id="publisherName"></span></p>
+
+        <p><b>Year:</b> <span id="publicationYear"></span></p>
+
+        <p><b>Availability:</b> <span id="stockStatus"></span></p>
+
+        <div class="variant">
+            <label>Format</label>
+            <select id="variantSelect">
+                <option value="">Select version</option>
+            </select>
+        </div>
 
         <p id="description"></p>
 
