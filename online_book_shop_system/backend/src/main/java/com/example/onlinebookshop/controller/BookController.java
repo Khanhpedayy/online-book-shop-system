@@ -1,5 +1,6 @@
 package com.example.onlinebookshop.controller;
 
+import com.example.onlinebookshop.Entity.BookVariant;
 import com.example.onlinebookshop.Service.BookService;
 import com.example.onlinebookshop.dto.BookDetailDTO;
 import com.example.onlinebookshop.dto.BookVariantDTO;
@@ -25,6 +26,16 @@ public class BookController {
     @GetMapping
     public List<BookVariantDTO> getAllBooks() {
         return bookService.getAllBookVariants();
+    }
+
+    @GetMapping("/filter")
+    public List<BookVariantDTO> getBooks(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String publisherName,
+            @RequestParam(required = false) Double minPrice,
+            @RequestParam(required = false) Double maxPrice
+    ) {
+        return bookService.findBooks(keyword, publisherName, minPrice, maxPrice);
     }
 
     @GetMapping("/{id}")

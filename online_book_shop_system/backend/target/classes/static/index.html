@@ -1,509 +1,319 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Books – Online Book Shop</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Book Shop</title>
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-    <link rel="stylesheet" href="css/style.css">
     <style>
         :root {
             --header-bg: #1a1a2e;
-            --header-text: #eee;
-            --accent: #c9a227;
-            --accent-hover: #b8921f;
+            --header-text: #fff;
+            --accent: #ee4d2d;
+            --accent-hover: #c0392b;
             --card-bg: #fff;
-            --body-bg: #f8f6f1;
+            --body-bg: #f8f9fa;
             --text: #333;
             --border: #e0ddd8;
         }
-        * { box-sizing: border-box; }
+
         body {
-            font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
-            margin: 0;
+            margin:0;
+            font-family: "Segoe UI", sans-serif;
             background: var(--body-bg);
             color: var(--text);
-            line-height: 1.5;
-        }
-        body{
-            background:#f8f9fa;
         }
 
+        a { text-decoration:none; color:inherit; }
 
-
-        .card img{
-            height:250px;
-            object-fit:cover;
-        }
-
-        /* ----- Header ----- */
-        .header-top{
-            background:#1a1a2e;
-            color:white;
-            padding:12px 24px;
+        /* ===== HEADER ===== */
+        header {
+            position: sticky;
+            top:0;
+            z-index:1000;
+            background: var(--header-bg);
+            color: var(--header-text);
             display:flex;
             align-items:center;
             justify-content:space-between;
+            padding:10px 20px;
         }
 
-        .logo{
-            font-size:20px;
-            font-weight:bold;
-        }
+        header .logo { font-size:1.5rem; font-weight:bold; }
+        header .nav { display:flex; gap:15px; }
+        header .nav a { color:white; font-weight:500; }
+        header .nav a:hover { color:var(--accent); }
 
-        .search-bar{
-            display:flex;
-            justify-content:center;
-            align-items:center;
-            gap:10px;
-        }
-
-        .search-bar input{
-            width:1000px;
-            padding:8px 14px;
-            border-radius:20px;
-            border:1px solid #ccc;
-        }
-
-        #searchBtn{
-            padding:8px 16px;
-            border:none;
-            background:#c9a227;
-            color:white;
-            border-radius:20px;
-            cursor:pointer;
-        }
-
-        #searchBtn:hover{
-            background:#a88b1f;
-        }
-
-        .nav{
-            display:flex;
-            gap:20px;
-        }
-
-        .nav a{
-            color:white;
-            text-decoration:none;
-            font-weight:500;
-        }
-
-        .nav a:hover{
-            color:#c9a227;
-        }
-        /* ----- Main ----- */
-        main { max-width: 1280px; margin: 0 auto; padding: 24px 20px 48px; }
-        .banner img{
-            width:100%;
-            border-radius:8px;
-            margin-bottom:20px;
-        }
-        /* Hero / intro */
-        .collection-intro {
-            margin-bottom: 28px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid var(--border);
-        }
-        .collection-intro h1 {
-            font-size: 1.75rem;
-            margin: 0 0 12px;
-            font-weight: 600;
-        }
-        .collection-intro p {
-            margin: 0;
-            max-width: 720px;
-            color: #555;
-            font-size: 0.95rem;
-        }
-
-        /* Toolbar: sort & filter */
-        .categories{
-            background:white;
-            padding:20px;
-            border-radius:8px;
-            box-shadow:0 2px 8px rgba(0,0,0,0.05);
-        }
-
-        .categories h3{
-            font-size:14px;
-            margin-top:15px;
-        }
-
-        .categories select,
-        .categories input{
-            width:100%;
-            margin-bottom:10px;
-            padding:6px;
-            border:1px solid #ddd;
-            border-radius:4px;
-        }
-        .toolbar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-        .toolbar-label { font-size: 0.9rem; font-weight: 600; }
-        .sort-select {
-            padding: 8px 12px;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            background: var(--card-bg);
-            font-size: 0.9rem;
-            cursor: pointer;
-        }
-        .product-count { font-size: 0.9rem; color: #666; }
-
-        /* Book grid */
-        #booksContainer {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 24px;
-        }
-        .book {
-            background: var(--card-bg);
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-            transition: box-shadow 0.2s, transform 0.2s;
-            display: flex;
-            flex-direction: column;
-        }
-        .book:hover {
-            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
-            transform: translateY(-2px);
-        }
-        .book-cover {
-            width: 100%;
-            aspect-ratio: 2/3;
-            object-fit: cover;
-            background: #e8e6e1;
-        }
-        .book-info { padding: 14px; flex: 1; display: flex; flex-direction: column; }
-        .book-title {
-            font-weight: 600;
-            font-size: 0.98rem;
-            margin-bottom: 6px;
-            line-height: 1.3;
-            min-height: 2.6em;
-        }
-        .book-price {
-            color: #b45309;
-            font-weight: 700;
-            font-size: 1rem;
-            margin-bottom: 10px;
-        }
-        .book-meta { font-size: 0.8rem; color: #777; margin-bottom: 10px; }
-        .book-actions { margin-top: auto; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-        .book-actions input[type="number"] {
-            width: 52px;
-            padding: 6px 8px;
-            border: 1px solid var(--border);
-            border-radius: 4px;
-            font-size: 0.9rem;
-        }
-        .btn {
-            background: var(--accent);
-            color: #1a1a2e;
-            border: none;
-            padding: 8px 14px;
-            border-radius: 6px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .btn:hover { background: var(--accent-hover); }
-        .btn-secondary {
-            background: #444;
-            color: #fff;
-        }
-        .btn-secondary:hover { background: #333; }
-        .pagination{
-            display:flex;
-            justify-content:center;
-            margin-top:30px;
-            gap:8px;
-        }
-
-        .page-btn{
+        .search-bar { display:flex; flex:1; margin:0 20px; }
+        .search-bar input {
+            flex:1;
             padding:6px 12px;
-            border:1px solid #ccc;
-            background:white;
-            cursor:pointer;
-            border-radius:4px;
-        }
-
-        .page-btn.active{
-            background:#c9a227;
-            color:white;
+            border-radius:20px 0 0 20px;
             border:none;
         }
+        .search-bar button {
+            border:none;
+            background: var(--accent);
+            color:white;
+            padding:6px 15px;
+            border-radius:0 20px 20px 0;
+            cursor:pointer;
+        }
+        .search-bar button:hover { background: var(--accent-hover); }
 
+        /* Cart */
+        .cart{
+            display:flex;
+            align-items:center;
+            gap:5px;
+            padding:6px 10px;
+            border-radius:8px;
+            transition:0.2s;
+            cursor:pointer;
+        }
+        .cart:hover { background:rgba(255,255,255,0.1); }
+
+        /* ===== BANNER ===== */
+        .banner-slider{
+            position:relative;
+            width:100%;
+            height:320px;
+            overflow:hidden;
+            margin:20px auto;
+            border-radius:12px;
+        }
+        .banner-slider .slide{
+            position:absolute;
+            width:100%;
+            height:100%;
+            object-fit:cover;
+            opacity:0;
+            transition:0.5s;
+        }
+        .banner-slider .slide.active{ opacity:1; }
+
+        .banner-slider .nav{
+            position:absolute;
+            top:50%;
+            transform:translateY(-50%);
+            background:rgba(0,0,0,0.4);
+            color:white;
+            border:none;
+            padding:10px;
+            cursor:pointer;
+            border-radius:50%;
+        }
+        .banner-slider .prev{ left:10px; }
+        .banner-slider .next{ right:10px; }
+
+        .banner-slider .dots{
+            position:absolute;
+            bottom:10px;
+            width:100%;
+            text-align:center;
+        }
+        .banner-slider .dot{
+            display:inline-block;
+            width:12px;
+            height:12px;
+            margin:0 5px;
+            background:white;
+            border-radius:50%;
+            opacity:0.5;
+            cursor:pointer;
+        }
+        .banner-slider .dot.active{
+            opacity:1;
+            background: var(--accent);
+        }
+
+        /* ===== CATEGORY SHORTCUTS ===== */
         .category-icons{
             display:flex;
             justify-content:center;
-            gap:40px;
-            padding:30px;
+            gap:30px;
+            padding:20px 0;
             background:white;
-            border-radius:8px;
-            margin-bottom:20px;
+            border-radius:12px;
+            margin:20px auto;
         }
-
-        .cat{
-            text-align:center;
+        .category-icons .cat{
+            display:flex;
+            flex-direction:column;
+            align-items:center;
             cursor:pointer;
             font-size:28px;
+            transition:0.2s;
         }
-
-        .cat span{
-            display:block;
+        .category-icons .cat span{
             font-size:14px;
-            margin-top:5px;
+            margin-top:6px;
+        }
+        .category-icons .cat:hover{ color: var(--accent); transform:scale(1.1); }
+
+        /* ===== MAIN BOOKS ===== */
+        .container-main{
+            display:flex;
+            gap:20px;
+            max-width:1280px;
+            margin:20px auto;
         }
 
-        .cat:hover{
-            color:#c9a227;
-            transform:scale(1.1);
-        }
-        .modal{
-            display:none;
-            position:fixed;
-            top:0;
-            left:0;
-            width:100%;
-            height:100%;
-            background:rgba(0,0,0,0.6);
-            justify-content:center;
-            align-items:center;
-            z-index:999;
-        }
-
-        .modal-content{
+        aside.categories{
+            width:250px;
             background:white;
-            padding:20px;
-            border-radius:8px;
-            width:500px;
-            max-width:90%;
+            padding:15px;
+            border-radius:12px;
+            box-shadow:0 2px 10px rgba(0,0,0,0.05);
+            height:fit-content;
+            position:sticky;
+            top:90px;
         }
-        /* Footer */
-        footer {
-            background: var(--header-bg);
-            color: var(--header-text);
-            padding: 32px 24px 24px;
-            margin-top: 48px;
+        aside h3{ font-size:14px; margin:10px 0; color:var(--accent); }
+        aside select, aside input{ width:100%; margin-bottom:10px; padding:6px; border:1px solid #ddd; border-radius:4px; }
+
+        .books-right{
+            flex:1;
         }
-        .footer-inner { max-width: 1280px; margin: 0 auto; }
-        .footer-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 24px;
-            margin-bottom: 28px;
+
+        .toolbar{
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            margin-bottom:15px;
         }
-        .footer h3 { font-size: 0.9rem; margin-bottom: 12px; color: var(--accent); }
-        .footer ul { list-style: none; padding: 0; margin: 0; }
-        .footer li { margin-bottom: 6px; }
-        .footer a { color: #ccc; text-decoration: none; font-size: 0.9rem; }
-        .footer a:hover { color: #fff; }
-        .footer-bottom { padding-top: 20px; border-top: 1px solid #333; font-size: 0.85rem; color: #888; }
+        .sort-select{ padding:6px 12px; border-radius:6px; border:1px solid var(--border); }
+
+        /* BOOK GRID */
+        #booksContainer{
+            display:grid;
+            grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+            gap:20px;
+        }
+        .book{
+            background:white;
+            border-radius:12px;
+            overflow:hidden;
+            box-shadow:0 2px 8px rgba(0,0,0,0.05);
+            display:flex;
+            flex-direction:column;
+            transition:0.3s;
+        }
+        .book:hover{ transform:translateY(-2px); box-shadow:0 6px 20px rgba(0,0,0,0.1); }
+        .book img{ width:100%; aspect-ratio:2/3; object-fit:cover; }
+        .book-info{ padding:12px; display:flex; flex-direction:column; flex:1; }
+        .book-title{ font-weight:600; font-size:0.95rem; margin-bottom:6px; min-height:2.4em; }
+        .book-price{ color:#b45309; font-weight:700; margin-bottom:10px; }
+        .book-actions{ margin-top:auto; display:flex; gap:5px; flex-wrap:wrap; }
+        .book-actions input{ width:50px; padding:5px; border:1px solid #ddd; border-radius:4px; }
+
+        /* BUTTON */
+        .btn{ background: var(--accent); color:white; border:none; padding:6px 12px; border-radius:6px; cursor:pointer; }
+        .btn:hover{ background: var(--accent-hover); }
+        .btn-secondary{ background:#555; color:white; }
+        .btn-secondary:hover{ background:#333; }
+
+        /* PAGINATION */
+        .pagination{ display:flex; justify-content:center; gap:8px; margin-top:20px; }
+        .page-btn{ padding:6px 12px; border:1px solid #ccc; border-radius:4px; cursor:pointer; background:white; }
+        .page-btn.active{ background:var(--accent); color:white; border:none; }
     </style>
 </head>
 <body>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<header class="header-top">
 
-    <div class="logo">
-        <a href="index.html">📚 Online Book Shop</a>
-    </div>
+<!-- ===== HEADER ===== -->
+<header>
+    <div class="logo">📚 Online Book Shop</div>
 
     <div class="search-bar">
-
         <input type="text" id="searchInput" placeholder="Search books...">
-
         <button id="searchBtn">Search</button>
-
     </div>
 
-    <nav class="nav">
-        <a href="index.html">Home</a>
+    <div class="nav">
+        <a href="#">Home</a>
         <a href="login.html">Login</a>
-        <a href="cart.html">
-            <i class="fa-solid fa-cart-shopping"></i>
-            <span id="headerCartCount">(0)</span>
-        </a>
-    </nav>
-
-</header>
-<div id="bannerCarousel" class="carousel slide" data-bs-ride="carousel">
-
-    <div class="carousel-inner">
-
-        <div class="carousel-item active">
-            <img src="images/banner1.jpg" class="d-block w-100">
-        </div>
-
-        <div class="carousel-item">
-            <img src="images/banner2.jpg" class="d-block w-100">
-        </div>
-
-        <div class="carousel-item">
-            <img src="images/banner3.jpg" class="d-block w-100">
-        </div>
-
+        <a href="cart.html" class="cart">🛒 <span id="headerCartCount">$0.00 (0)</span></a>
     </div>
+</header>
 
-    <button class="carousel-control-prev" type="button" data-bs-target="#bannerCarousel" data-bs-slide="prev">
-        <span class="carousel-control-prev-icon"></span>
-    </button>
+<!-- ===== BANNER ===== -->
+<div class="banner-slider">
+    <img src="images/banner1.jpg" class="slide active">
+    <img src="images/banner2.jpg" class="slide">
+    <img src="images/banner3.jpg" class="slide">
 
-    <button class="carousel-control-next" type="button" data-bs-target="#bannerCarousel" data-bs-slide="next">
-        <span class="carousel-control-next-icon"></span>
-    </button>
+    <button class="nav prev" onclick="prevSlide()">❮</button>
+    <button class="nav next" onclick="nextSlide()">❯</button>
 
+    <div class="dots">
+        <span onclick="goToSlide(0)" class="dot active"></span>
+        <span onclick="goToSlide(1)" class="dot"></span>
+        <span onclick="goToSlide(2)" class="dot"></span>
+    </div>
 </div>
 
-<main>
-    <section class="collection-intro" id="books">
-        <h1>Books</h1>
-        <p>Discover a world of wisdom and inspiration. Browse our book collection—current titles and classics for learning, mindfulness, and the joy of reading.</p>
-    </section>
+<!-- ===== CATEGORY SHORTCUTS ===== -->
+<div class="category-icons">
+    <div class="cat" onclick="applyFilters()">📖<span>Fiction</span></div>
+    <div class="cat" onclick="applyFilters()">💼<span>Business</span></div>
+    <div class="cat" onclick="applyFilters()">💻<span>Technology</span></div>
+    <div class="cat" onclick="applyFilters()">🔬<span>Science</span></div>
+    <div class="cat" onclick="applyFilters()">🧠<span>Self Help</span></div>
+</div>
 
-    <section class="category-icons">
+<!-- ===== MAIN ===== -->
+<div class="container-main">
+    <!-- LEFT FILTER -->
+    <aside class="categories">
+        <h3>Publisher</h3>
+        <select id="publisherFilter"><option value="">All Publishers</option></select>
 
-        <div class="cat" onclick="filterBooks('fiction')">
-            📖
-            <span>Fiction</span>
+        <h3>Price</h3>
+        <input type="number" id="minPrice" placeholder="Min">
+        <input type="number" id="maxPrice" placeholder="Max">
+
+        <h3>Format</h3>
+        <select id="formatFilter">
+            <option value="">All</option>
+            <option value="hardcover">Hardcover</option>
+            <option value="paperback">Paperback</option>
+            <option value="ebook">Ebook</option>
+        </select>
+
+        <h3>Condition</h3>
+        <select id="conditionFilter">
+            <option value="">All</option>
+            <option value="new">New</option>
+            <option value="like_new">Like New</option>
+            <option value="good">Good</option>
+            <option value="fair">Fair</option>
+        </select>
+
+        <button class="btn" onclick="applyFilters()">Apply Filters</button>
+    </aside>
+
+    <!-- RIGHT BOOK GRID -->
+    <div class="books-right">
+        <div class="toolbar">
+            <span class="toolbar-label"></span>
+            <select class="sort-select" id="sortSelect">
+                <option value="featured">Featured</option>
+                <option value="title-asc">A–Z</option>
+                <option value="title-desc">Z–A</option>
+                <option value="price-asc">Price ↑</option>
+                <option value="price-desc">Price ↓</option>
+            </select>
+            <span class="product-count" id="productCount">0 products</span>
         </div>
 
-        <div class="cat" onclick="filterBooks('business')">
-            💼
-            <span>Business</span>
-        </div>
-
-        <div class="cat" onclick="filterBooks('technology')">
-            💻
-            <span>Technology</span>
-        </div>
-
-        <div class="cat" onclick="filterBooks('science')">
-            🔬
-            <span>Science</span>
-        </div>
-
-        <div class="cat" onclick="filterBooks('self-help')">
-            🧠
-            <span>Self Help</span>
-        </div>
-
-    </section>
-    <div class="container-fluid">
-        <div class="row">
-
-            <!-- LEFT SIDEBAR -->
-            <div class="col-lg-3">
-
-                <aside class="categories">
-
-                    <h3>Publisher</h3>
-                    <select id="publisherFilter">
-                        <option value="">All Publishers</option>
-                    </select>
-
-                    <h3>Price</h3>
-                    <input type="number" id="minPrice" placeholder="Min">
-                    <input type="number" id="maxPrice" placeholder="Max">
-
-                    <h3>Format</h3>
-                    <select id="formatFilter">
-                        <option value="">All</option>
-                        <option value="hardcover">Hardcover</option>
-                        <option value="paperback">Paperback</option>
-                        <option value="ebook">Ebook</option>
-                    </select>
-
-                    <h3>Condition</h3>
-                    <select id="conditionFilter">
-                        <option value="">All</option>
-                        <option value="new">New</option>
-                        <option value="like_new">Like New</option>
-                        <option value="good">Good</option>
-                        <option value="fair">Fair</option>
-                    </select>
-
-                    <button class="btn" onclick="applyFilters()">Apply Filters</button>
-
-                </aside>
-
-            </div>
-
-
-            <!-- RIGHT SIDE PRODUCTS -->
-            <div class="col-lg-9">
-
-                <div class="toolbar">
-                    <span class="toolbar-label"></span>
-
-                    <select class="sort-select" id="sortSelect">
-                        <option value="featured">Featured</option>
-                        <option value="title-asc">Alphabetically, A–Z</option>
-                        <option value="title-desc">Alphabetically, Z–A</option>
-                        <option value="price-asc">Price, low to high</option>
-                        <option value="price-desc">Price, high to low</option>
-                    </select>
-
-                    <span class="product-count" id="productCount">0 products</span>
-                </div>
-
-                <div id="openBookModal" class="modal">
-
-                    <div class="modal-content">
-
-                        <span onclick="closeModal()" style="cursor:pointer;float:right;">✖</span>
-
-                        <div id="openBook"></div>
-
-                    </div>
-
-                </div>
-                <div id="booksContainer"></div>
-
-                <div class="pagination" id="pagination"></div>
-            </div>
-
-        </div>
+        <div id="booksContainer"></div>
+        <div class="pagination" id="pagination"></div>
     </div>
-</main>
-
-<footer>
-    <div class="footer-inner">
-        <div class="footer-grid">
-            <div>
-                <h3>Information</h3>
-                <ul>
-                    <li><a href="#">Contact Us</a></li>
-                    <li><a href="#">Shipping Policy</a></li>
-                    <li><a href="#">Returns</a></li>
-                </ul>
-            </div>
-            <div>
-                <h3>About</h3>
-                <ul>
-                    <li><a href="#">About Us</a></li>
-                    <li><a href="#">Privacy Policy</a></li>
-                </ul>
-            </div>
-        </div>
-        <div class="footer-bottom">© Online Book Shop</div>
-    </div>
-</footer>
+</div>
 
 <script src="app.js"></script>
 </body>
