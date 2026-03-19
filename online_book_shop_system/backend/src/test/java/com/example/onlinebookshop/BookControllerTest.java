@@ -4,7 +4,7 @@ import com.example.onlinebookshop.Service.BookService;
 import com.example.onlinebookshop.dto.BookVariantDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -18,6 +18,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(com.example.onlinebookshop.Controller.BookController.class)
+@AutoConfigureMockMvc(addFilters = false)
 class BookControllerTest {
 
     @Autowired
@@ -31,7 +32,8 @@ class BookControllerTest {
 
     @Test
     void getAllBooks_shouldReturn200AndList() throws Exception {
-        BookVariantDTO dto = BookVariantDTO.builder().id(1L).title("Clean Code").salePrice(BigDecimal.valueOf(39.99)).build();
+        BookVariantDTO dto = BookVariantDTO.builder().id(1L).title("Clean Code").salePrice(BigDecimal.valueOf(39.99))
+                .build();
         when(bookService.getAllBookVariants()).thenReturn(List.of(dto));
 
         mockMvc.perform(get("/api/books"))
@@ -44,7 +46,8 @@ class BookControllerTest {
 
     @Test
     void getBookById_shouldReturn200AndDTO() throws Exception {
-        BookVariantDTO dto = BookVariantDTO.builder().id(1L).title("Clean Code").salePrice(BigDecimal.valueOf(39.99)).build();
+        BookVariantDTO dto = BookVariantDTO.builder().id(1L).title("Clean Code").salePrice(BigDecimal.valueOf(39.99))
+                .build();
         when(bookService.getBookVariantById(1L)).thenReturn(dto);
 
         mockMvc.perform(get("/api/books/1"))
