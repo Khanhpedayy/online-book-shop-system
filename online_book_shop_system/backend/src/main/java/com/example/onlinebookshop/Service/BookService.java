@@ -18,4 +18,6 @@ public interface BookService {
     BookDetailDTO getBookDetail(Long id);
 
     void deleteBookVariant(Long id);
+
+    List<BookVariantDTO> findBooks(String keyword, String publisherName, Double minPrice, Double maxPrice);
 }

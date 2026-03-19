@@ -134,4 +134,15 @@ public class BookServiceImpl implements BookService {
 
         return dto;
     }
+
+    @Override
+    public List<BookVariantDTO> findBooks(String keyword, String publisherName, Double minPrice, Double maxPrice) {
+        List<BookVariant> variants = variantRepository.findBooksFiltered(
+                keyword, publisherName, minPrice, maxPrice
+        );
+
+        return variants.stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
+    }
 }

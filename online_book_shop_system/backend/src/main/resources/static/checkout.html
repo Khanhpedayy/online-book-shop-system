@@ -5,6 +5,34 @@
     <title>Checkout</title>
 
     <style>
+        .header-top{
+            background:#1a1a2e;
+            color:white;
+            padding:12px 24px;
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+        }
+
+        .logo{
+            font-size:20px;
+            font-weight:bold;
+        }
+
+        .nav{
+            display:flex;
+            gap:20px;
+        }
+
+        .nav a{
+            color:white;
+            text-decoration:none;
+            font-weight:500;
+        }
+
+        .nav a:hover{
+            color:#c9a227;
+        }
         body {
             margin:0;
             font-family: system-ui;
@@ -76,7 +104,22 @@
 </head>
 
 <body>
+<header class="header-top">
 
+    <div class="logo">
+        <a href="index.html">📚 Online Book Shop</a>
+    </div>
+
+    <nav class="nav">
+        <a href="index.html">Home</a>
+        <a href="login.html">Login</a>
+        <a href="cart.html">
+            <i class="fa-solid fa-cart-shopping"></i>
+            <span id="headerCartCount">(0)</span>
+        </a>
+    </nav>
+
+</header>
 <div class="container">
 
     <h1>Checkout</h1>
@@ -99,6 +142,7 @@
                     <option value="COD">Cash on Delivery</option>
                     <option value="PAYOS">Pay with PayOS</option>
                 </select>
+
 
                 <button id="submitBtn" type="submit">Place Order</button>
 
