@@ -98,9 +98,9 @@ public class ManagerReturnsDecisionRepository {
     }
 
     public void logTransaction(String movementType, Long variantId, Long lotId, Long copyId,
-            int qty, String refType, Long refId, String reason, String note) {
+                               int qty, String refType, Long refId, String reason, String note) {
         jdbc.update("INSERT INTO inventory_transactions (movement_type, variant_id, lot_id, copy_id, "
-                + "quantity, reference_type, reference_id, reason, note) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                        + "quantity, reference_type, reference_id, reason, note) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 movementType, variantId, lotId, copyId, qty, refType, refId, reason, note);
     }
 }
