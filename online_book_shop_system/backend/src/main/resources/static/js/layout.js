@@ -7,13 +7,14 @@ const Layout = {
         {
             title: 'Tổng quan',
             items: [
-                { label: 'Bảng tổng quan', href: 'inventory-overview.html', icon: 'bi-grid-1x2' },
+                { label: 'Bảng tổng quan', href: 'dashboard.html', icon: 'bi-grid-1x2' },
             ],
         },
         {
             title: 'Quản lý',
             items: [
                 { label: 'Sách', href: 'books.html', icon: 'bi-book' },
+                { label: 'Danh mục', href: 'categories.html', icon: 'bi-bookmark' },
                 { label: 'Phiên bản & Giá', href: 'variants.html', icon: 'bi-tags' },
                 { label: 'Nhà cung cấp', href: 'suppliers.html', icon: 'bi-truck' },
             ],
@@ -21,10 +22,12 @@ const Layout = {
         {
             title: 'Kho hàng',
             items: [
+                { label: 'Tồn kho', href: 'stock.html', icon: 'bi-box-seam' },
                 { label: 'Nhập hàng', href: 'lots.html', icon: 'bi-box-seam' },
-                { label: 'Đăng ký bản sao', href: 'copies.html', icon: 'bi-qr-code-scan' },
+                { label: 'Sắp xếp lên kệ (Bản sao)', href: 'copies.html', icon: 'bi-qr-code-scan' },
                 { label: 'Điều chỉnh', href: 'adjustments.html', icon: 'bi-arrow-down-up' },
                 { label: 'Kiểm kê', href: 'stocktaking.html', icon: 'bi-clipboard-check' },
+                { label: 'Cài đặt Điều phối', href: 'staff-allocation-settings.html', icon: 'bi-gear-wide-connected' },
             ],
         },
         {
