@@ -31,18 +31,33 @@ public class ManagerVariantPricingService {
         return v;
     }
 
+    public VariantDTO getVariantBySku(String sku) {
+        VariantDTO v = repo.findVariantBySku(sku);
+        if (v == null)
+            throw new RuntimeException("Variant not found with SKU: " + sku);
+        return v;
+    }
+
     @Transactional
     public VariantDTO createVariant(CreateVariantRequest req) {
         if (req.getBookId() == null)
-            throw new IllegalArgumentException("bookId is required");
+            throw new IllegalArgumentException("Thiếu thông tin sách (bookId)");
         if (req.getSku() == null || req.getSku().isBlank())
-            throw new IllegalArgumentException("sku is required");
+            throw new IllegalArgumentException("Thiếu mã SKU");
+        if (req.getListPrice() == null)
+            throw new IllegalArgumentException("Thiếu Giá niêm yết (list_price)");
+        if (req.getSalePrice() == null)
+            throw new IllegalArgumentException("Thiếu Giá bán (sale_price)");
         Long id = repo.insertVariant(req);
         return repo.findVariantById(id);
     }
 
     @Transactional
     public VariantDTO updateVariant(Long id, UpdateVariantRequest req) {
+        if (req.getListPrice() == null)
+            throw new IllegalArgumentException("Thiếu Giá niêm yết (list_price)");
+        if (req.getSalePrice() == null)
+            throw new IllegalArgumentException("Thiếu Giá bán (sale_price)");
         getVariantById(id); // ensure exists
         int rows = repo.updateVariant(id, req);
         if (rows == 0)

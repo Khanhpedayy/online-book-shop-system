@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 
 import java.util.List;
 import java.util.Map;
@@ -35,13 +36,13 @@ public class ManagerSupplierController {
 
     @PostMapping
     @Operation(summary = "Create supplier", description = "Create a new supplier record")
-    public ResponseEntity<SupplierDTO> create(@RequestBody CreateSupplierRequest req) {
+    public ResponseEntity<SupplierDTO> create(@Valid @RequestBody CreateSupplierRequest req) {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.create(req));
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "Update supplier")
-    public SupplierDTO update(@PathVariable Long id, @RequestBody UpdateSupplierRequest req) {
+    public SupplierDTO update(@PathVariable Long id, @Valid @RequestBody UpdateSupplierRequest req) {
         return service.update(id, req);
     }
 

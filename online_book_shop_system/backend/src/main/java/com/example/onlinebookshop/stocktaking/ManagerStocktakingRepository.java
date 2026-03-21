@@ -99,7 +99,7 @@ public class ManagerStocktakingRepository {
     /* â”€â”€ Log adjustment transaction â”€â”€ */
     public void logAdjustment(Long variantId, Long lotId, int qty, String note) {
         jdbc.update("INSERT INTO inventory_transactions (movement_type, variant_id, lot_id, quantity, "
-                + "reference_type, reason, note) VALUES ('ADJUST', ?, ?, ?, 'STOCKTAKING', 'COUNT_DIFF', ?)",
+                        + "reference_type, reason, note) VALUES ('ADJUST', ?, ?, ?, 'STOCKTAKING', 'COUNT_DIFF', ?)",
                 variantId, lotId, qty, note);
     }
 }

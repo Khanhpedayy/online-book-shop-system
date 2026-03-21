@@ -1,6 +1,8 @@
 package com.example.onlinebookshop.supplier;
 
 import lombok.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Email;
 import java.util.List;
 
 /* ═══ Response ═══ */
@@ -17,13 +19,15 @@ class SupplierDTO {
     private String phone;
     private String address;
     private String contactPerson;
-    private String taxId;
-    private String paymentTerms;
     private Boolean isActive;
     private String createdAt;
     private String updatedAt;
     private int totalLots;
     private int totalQtyReceived;
+
+    // Additional fields mapped from db
+    private String taxId;
+    private String paymentTerms;
 }
 
 /* ═══ Request ═══ */
@@ -33,15 +37,23 @@ class SupplierDTO {
 @NoArgsConstructor
 @AllArgsConstructor
 class CreateSupplierRequest {
+    @NotBlank(message = "Tên nhà cung cấp không được để trống")
     private String name;
+
+    @NotBlank(message = "Mã nhà cung cấp không được để trống")
     private String code;
+
+    @Email(message = "Định dạng email không hợp lệ")
     private String email;
+
     private String phone;
     private String address;
     private String contactPerson;
+    private Boolean isActive;
+
+    // Extra fields to prevent Jackson UnrecognizedPropertyException
     private String taxId;
     private String paymentTerms;
-    private Boolean isActive;
 }
 
 @Getter
@@ -49,13 +61,21 @@ class CreateSupplierRequest {
 @NoArgsConstructor
 @AllArgsConstructor
 class UpdateSupplierRequest {
+    @NotBlank(message = "Tên nhà cung cấp không được để trống")
     private String name;
+
+    @NotBlank(message = "Mã nhà cung cấp không được để trống")
     private String code;
+
+    @Email(message = "Định dạng email không hợp lệ")
     private String email;
+
     private String phone;
     private String address;
     private String contactPerson;
-    private String taxId;
     private Boolean isActive;
+
+    // Extra fields
+    private String taxId;
     private String paymentTerms;
 }

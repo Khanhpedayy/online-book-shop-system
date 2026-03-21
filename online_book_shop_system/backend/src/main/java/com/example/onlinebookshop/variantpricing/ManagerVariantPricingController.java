@@ -37,6 +37,12 @@ public class ManagerVariantPricingController {
         return service.getVariantById(id);
     }
 
+    @GetMapping("/sku/{sku}")
+    @Operation(summary = "Get variant detail by SKU")
+    public VariantDTO getVariantBySku(@PathVariable String sku) {
+        return service.getVariantBySku(sku);
+    }
+
     @PostMapping
     @Operation(summary = "Create variant", description = "Create a variant (cover type/edition/language) with SKU mapping")
     public ResponseEntity<VariantDTO> createVariant(@RequestBody CreateVariantRequest req) {
@@ -86,7 +92,7 @@ public class ManagerVariantPricingController {
     @PutMapping("/copies/{copyId}/price-override")
     @Operation(summary = "Override price per copy", description = "Set a custom selling price for an individual copy. Pass null to clear.")
     public ResponseEntity<Map<String, String>> overrideCopyPrice(@PathVariable Long copyId,
-            @RequestBody OverrideCopyPriceRequest req) {
+                                                                 @RequestBody OverrideCopyPriceRequest req) {
         service.overrideCopyPrice(copyId, req.getSellPriceOverride());
         return ResponseEntity.ok(Map.of("message", "Price override saved"));
     }

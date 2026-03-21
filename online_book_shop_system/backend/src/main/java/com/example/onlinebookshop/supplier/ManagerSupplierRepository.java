@@ -20,6 +20,7 @@ public class ManagerSupplierRepository {
 
     public List<SupplierDTO> findAll() {
         String sql = "SELECT s.id, s.name, s.code, s.email, s.phone, s.address, s.contact_person, s.is_active, "
+                + "s.tax_id, s.payment_terms, "
                 + "s.created_at, s.updated_at, "
                 + "ISNULL(agg.totalLots, 0) AS totalLots, ISNULL(agg.totalQtyReceived, 0) AS totalQtyReceived "
                 + "FROM suppliers s "
@@ -45,12 +46,15 @@ public class ManagerSupplierRepository {
                 d.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime().toString());
             d.setTotalLots(rs.getInt("totalLots"));
             d.setTotalQtyReceived(rs.getInt("totalQtyReceived"));
+            d.setTaxId(rs.getString("tax_id"));
+            d.setPaymentTerms(rs.getString("payment_terms"));
             return d;
         });
     }
 
     public SupplierDTO findById(Long id) {
         String sql = "SELECT s.id, s.name, s.code, s.email, s.phone, s.address, s.contact_person, s.is_active, "
+                + "s.tax_id, s.payment_terms, "
                 + "s.created_at, s.updated_at, "
                 + "ISNULL(agg.totalLots, 0) AS totalLots, ISNULL(agg.totalQtyReceived, 0) AS totalQtyReceived "
                 + "FROM suppliers s "
@@ -75,13 +79,15 @@ public class ManagerSupplierRepository {
                 d.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime().toString());
             d.setTotalLots(rs.getInt("totalLots"));
             d.setTotalQtyReceived(rs.getInt("totalQtyReceived"));
+            d.setTaxId(rs.getString("tax_id"));
+            d.setPaymentTerms(rs.getString("payment_terms"));
             return d;
         }, id);
         return list.isEmpty() ? null : list.get(0);
     }
 
     public Long insert(CreateSupplierRequest req) {
-        String sql = "INSERT INTO suppliers (name, code, email, phone, address, contact_person) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO suppliers (name, code, email, phone, address, contact_person, tax_id, payment_terms) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         KeyHolder kh = new GeneratedKeyHolder();
         jdbc.update(con -> {
             PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
@@ -91,16 +97,18 @@ public class ManagerSupplierRepository {
             ps.setString(4, req.getPhone());
             ps.setString(5, req.getAddress());
             ps.setString(6, req.getContactPerson());
+            ps.setString(7, req.getTaxId());
+            ps.setString(8, req.getPaymentTerms());
             return ps;
         }, kh);
         return kh.getKey().longValue();
     }
 
     public int update(Long id, UpdateSupplierRequest req) {
-        String sql = "UPDATE suppliers SET name=?, code=?, email=?, phone=?, address=?, contact_person=?, "
+        String sql = "UPDATE suppliers SET name=?, code=?, email=?, phone=?, address=?, contact_person=?, tax_id=?, payment_terms=?, "
                 + "is_active=?, updated_at=SYSUTCDATETIME() WHERE id=? AND deleted_at IS NULL";
         return jdbc.update(sql, req.getName(), req.getCode(), req.getEmail(), req.getPhone(),
-                req.getAddress(), req.getContactPerson(), req.getIsActive(), id);
+                req.getAddress(), req.getContactPerson(), req.getTaxId(), req.getPaymentTerms(), req.getIsActive(), id);
     }
 
     public int softDelete(Long id) {
