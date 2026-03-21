@@ -64,6 +64,25 @@ public class ManagerLotRepository {
         return list.isEmpty() ? null : list.get(0);
     }
 
+    /* ―― Single lot by code ―― */
+    public LotDTO findByLotCode(String lotCode) {
+        String sql = "SELECT l.id, l.lot_code, l.supplier_id, s.name AS supplier_name, "
+                + "l.variant_id, v.sku AS variant_sku, b.title AS book_title, "
+                + "l.receipt_code, l.invoice_no, l.warehouse, l.received_at, "
+                + "l.unit_cost, l.qty_received, l.qty_available, l.qty_reserved, "
+                + "l.qty_sold, l.qty_damaged, l.qty_returned, "
+                + "l.condition_default, l.status, l.note, l.created_at, "
+                + "DATEDIFF(day, l.received_at, GETDATE()) AS age_days, "
+                + "(l.qty_available * l.unit_cost) AS total_cost_value "
+                + "FROM lots l "
+                + "JOIN suppliers s ON l.supplier_id = s.id "
+                + "JOIN book_variants v ON l.variant_id = v.id "
+                + "JOIN books b ON v.book_id = b.id "
+                + "WHERE l.lot_code = ? AND l.deleted_at IS NULL";
+        List<LotDTO> list = jdbc.query(sql, (rs, i) -> mapLotDTO(rs), lotCode);
+        return list.isEmpty() ? null : list.get(0);
+    }
+
     /* â”€â”€ Copies for a lot â”€â”€ */
     public List<LotCopyDTO> findCopiesByLot(Long lotId) {
         String sql = "SELECT id, copy_code, location, condition_grade, condition_note, "
@@ -113,7 +132,7 @@ public class ManagerLotRepository {
 
     /* â”€â”€ Generate copies â”€â”€ */
     public int generateCopies(Long lotId, Long variantId, int count, String prefix, String location,
-            String conditionGrade) {
+                              String conditionGrade) {
         String sql = "INSERT INTO copies (copy_code, lot_id, variant_id, location, condition_grade) VALUES (?, ?, ?, ?, ?)";
         for (int i = 1; i <= count; i++) {
             String code = prefix + String.format("%04d", i);
@@ -136,7 +155,7 @@ public class ManagerLotRepository {
 
     /* â”€â”€ Log inventory transaction â”€â”€ */
     public void logTransaction(String movementType, Long variantId, Long lotId, Long copyId,
-            int quantity, String refType, Long refId, String reason, String note) {
+                               int quantity, String refType, Long refId, String reason, String note) {
         String sql = "INSERT INTO inventory_transactions (movement_type, variant_id, lot_id, copy_id, "
                 + "quantity, reference_type, reference_id, reason, note) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         jdbc.update(sql, movementType, variantId, lotId, copyId, quantity, refType, refId, reason, note);

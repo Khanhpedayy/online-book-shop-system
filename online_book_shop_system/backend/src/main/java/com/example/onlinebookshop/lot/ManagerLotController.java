@@ -52,7 +52,7 @@ public class ManagerLotController {
     @PutMapping("/{id}/lock")
     @Operation(summary = "Lock lot", description = "Lock a lot to stop allocation/sales")
     public ResponseEntity<Map<String, String>> lock(@PathVariable Long id,
-            @RequestBody(required = false) LockLotRequest req) {
+                                                    @RequestBody(required = false) LockLotRequest req) {
         service.lockLot(id, req != null ? req.getReason() : null);
         return ResponseEntity.ok(Map.of("message", "Lot locked successfully"));
     }
@@ -62,6 +62,12 @@ public class ManagerLotController {
     public ResponseEntity<Map<String, String>> unlock(@PathVariable Long id) {
         service.unlockLot(id);
         return ResponseEntity.ok(Map.of("message", "Lot unlocked successfully"));
+    }
+
+    @GetMapping("/code/{lotCode}")
+    @Operation(summary = "Get lot by code", description = "Find a specific lot by its lotCode instead of ID")
+    public LotDetailDTO getByLotCode(@PathVariable String lotCode) {
+        return service.getByLotCode(lotCode);
     }
 }
 

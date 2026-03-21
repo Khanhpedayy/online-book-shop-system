@@ -90,8 +90,8 @@ public class ManagerLotService {
         int rows = repo.lockLot(id);
         if (rows == 0)
             throw new RuntimeException("Lot not found: " + id);
-        LotDTO lot = repo.findById(id);
-        repo.logTransaction("ADJUST", lot.getVariantId(), id, null, 0, "ADJUSTMENT", id, "LOCKED", reason);
+        // Note: We don't log to inventory_transactions because quantity = 0 violates CK_it_qty
+        // and locking a lot doesn't actually move physical inventory.
     }
 
     @Transactional
@@ -105,5 +105,11 @@ public class ManagerLotService {
     public List<LotDTO> getLotsByVariant(Long variantId) {
         return repo.findAll(null, variantId);
     }
-}
 
+    public LotDetailDTO getByLotCode(String lotCode) {
+        LotDTO lot = repo.findByLotCode(lotCode);
+        if (lot == null)
+            throw new RuntimeException("Lot not found: " + lotCode);
+        return getById(lot.getId());
+    }
+}
