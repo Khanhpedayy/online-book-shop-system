@@ -35,7 +35,7 @@ public class ManagerBookController {
     // UPDATE
     @PutMapping("/{id}")
     public ManagerBook updateBook(@PathVariable Long id,
-            @RequestBody ManagerBook book) {
+                                  @RequestBody ManagerBook book) {
         return bookService.updateBook(id, book);
     }
 
