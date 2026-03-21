@@ -41,8 +41,8 @@ public class SecurityConfig {
                         // Admin-only endpoints
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         // Static resources
-                        .requestMatchers("/", "/index.html", "/login.html", "/admin.html",
-                                "/css/**", "/js/**", "/images/**", "/favicon.ico")
+                        .requestMatchers("/", "/index.html","book.html", "/login.html", "/admin.html", "/cart.html","/checkout.html",
+                                "/css/**", "/js/**","/*.js", "/images/**", "/favicon.ico")
                         .permitAll()
                         // All other requests require authentication
                         .anyRequest().authenticated())

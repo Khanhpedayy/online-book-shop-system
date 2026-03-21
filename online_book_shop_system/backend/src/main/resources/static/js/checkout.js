@@ -1,5 +1,4 @@
 const API_BASE = 'http://localhost:8080';
-const USER_ID = 1;
 
 const shippingCost = 5; // fixed shipping cost
 const vouchers = {
@@ -24,8 +23,15 @@ const paymentMethodSelect = document.getElementById("paymentMethod");
 const voucherInput = document.getElementById("voucherCode"); // new field
 const applyVoucherBtn = document.getElementById("applyVoucherBtn");
 // ===== API =====
+function getToken() {
+    return localStorage.getItem("token");
+}
 async function apiGet(path) {
-    const res = await fetch(API_BASE + path);
+    const res = await fetch(API_BASE + path, {
+        headers: {
+            "Authorization": "Bearer " + getToken()
+        }
+    });
     if (!res.ok) throw new Error(await res.text());
     return res.json();
 }
@@ -33,7 +39,10 @@ async function apiGet(path) {
 async function apiPost(path, body){
     const res = await fetch(API_BASE + path,{
         method:'POST',
-        headers:{'Content-Type':'application/json'},
+        headers:{
+            'Content-Type':'application/json',
+            "Authorization": "Bearer " + getToken()
+        },
         body:JSON.stringify(body)
     });
     if(!res.ok) throw new Error(await res.text());
@@ -61,7 +70,7 @@ async function loadCheckoutSummary() {
     summaryDiv.innerHTML = "Loading...";
 
     try {
-        const items = await apiGet(`/api/cart/user/${USER_ID}`);
+        const items = await apiGet(`/api/cart/me`);
         if (!items || items.length === 0) {
             summaryDiv.innerHTML = "Cart is empty.";
             return;
@@ -130,7 +139,6 @@ if (orderForm) {
 
         try {
             const body = {
-                customerId: USER_ID,
                 email: emailInput.value,
                 shippingAddress: addressInput.value,
                 recipientName: recipientInput.value,
@@ -141,8 +149,7 @@ if (orderForm) {
             };
 
             // 🔥 QUAN TRỌNG: dùng API đúng
-            const res = await apiPost(`/api/orders/from-cart/${USER_ID}`, body);
-
+            const res = await apiPost(`/api/orders/from-cart`, body);
             // ===== COD =====
             if (!res.paymentUrl) {
                 orderResult.textContent =

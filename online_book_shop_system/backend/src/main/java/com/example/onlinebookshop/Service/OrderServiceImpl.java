@@ -101,25 +101,45 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public Order placeOrderFromCart(Long userId, CheckoutRequest request) {
-        List<CartItem> cartItems = cartItemRepository.findByUser_IdOrderByAddedAtDesc(userId);
+    public Order placeOrderFromCartByEmail(String email, CheckoutRequest request) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // 🛒 lấy cart
+        List<CartItem> cartItems = cartItemRepository.findByUser_Id(user.getId());
+
         if (cartItems.isEmpty()) {
-            throw new IllegalArgumentException("Cart is empty");
-        }
-        if (request.getCustomerId() == null || !request.getCustomerId().equals(userId)) {
-            throw new IllegalArgumentException("You must log in to checkout. Guests cannot buy without an account.");
+            throw new RuntimeException("Cart is empty");
         }
         if (request.getShippingAddress() == null || request.getShippingAddress().isBlank()) {
             throw new IllegalArgumentException("Shipping address is required");
         }
 
+        // 📦 convert cart -> order items
         List<OrderItemRequest> items = cartItems.stream()
-                .map(ci -> new OrderItemRequest(ci.getVariant().getId(), ci.getQuantity()))
+                .map(ci -> new OrderItemRequest(
+                        ci.getVariant().getId(),
+                        ci.getQuantity()
+                ))
                 .toList();
-        OrderRequest orderRequest = new OrderRequest(items, request.getEmail(), request.getShippingAddress(),
-                request.getRecipientName(),request.getPhone(),request.getPaymentMethod() , request.getCustomerId());
+
+        // 🧾 build order request (gắn userId từ server)
+        OrderRequest orderRequest = new OrderRequest(
+                items,
+                request.getEmail(),
+                request.getShippingAddress(),
+                request.getRecipientName(),
+                request.getPhone(),
+                request.getPaymentMethod(),
+                user.getId() // 👈 QUAN TRỌNG
+        );
+
+        // 🛍 tạo order
         Order order = placeOrder(orderRequest);
-        cartItemRepository.deleteByUserId(userId);
+
+        // 🧹 clear cart
+        cartItemRepository.deleteByUserId(user.getId());
+
         return order;
     }
 

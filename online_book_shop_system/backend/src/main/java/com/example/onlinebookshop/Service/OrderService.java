@@ -13,7 +13,7 @@ public interface OrderService {
 
     Order placeOrder(OrderRequest request);
 
-    Order placeOrderFromCart(Long userId, CheckoutRequest request);
+    Order placeOrderFromCartByEmail(String email, CheckoutRequest request);
 
     Order getOrderById(Long id);
 

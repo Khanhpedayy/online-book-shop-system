@@ -24,19 +24,20 @@ public class OrderController {
     /**
      * Checkout from cart. Converts cart items to order and clears cart.
      */
-    @PostMapping("/from-cart/{userId}")
+    @PostMapping("/from-cart")
     @ResponseStatus(HttpStatus.CREATED)
     public Map<String, Object> checkoutFromCart(
-            @PathVariable Long userId,
-            @RequestBody CheckoutRequest request
+            @RequestBody CheckoutRequest request,
+            org.springframework.security.core.Authentication auth
     ) {
-        Order order = orderService.placeOrderFromCart(userId, request);
+        String email = auth.getName();
+
+        Order order = orderService.placeOrderFromCartByEmail(email, request);
 
         Map<String, Object> response = new HashMap<>();
         response.put("orderId", order.getId());
         response.put("totalAmount", order.getTotalAmount());
 
-        // 👇 xử lý payment luôn tại đây
         if ("PAYOS".equalsIgnoreCase(request.getPaymentMethod())) {
             String paymentUrl = orderService.createPayment(order);
             response.put("paymentUrl", paymentUrl);

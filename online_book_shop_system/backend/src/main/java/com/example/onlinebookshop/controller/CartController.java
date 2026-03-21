@@ -5,6 +5,7 @@ import com.example.onlinebookshop.Service.CartService;
 import com.example.onlinebookshop.dto.AddToCartRequest;
 import com.example.onlinebookshop.dto.UpdateCartItemRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,38 +20,34 @@ public class CartController {
         this.cartService = cartService;
     }
 
-    /**
-     * Get cart items for user.
-     */
-    @GetMapping("/user/{userId}")
-    public List<CartItem> getCart(@PathVariable Long userId) {
-        return cartService.getCart(userId);
+    // ✅ GET MY CART
+    @GetMapping("/me")
+    public List<CartItem> getMyCart(Authentication auth) {
+        String email = auth.getName();
+        return cartService.getCartByEmail(email);
     }
 
-    /**
-     * Add item to cart.
-     */
-    @PostMapping("/user/{userId}/items")
-    @ResponseStatus(HttpStatus.CREATED)
-    public CartItem addItem(@PathVariable Long userId, @RequestBody AddToCartRequest request) {
-        return cartService.addItem(userId, request);
+    // ✅ ADD ITEM
+    @PostMapping("/items")
+    public CartItem addToCart(@RequestBody AddToCartRequest req, Authentication auth) {
+        String email = auth.getName();
+        return cartService.addItemByEmail(email, req);
     }
 
-    /**
-     * Update item quantity. Set quantity to 0 to remove.
-     */
-    @PutMapping("/user/{userId}/items/{variantId}")
-    public CartItem updateItem(@PathVariable Long userId, @PathVariable Long variantId,
-                               @RequestBody UpdateCartItemRequest request) {
-        return cartService.updateItem(userId, variantId, request);
+    // ✅ UPDATE ITEM
+    @PutMapping("/items/{variantId}")
+    public CartItem updateItem(@PathVariable Long variantId,
+                               @RequestBody UpdateCartItemRequest request,
+                               Authentication auth) {
+        String email = auth.getName();
+        return cartService.updateItemByEmail(email, variantId, request);
     }
 
-    /**
-     * Remove item from cart.
-     */
-    @DeleteMapping("/user/{userId}/items/{variantId}")
+    // ✅ DELETE ITEM
+    @DeleteMapping("/items/{variantId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void removeItem(@PathVariable Long userId, @PathVariable Long variantId) {
-        cartService.removeItem(userId, variantId);
+    public void removeItem(@PathVariable Long variantId, Authentication auth) {
+        String email = auth.getName();
+        cartService.removeItemByEmail(email, variantId);
     }
 }

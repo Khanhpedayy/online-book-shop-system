@@ -15,6 +15,7 @@ public interface CartItemRepository extends JpaRepository<CartItem, Long> {
     Optional<CartItem> findByUser_IdAndVariant_IdAndCopyId(Long userId, Long variantId, Long copyId);
     /** Use when copyId is null (quantity-based cart item) */
     Optional<CartItem> findByUser_IdAndVariant_IdAndCopyIdIsNull(Long userId, Long variantId);
+    List<CartItem> findByUser_Id(Long userId);
     @Modifying
     @Query("DELETE FROM CartItem c WHERE c.user.id = :userId")
     void deleteByUserId(Long userId);

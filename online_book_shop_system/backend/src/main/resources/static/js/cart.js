@@ -1,5 +1,4 @@
 const API_BASE = 'http://localhost:8080';
-const USER_ID = 1;
 
 const cartContainer = document.getElementById("cartContainer");
 const headerCartCount = document.getElementById('headerCartCount');
@@ -18,6 +17,8 @@ const vouchers = {
     "HALFPRICE": 0.5,   // 50% off
 };
 
+console.log("TOKEN:", localStorage.getItem("token"));
+
 function updateHeaderCart(total, count) {
     if (!headerCartCount) return;
     headerCartCount.textContent =
@@ -25,14 +26,37 @@ function updateHeaderCart(total, count) {
         ' (' + (count || 0) + ')';
 }
 
+function isLoggedIn() {
+    return !!localStorage.getItem("token");
+}
+
 async function apiGet(path){
-    const resp = await fetch(`${API_BASE}${path}`);
+    const headers = {};
+
+    const token = localStorage.getItem("token");
+    if (token) {
+        headers["Authorization"] = "Bearer " + token;
+    }
+
+    const resp = await fetch(`${API_BASE}${path}`, { headers });
+
     if(!resp.ok) throw new Error(await resp.text());
     return resp.json();
 }
 
 async function apiDelete(path) {
-    const resp = await fetch(`${API_BASE}${path}`, { method: "DELETE" });
+    const headers = {};
+
+    const token = localStorage.getItem("token");
+    if (token) {
+        headers["Authorization"] = "Bearer " + token;
+    }
+
+    const resp = await fetch(`${API_BASE}${path}`, {
+        method: "DELETE",
+        headers
+    });
+
     if (!resp.ok && resp.status !== 204) {
         const text = await resp.text();
         throw new Error(`DELETE ${path} failed: ${resp.status} ${text}`);
@@ -58,7 +82,7 @@ async function loadCart() {
     if (cartContainer) cartContainer.innerHTML = 'Loading…';
 
     try {
-        const items = await apiGet(`/api/cart/user/${USER_ID}`);
+        const items = await apiGet(`/api/cart/me`);
 
         if (!Array.isArray(items) || items.length === 0) {
             cartContainer.innerHTML = 'Your cart is empty.';
@@ -91,7 +115,7 @@ async function loadCart() {
             btn.addEventListener('click', async () => {
                 const variantId = Number(btn.getAttribute('data-remove'));
                 try {
-                    await apiDelete(`/api/cart/user/${USER_ID}/items/${variantId}`);
+                    await apiDelete(`/api/cart/items/${variantId}`);
                     await loadCart();
                 } catch (e) {
                     console.error(e);
@@ -131,5 +155,11 @@ function goToCheckout() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+    if (!isLoggedIn()) {
+        alert("Please login first!");
+        window.location = "login.html";
+        return;
+    }
+
     loadCart();
 });
