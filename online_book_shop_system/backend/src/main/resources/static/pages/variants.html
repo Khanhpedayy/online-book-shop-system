@@ -85,11 +85,13 @@
                 </div>
                 <div class="modal-body">
                     <form id="variantForm" novalidate>
-                        <div id="bookIdField">
-                            <div class="mb-3"><label class="form-label">ID Sách <span
-                                        class="text-danger">*</span></label><input type="number" class="form-control"
-                                    id="f_bookId" required min="1">
-                                <div class="invalid-feedback">ID Sách là bắt buộc</div>
+                        <div id="bookIdField" class="position-relative">
+                            <div class="mb-3"><label class="form-label">Tên Sách hoặc ISBN <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="f_bookSearch" required placeholder="Gõ từ khóa, ISBN..." autocomplete="off">
+                                <input type="hidden" id="f_bookId">
+                                <div class="invalid-feedback">Vui lòng tìm và chọn một cuốn Sách từ danh sách</div>
+                                <ul class="dropdown-menu w-100 shadow-sm" id="bookSearchDropdown" style="max-height:250px; overflow-y:auto; display:none; position:absolute;"></ul>
                             </div>
                         </div>
                         <div class="row g-3 mb-3">
@@ -162,10 +164,10 @@
                 <div class="modal-body">
                     <div class="mb-3"><label class="form-label">Giá niêm yết (₫) <span
                                 class="text-danger">*</span></label><input type="number" class="form-control"
-                            id="p_listPrice" min="0" step="1000" required></div>
+                            id="p_listPrice" min="0" step="1000" oninput="this.value = this.value.replace(/[^0-9]/g, '')" required></div>
                     <div class="mb-3"><label class="form-label">Giá bán (₫) <span
                                 class="text-danger">*</span></label><input type="number" class="form-control"
-                            id="p_salePrice" min="0" step="1000" required></div>
+                            id="p_salePrice" min="0" step="1000" oninput="this.value = this.value.replace(/[^0-9]/g, '')" required></div>
                 </div>
                 <div class="modal-footer"><button type="button" class="btn btn-secondary"
                         data-bs-dismiss="modal">Hủy</button><button type="button" class="btn btn-primary"
@@ -190,15 +192,15 @@
                             giá (giảm 0%)</span></div>
                     <div class="mb-3"><label class="form-label">Như mới (Like New) — % Giảm giá</label>
                         <div class="input-group"><input type="number" class="form-control" id="c_likeNewPct" min="0"
-                                max="100"><span class="input-group-text">%</span></div>
+                                max="100" oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value>100) this.value=100;"><span class="input-group-text">%</span></div>
                     </div>
                     <div class="mb-3"><label class="form-label">Tốt (Good) — % Giảm giá</label>
                         <div class="input-group"><input type="number" class="form-control" id="c_goodPct" min="0"
-                                max="100"><span class="input-group-text">%</span></div>
+                                max="100" oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value>100) this.value=100;"><span class="input-group-text">%</span></div>
                     </div>
                     <div class="mb-3"><label class="form-label">Khá (Fair) — % Giảm giá</label>
                         <div class="input-group"><input type="number" class="form-control" id="c_fairPct" min="0"
-                                max="100"><span class="input-group-text">%</span></div>
+                                max="100" oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value>100) this.value=100;"><span class="input-group-text">%</span></div>
                     </div>
                 </div>
                 <div class="modal-footer"><button type="button" class="btn btn-secondary"
@@ -276,14 +278,21 @@
 
         function openCreate() {
             editingId = null;
-            document.getElementById('formTitle').textContent = 'Tạo biến thể';
+            document.getElementById('formTitle').textContent = 'Thêm biến thể / SKU mới';
             document.getElementById('btnSave').textContent = 'Tạo';
             document.getElementById('bookIdField').style.display = 'block';
+            document.getElementById('f_bookSearch').required = true;
             document.getElementById('isActiveField').style.display = 'none';
             document.getElementById('variantForm').reset();
+            document.getElementById('f_bookId').value = '';
+            document.getElementById('f_bookSearch').value = '';
+            document.getElementById('bookSearchDropdown').style.display = 'none';
             document.getElementById('variantForm').classList.remove('was-validated');
             const bp = new URLSearchParams(window.location.search).get('bookId');
-            if (bp) document.getElementById('f_bookId').value = bp;
+            if (bp) {
+                document.getElementById('f_bookId').value = bp;
+                document.getElementById('f_bookSearch').value = "ID sách đã chọn: " + bp;
+            }
             new bootstrap.Modal(document.getElementById('formModal')).show();
         }
 
@@ -293,6 +302,7 @@
             document.getElementById('formTitle').textContent = 'Sửa biến thể';
             document.getElementById('btnSave').textContent = 'Cập nhật';
             document.getElementById('bookIdField').style.display = 'none';
+            document.getElementById('f_bookSearch').required = false;
             document.getElementById('isActiveField').style.display = 'block';
             document.getElementById('f_sku').value = v.sku || '';
             document.getElementById('f_format').value = v.format || '';
@@ -313,11 +323,30 @@
         async function save() {
             const form = document.getElementById('variantForm');
             if (!form.checkValidity()) { form.classList.add('was-validated'); return; }
+            
             const payload = {};
             ['sku', 'format', 'edition', 'language'].forEach(f => { const v = document.getElementById('f_' + f).value.trim(); if (v) payload[f] = v; });
-            ['listPrice', 'salePrice', 'pageCount', 'weightGrams', 'thicknessMm', 'widthMm', 'heightMm'].forEach(f => { const v = document.getElementById('f_' + f).value; if (v) payload[f] = Number(v); });
-            if (!editingId) payload.bookId = Number(document.getElementById('f_bookId').value);
-            if (editingId) payload.isActive = document.getElementById('f_isActive').checked;
+            
+            const listPrice = document.getElementById('f_listPrice').value;
+            const salePrice = document.getElementById('f_salePrice').value;
+            if (!listPrice || listPrice === '') { showToast('Vui lòng nhập Giá niêm yết', 'warning'); return; }
+            if (!salePrice || salePrice === '') { showToast('Vui lòng nhập Giá bán', 'warning'); return; }
+            
+            payload.listPrice = Number(listPrice);
+            payload.salePrice = Number(salePrice);
+            
+            ['pageCount', 'weightGrams', 'thicknessMm', 'widthMm', 'heightMm'].forEach(f => { const v = document.getElementById('f_' + f).value; if (v !== '') payload[f] = Number(v); });
+            
+            if (!editingId) {
+                const bId = Number(document.getElementById('f_bookId').value);
+                if (!bId || bId <= 0) {
+                    showToast('Vui lòng tìm và SỬ DỤNG CHUỘT BẤM CHỌN một cuốn Sách từ danh sách gợi ý!', 'danger');
+                    return;
+                }
+                payload.bookId = bId;
+            } else {
+                payload.isActive = document.getElementById('f_isActive').checked;
+            }
             try {
                 if (editingId) { await api.put(`/management/variants/${editingId}`, payload); showToast('Đã cập nhật biến thể', 'success'); }
                 else { await api.post('/management/variants', payload); showToast('Đã tạo biến thể', 'success'); }
@@ -337,7 +366,7 @@
         async function savePrice() {
             if (!pricingId) return;
             try {
-                await api.put(`/management/variants/${pricingId}/base-price`, {
+                await api.put(`/management/variants/${pricingId}/price`, {
                     listPrice: Number(document.getElementById('p_listPrice').value),
                     salePrice: Number(document.getElementById('p_salePrice').value),
                 });
@@ -360,18 +389,24 @@
 
         async function saveCond() {
             if (!condId) return;
-            const json = {};
             const ln = Number(document.getElementById('c_likeNewPct').value);
             const gd = Number(document.getElementById('c_goodPct').value);
             const fr = Number(document.getElementById('c_fairPct').value);
+            
+            if (ln < 0 || ln > 100 || gd < 0 || gd > 100 || fr < 0 || fr > 100) {
+                showToast('Lỗi: Phần trăm giảm giá chỉ được phép từ 0 đến 100%', 'danger');
+                return;
+            }
+
+            const json = {};
             if (ln > 0) json.LIKE_NEW = { pct: ln };
             if (gd > 0) json.GOOD = { pct: gd };
             if (fr > 0) json.FAIR = { pct: fr };
             try {
                 await api.put(`/management/variants/${condId}/condition-prices`, { conditionPricesJson: JSON.stringify(json) });
-                showToast('Đã cập nhật giá theo tình trạng', 'success');
+                showToast('Đã lưu cấu hình giá theo tình trạng', 'success');
                 bootstrap.Modal.getInstance(document.getElementById('condModal')).hide();
-                variants = await api.get('/management/variants'); render();
+                variants = await api.get('/management/variants'); renderKPI(); render();
             } catch (e) { showToast('Lỗi', 'danger'); }
         }
 
@@ -381,6 +416,39 @@
             try { await api.delete(`/management/variants/${id}`); showToast('Đã xóa', 'success'); variants = await api.get('/management/variants'); renderKPI(); render(); }
             catch (e) { showToast('Thất bại', 'danger'); }
         }
+
+        let searchTimer = null;
+        document.getElementById('f_bookSearch').addEventListener('input', function(e) {
+            const val = e.target.value.trim();
+            const dd = document.getElementById('bookSearchDropdown');
+            document.getElementById('f_bookId').value = ''; 
+            if (val.length < 2) { dd.style.display = 'none'; return; }
+            clearTimeout(searchTimer);
+            searchTimer = setTimeout(async () => {
+                try {
+                    const res = await api.get('/management/books/search?q=' + encodeURIComponent(val));
+                    if (res && res.length) {
+                        dd.innerHTML = res.map(b => `<li><a class="dropdown-item py-2 border-bottom" href="javascript:void(0)" onclick="selectBook(${b.id}, '${(b.title || '').replace(/'/g, "\\'")}', '${b.isbn13 || b.isbn10 || ''}')"><div class="fw-bold text-truncate" style="max-width:300px">${b.title}</div><div class="small text-muted"><i class="bi bi-upc-scan"></i> ISBN: ${b.isbn13 || b.isbn10 || 'N/A'}</div></a></li>`).join('');
+                        dd.style.display = 'block';
+                    } else {
+                        dd.innerHTML = '<li class="dropdown-item text-muted text-center py-3">Không tìm thấy sách</li>';
+                        dd.style.display = 'block';
+                    }
+                } catch(e) { console.error(e); }
+            }, 300);
+        });
+        
+        function selectBook(id, title, isbn) {
+            document.getElementById('f_bookId').value = id;
+            document.getElementById('f_bookSearch').value = title + (isbn ? ` (${isbn})` : '');
+            document.getElementById('bookSearchDropdown').style.display = 'none';
+        }
+
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('#bookIdField')) {
+                document.getElementById('bookSearchDropdown').style.display = 'none';
+            }
+        });
 
         document.addEventListener('DOMContentLoaded', init);
     </script>

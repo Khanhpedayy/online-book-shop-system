@@ -610,7 +610,8 @@
                     formData.append('file', file);
                     const resp = await fetch('/api/upload/image', {
                         method: 'POST',
-                        body: formData
+                        body: formData,
+                        credentials: 'include'
                     });
                     if (!resp.ok) throw new Error('Upload failed');
                     const data = await resp.json();

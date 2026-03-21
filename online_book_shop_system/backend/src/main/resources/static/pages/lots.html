@@ -20,7 +20,7 @@
                 <div class="d-flex justify-content-between align-items-start mb-4">
                     <div>
                         <h2 class="fw-bold mb-1"><i class="bi bi-box-seam"></i>Nhập kho & Lô hàng</h2>
-                        <p class="text-muted mb-0">Nhận hàng, quản lý lô, tạo bản sao cá nhân</p>
+                        <p class="text-muted mb-0">Nhận hàng, quản lý lô, sắp xếp lên kệ</p>
                     </div>
                     <button class="btn btn-primary d-flex align-items-center gap-2" onclick="openCreate()">
                         <i class="bi bi-plus-lg"></i> Phiếu nhập kho mới
@@ -95,10 +95,17 @@
                                     id="f_supplierId" required></select>
                                 <div class="invalid-feedback">Bắt buộc</div>
                             </div>
-                            <div class="col-md-6"><label class="form-label">ID Biến thể <span
-                                        class="text-danger">*</span></label><input type="number" class="form-control"
-                                    id="f_variantId" required placeholder="Nhập ID biến thể">
-                                <div class="invalid-feedback">Bắt buộc</div>
+                            <div class="col-md-6"><label class="form-label">SKU Biến thể <span
+                                        class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="f_variantSku" placeholder="Nhập mã SKU"
+                                        onkeypress="if(event.key === 'Enter') { event.preventDefault(); searchVariantBySku(); }">
+                                    <button class="btn btn-outline-secondary" type="button"
+                                        onclick="searchVariantBySku()"><i class="bi bi-search"></i> TÌM</button>
+                                </div>
+                                <input type="hidden" id="f_variantId" required>
+                                <div class="invalid-feedback">Bắt buộc tìm thấy ID biến thể</div>
+                                <div id="variantInfo" class="mt-2 small"></div>
                             </div>
                         </div>
                         <h6 class="text-muted small fw-bold mb-3">Số lượng & Giá cả</h6>
@@ -124,8 +131,8 @@
                         <div class="row g-3 mb-3">
                             <div class="col-md-6"><label class="form-label">Kho hàng</label><input type="text"
                                     class="form-control" id="f_warehouse" value="MAIN"></div>
-                            <div class="col-md-6"><label class="form-label">Ngày hết hạn</label><input type="date"
-                                    class="form-control" id="f_expiresAt"></div>
+                            <!-- <div class="col-md-6"><label class="form-label">Ngày hết hạn</label><input type="date"
+                                    class="form-control" id="f_expiresAt"></div> -->
                         </div>
                     </form>
                 </div>
@@ -141,7 +148,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title fw-bold">🔢 Tạo Bản sao Cá nhân (Copies)</h5><button type="button"
+                    <h5 class="modal-title fw-bold">🔢 Sắp xếp lên kệ (Tạo Bản sao)</h5><button type="button"
                         class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
@@ -240,7 +247,34 @@
         function openCreate() {
             document.getElementById('lotForm').reset();
             document.getElementById('lotForm').classList.remove('was-validated');
+            document.getElementById('variantInfo').innerHTML = '';
+            document.getElementById('f_variantId').value = '';
             new bootstrap.Modal(document.getElementById('createModal')).show();
+        }
+
+        async function searchVariantBySku() {
+            const sku = document.getElementById('f_variantSku').value.trim();
+            const infoDiv = document.getElementById('variantInfo');
+            const hiddenId = document.getElementById('f_variantId');
+            if (!sku) {
+                infoDiv.innerHTML = '<span class="text-danger">Vui lòng nhập SKU</span>';
+                hiddenId.value = '';
+                return;
+            }
+            try {
+                infoDiv.innerHTML = '<span class="text-muted"><i class="bi bi-hourglass-split"></i> Đang tìm...</span>';
+                const v = await api.get('/management/variants/sku/' + sku);
+                if (v && v.id) {
+                    hiddenId.value = v.id;
+                    infoDiv.innerHTML = `<span class="text-success fw-bold"><i class="bi bi-check-circle"></i> Đã tìm thấy:</span> ${v.bookTitle} (${v.format} - ${v.edition})`;
+                } else {
+                    hiddenId.value = '';
+                    infoDiv.innerHTML = '<span class="text-danger"><i class="bi bi-x-circle"></i> Không tìm thấy biến thể với SKU này.</span>';
+                }
+            } catch (e) {
+                hiddenId.value = '';
+                infoDiv.innerHTML = '<span class="text-danger"><i class="bi bi-x-circle"></i> ' + (e.message || 'Không tìm thấy hoặc lỗi.') + '</span>';
+            }
         }
 
         async function createLot() {
@@ -255,8 +289,7 @@
                 qtyReceived: Number(document.getElementById('f_qtyReceived').value),
                 unitCost: Number(document.getElementById('f_unitCost').value),
                 conditionDefault: document.getElementById('f_conditionDefault').value,
-                warehouse: document.getElementById('f_warehouse').value.trim() || null,
-                expiresAt: document.getElementById('f_expiresAt').value || null,
+                warehouse: document.getElementById('f_warehouse').value.trim() || null
             };
             try {
                 await api.post('/inventory/lots', payload);
@@ -287,7 +320,7 @@
         }
 
         async function lockLot(id) {
-            try { await api.put(`/inventory/lots/${id}/lock`); showToast('Đã khóa lô', 'info'); lots = await api.get('/inventory/lots'); renderKPI(); render(); }
+            try { await api.put(`/inventory/lots/${id}/lock`, {}); showToast('Đã khóa lô', 'info'); lots = await api.get('/inventory/lots'); renderKPI(); render(); }
             catch (e) { showToast('Thất bại', 'danger'); }
         }
         async function unlockLot(id) {

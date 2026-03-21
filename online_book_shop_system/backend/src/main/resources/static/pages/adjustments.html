@@ -64,11 +64,28 @@
                 <div class="modal-body">
                     <form id="adjForm" novalidate>
                         <div class="row g-3 mb-3">
-                            <div class="col-md-6"><label class="form-label">ID Biến thể <span
-                                        class="text-danger">*</span></label><input type="number" class="form-control"
-                                    id="f_variantId" required></div>
-                            <div class="col-md-6"><label class="form-label">ID Lô hàng</label><input type="number"
-                                    class="form-control" id="f_lotId"></div>
+                            <div class="col-md-6"><label class="form-label">SKU Biến thể <span
+                                        class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="f_variantSku" placeholder="Nhập mã SKU"
+                                        onkeypress="if(event.key === 'Enter') { event.preventDefault(); searchVariantBySku(); }">
+                                    <button class="btn btn-outline-secondary" type="button"
+                                        onclick="searchVariantBySku()"><i class="bi bi-search"></i> TÌM</button>
+                                </div>
+                                <input type="hidden" id="f_variantId" required>
+                                <div class="invalid-feedback">Bắt buộc tìm thấy ID biến thể</div>
+                                <div id="variantInfo" class="mt-2 small"></div>
+                            </div>
+                            <div class="col-md-6"><label class="form-label">Mã Lô hàng</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="f_lotCode" placeholder="Nhập mã lô"
+                                        onkeypress="if(event.key === 'Enter') { event.preventDefault(); searchLotByCode(); }">
+                                    <button class="btn btn-outline-secondary" type="button"
+                                        onclick="searchLotByCode()"><i class="bi bi-search"></i> TÌM</button>
+                                </div>
+                                <input type="hidden" id="f_lotId">
+                                <div id="lotInfo" class="mt-2 small"></div>
+                            </div>
                         </div>
                         <div class="row g-3 mb-3">
                             <div class="col-md-4"><label class="form-label">Loại <span
@@ -150,6 +167,10 @@
         function openCreate() {
             document.getElementById('adjForm').reset();
             document.getElementById('adjForm').classList.remove('was-validated');
+            document.getElementById('variantInfo').innerHTML = '';
+            document.getElementById('f_variantId').value = '';
+            document.getElementById('lotInfo').innerHTML = '';
+            document.getElementById('f_lotId').value = '';
             new bootstrap.Modal(document.getElementById('createModal')).show();
         }
 
@@ -172,6 +193,56 @@
                 bootstrap.Modal.getInstance(document.getElementById('createModal')).hide();
                 adjustments = await api.get('/inventory/adjustments'); renderKPI(); render();
             } catch (e) { showToast('Thất bại', 'danger'); }
+        }
+
+        async function searchVariantBySku() {
+            const sku = document.getElementById('f_variantSku').value.trim();
+            const infoDiv = document.getElementById('variantInfo');
+            const hiddenId = document.getElementById('f_variantId');
+            if (!sku) {
+                infoDiv.innerHTML = '<span class="text-danger">Vui lòng nhập SKU</span>';
+                hiddenId.value = '';
+                return;
+            }
+            try {
+                infoDiv.innerHTML = '<span class="text-muted"><i class="bi bi-hourglass-split"></i> Đang tìm...</span>';
+                const v = await api.get('/management/variants/sku/' + sku);
+                if (v && v.id) {
+                    hiddenId.value = v.id;
+                    infoDiv.innerHTML = `<span class="text-success fw-bold"><i class="bi bi-check-circle"></i> Đã tìm thấy:</span> ${v.bookTitle} (${v.format} - ${v.edition})`;
+                } else {
+                    hiddenId.value = '';
+                    infoDiv.innerHTML = '<span class="text-danger"><i class="bi bi-x-circle"></i> Không tìm thấy biến thể với SKU này.</span>';
+                }
+            } catch (e) {
+                hiddenId.value = '';
+                infoDiv.innerHTML = '<span class="text-danger"><i class="bi bi-x-circle"></i> ' + (e.message || 'Không tìm thấy hoặc lỗi.') + '</span>';
+            }
+        }
+
+        async function searchLotByCode() {
+            const code = document.getElementById('f_lotCode').value.trim();
+            const infoDiv = document.getElementById('lotInfo');
+            const hiddenId = document.getElementById('f_lotId');
+            if (!code) {
+                infoDiv.innerHTML = '<span class="text-danger">Vui lòng nhập mã lô</span>';
+                hiddenId.value = '';
+                return;
+            }
+            try {
+                infoDiv.innerHTML = '<span class="text-muted"><i class="bi bi-hourglass-split"></i> Đang tìm...</span>';
+                const l = await api.get('/inventory/lots/code/' + code);
+                if (l && l.id) {
+                    hiddenId.value = l.id;
+                    infoDiv.innerHTML = `<span class="text-success fw-bold"><i class="bi bi-check-circle"></i> Đã tìm thấy lô:</span> ${l.bookTitle} (Kho: ${l.warehouse}, Có sẵn: <span class="fw-bold">${l.qtyAvailable}</span>)`;
+                } else {
+                    hiddenId.value = '';
+                    infoDiv.innerHTML = '<span class="text-danger"><i class="bi bi-x-circle"></i> Không tìm thấy lô hàng với mã này.</span>';
+                }
+            } catch (e) {
+                hiddenId.value = '';
+                infoDiv.innerHTML = '<span class="text-danger"><i class="bi bi-x-circle"></i> ' + (e.message || 'Không tìm thấy.') + '</span>';
+            }
         }
 
         document.addEventListener('DOMContentLoaded', init);

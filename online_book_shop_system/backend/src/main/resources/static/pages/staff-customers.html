@@ -60,7 +60,7 @@
                 <td>${c.email || '—'}</td>
                 <td>${c.phone || '—'}</td>
                 <td class="text-center"><span class="badge bg-primary">${c.orderCount || 0}</span></td>
-                <td><span class="badge bg-${c.status === 'ACTIVE' ? 'success' : 'secondary'}">${c.status || '—'}</span></td>
+                <td><span class="badge bg-${c.status === 'ACTIVE' ? 'success' : 'secondary'}">${c.status === 'ACTIVE' ? 'HOẠT ĐỘNG' : c.status === 'INACTIVE' ? 'BỊ KHÓA' : (c.status || '—')}</span></td>
                 <td class="small text-muted">${c.createdAt ? new Date(c.createdAt).toLocaleDateString('vi-VN') : '—'}</td>
             </tr>`).join('')}
         </tbody></table></div>`;
