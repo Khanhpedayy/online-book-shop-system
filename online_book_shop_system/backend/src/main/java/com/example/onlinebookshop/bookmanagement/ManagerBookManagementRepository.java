@@ -57,6 +57,43 @@ public class ManagerBookManagementRepository {
         });
     }
 
+    public List<BookListItemDTO> searchBooksByKeyword(String keyword) {
+        String sql = """
+                SELECT b.id, b.isbn13, b.title, b.subtitle, b.slug,
+                       b.publisher_name, b.publication_year, b.language, b.short_description, b.tags_json,
+                       c.name AS category_name, b.status, b.category_id, b.created_at, b.isbn10,
+                       (SELECT TOP 1 bi.url FROM book_images bi
+                        WHERE bi.book_id = b.id AND bi.is_cover = 1
+                          AND bi.deleted_at IS NULL
+                        ORDER BY bi.sort_order) AS cover_image_url
+                FROM books b
+                LEFT JOIN categories c ON c.id = b.category_id
+                WHERE b.deleted_at IS NULL
+                  AND (b.title LIKE ? OR b.isbn13 LIKE ? OR b.isbn10 LIKE ?)
+                ORDER BY b.created_at DESC
+            """;
+        String likeQuery = "%" + keyword + "%";
+        return jdbc.query(sql, (rs, rowNum) -> {
+            BookListItemDTO dto = new BookListItemDTO();
+            dto.setId(rs.getLong("id"));
+            dto.setIsbn13(rs.getString("isbn13"));
+            dto.setTitle(rs.getString("title"));
+            dto.setSubtitle(rs.getString("subtitle"));
+            dto.setSlug(rs.getString("slug"));
+            dto.setPublisherName(rs.getString("publisher_name"));
+            dto.setPublicationYear(rs.getObject("publication_year", Integer.class));
+            dto.setLanguage(rs.getString("language"));
+            dto.setShortDescription(rs.getString("short_description"));
+            dto.setTagsJson(rs.getString("tags_json"));
+            dto.setStatus(rs.getString("status"));
+            dto.setCategoryId(rs.getObject("category_id", Long.class));
+            dto.setCategoryName(rs.getString("category_name"));
+            dto.setCoverImageUrl(rs.getString("cover_image_url"));
+            dto.setCreatedAt(rs.getString("created_at"));
+            return dto;
+        }, likeQuery, likeQuery, likeQuery);
+    }
+
     /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• GET BY ID â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 
     public BookDetailDTO findBookById(Long id) {
@@ -80,7 +117,8 @@ public class ManagerBookManagementRepository {
             d.setShortDescription(rs.getString("short_description"));
             d.setDescriptionHtml(rs.getString("description_html"));
             d.setTagsJson(rs.getString("tags_json"));
-            d.setSellMode(rs.getString("sell_mode"));
+            String rawSellMode = rs.getString("sell_mode");
+            d.setSellMode("QUANTITY".equals(rawSellMode) ? "PER_QUANTITY" : rawSellMode);
             d.setStatus(rs.getString("status"));
             d.setCategoryId(rs.getObject("category_id", Long.class));
             d.setCategoryName(rs.getString("category_name"));
@@ -176,7 +214,7 @@ public class ManagerBookManagementRepository {
                                        publisher_name, publication_year, language,
                                        short_description, description_html, tags_json,
                                        sell_mode, status, created_at)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'DRAFT', SYSUTCDATETIME())
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, SYSUTCDATETIME())
                 """;
         KeyHolder kh = new GeneratedKeyHolder();
         jdbc.update(conn -> {
@@ -194,6 +232,7 @@ public class ManagerBookManagementRepository {
             ps.setString(11, req.getDescriptionHtml());
             ps.setString(12, req.getTagsJson());
             ps.setString(13, req.getSellMode() != null ? req.getSellMode() : "PER_COPY");
+            ps.setString(14, req.getStatus() != null ? req.getStatus() : "DRAFT");
             return ps;
         }, kh);
         return Objects.requireNonNull(kh.getKey()).longValue();

@@ -17,6 +17,8 @@ class SupplierDTO {
     private String phone;
     private String address;
     private String contactPerson;
+    private String taxId;
+    private String paymentTerms;
     private Boolean isActive;
     private String createdAt;
     private String updatedAt;
@@ -37,6 +39,9 @@ class CreateSupplierRequest {
     private String phone;
     private String address;
     private String contactPerson;
+    private String taxId;
+    private String paymentTerms;
+    private Boolean isActive;
 }
 
 @Getter
@@ -50,5 +55,7 @@ class UpdateSupplierRequest {
     private String phone;
     private String address;
     private String contactPerson;
+    private String taxId;
     private Boolean isActive;
+    private String paymentTerms;
 }

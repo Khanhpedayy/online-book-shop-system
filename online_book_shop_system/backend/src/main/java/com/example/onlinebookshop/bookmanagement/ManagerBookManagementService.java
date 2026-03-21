@@ -20,6 +20,13 @@ public class ManagerBookManagementService {
         return repo.findAllBooks();
     }
 
+    public List<BookListItemDTO> searchBooks(String query) {
+        if (query == null || query.isBlank()) {
+            return java.util.Collections.emptyList();
+        }
+        return repo.searchBooksByKeyword(query);
+    }
+
     public BookDetailDTO getBookById(Long id) {
         BookDetailDTO book = repo.findBookById(id);
         if (book == null) {
@@ -28,44 +35,74 @@ public class ManagerBookManagementService {
         return book;
     }
 
+    // Strip dashes/spaces from ISBN and validate length
+    private String sanitizeIsbn(String isbn, int maxLen, String label) {
+        if (isbn == null || isbn.isBlank()) return null;
+        String cleaned = isbn.replaceAll("[\\s-]", "");
+        if (cleaned.length() > maxLen) {
+            throw new IllegalArgumentException(label + " must be at most " + maxLen + " digits (got " + cleaned.length() + ")");
+        }
+        return cleaned;
+    }
+
     @Transactional
     public BookDetailDTO createBook(CreateBookRequest req) {
-        // Validate required fields
+
         if (req.getTitle() == null || req.getTitle().isBlank())
             throw new IllegalArgumentException("Title is required");
+
         if (req.getCategoryId() == null)
             throw new IllegalArgumentException("Category is required");
-        // Default language if not provided
+
         if (req.getLanguage() == null || req.getLanguage().isBlank())
             req.setLanguage("vi");
-        // Validate sell_mode against DB CHECK constraint (PER_COPY / PER_QUANTITY)
-        if (req.getSellMode() != null && !req.getSellMode().equals("PER_COPY")
-                && !req.getSellMode().equals("PER_QUANTITY"))
+
+        // Sanitize ISBNs (strip dashes/spaces, validate length)
+        req.setIsbn13(sanitizeIsbn(req.getIsbn13(), 13, "ISBN-13"));
+        req.setIsbn10(sanitizeIsbn(req.getIsbn10(), 10, "ISBN-10"));
+
+        // validate frontend value
+        if (req.getSellMode() != null && !req.getSellMode().isBlank() &&
+                !req.getSellMode().equals("PER_COPY") &&
+                !req.getSellMode().equals("PER_QUANTITY")) {
+
             throw new IllegalArgumentException(
                     "Invalid sell mode: " + req.getSellMode() + ". Must be PER_COPY or PER_QUANTITY.");
+        }
 
-        // 1) Insert main book record
+        if (req.getStatus() != null && !req.getStatus().isBlank() &&
+                !req.getStatus().equals("ACTIVE") &&
+                !req.getStatus().equals("HIDDEN") &&
+                !req.getStatus().equals("DRAFT")) {
+            throw new IllegalArgumentException(
+                    "Invalid status: " + req.getStatus() + ". Must be ACTIVE, HIDDEN, or DRAFT.");
+        }
+
+        // ===== MAP FRONTEND -> DATABASE =====
+        if ("PER_QUANTITY".equals(req.getSellMode())) {
+            req.setSellMode("QUANTITY");
+        }
+
         Long bookId = repo.insertBook(req);
 
-        // 2) Insert authors
         if (req.getAuthors() != null && !req.getAuthors().isEmpty()) {
             repo.insertBookAuthors(bookId, req.getAuthors());
         }
 
-        // 3) Insert variants
         if (req.getVariants() != null) {
             for (VariantInput v : req.getVariants()) {
                 if (v.getSku() == null || v.getSku().isBlank())
                     throw new IllegalArgumentException("Variant SKU is required");
+
                 repo.insertVariant(bookId, v);
             }
         }
 
-        // 4) Insert images â€” skip base64 data URIs (too long for DB column)
         if (req.getImages() != null && !req.getImages().isEmpty()) {
             List<ImageInput> validImages = req.getImages().stream()
                     .filter(img -> img.getUrl() != null && !img.getUrl().startsWith("data:"))
                     .collect(Collectors.toList());
+
             if (!validImages.isEmpty()) {
                 repo.insertImages(bookId, validImages);
             }
@@ -76,48 +113,71 @@ public class ManagerBookManagementService {
 
     @Transactional
     public BookDetailDTO updateBook(Long id, UpdateBookRequest req) {
-        // Ensure exists
+
         getBookById(id);
+
         if (req.getTitle() != null && req.getTitle().isBlank())
             throw new IllegalArgumentException("Title cannot be empty");
-        if (req.getSellMode() != null && !req.getSellMode().equals("PER_COPY")
-                && !req.getSellMode().equals("PER_QUANTITY"))
+
+        // Sanitize ISBNs (strip dashes/spaces, validate length)
+        req.setIsbn13(sanitizeIsbn(req.getIsbn13(), 13, "ISBN-13"));
+        req.setIsbn10(sanitizeIsbn(req.getIsbn10(), 10, "ISBN-10"));
+
+        if (req.getSellMode() != null && !req.getSellMode().isBlank() &&
+                !req.getSellMode().equals("PER_COPY") &&
+                !req.getSellMode().equals("PER_QUANTITY")) {
+
             throw new IllegalArgumentException(
                     "Invalid sell mode: " + req.getSellMode() + ". Must be PER_COPY or PER_QUANTITY.");
+        }
 
-        // Filter out base64 images before saving (DB url column can't hold base64)
+        // ===== MAP FRONTEND -> DATABASE =====
+        if ("PER_QUANTITY".equals(req.getSellMode())) {
+            req.setSellMode("QUANTITY");
+        }
+
         if (req.getImages() != null) {
             List<ImageInput> validImages = req.getImages().stream()
                     .filter(img -> img.getUrl() != null && !img.getUrl().startsWith("data:"))
                     .collect(Collectors.toList());
-            // Only replace images if there are valid non-base64 URLs
-            // If all images were base64, don't touch existing images at all
+
             if (validImages.isEmpty()) {
-                req.setImages(null); // null = keep existing images in repo
+                req.setImages(null);
             } else {
                 req.setImages(validImages);
             }
         }
 
         repo.updateBook(id, req);
+
         return repo.findBookById(id);
     }
 
     @Transactional
     public void changeStatus(Long id, String status) {
+
         if (status == null || status.isBlank())
             throw new IllegalArgumentException("Status is required");
-        if (!status.equals("ACTIVE") && !status.equals("HIDDEN") && !status.equals("DRAFT")) {
-            throw new IllegalArgumentException("Invalid status: " + status + ". Must be ACTIVE, HIDDEN, or DRAFT.");
+
+        if (!status.equals("ACTIVE") &&
+                !status.equals("HIDDEN") &&
+                !status.equals("DRAFT")) {
+
+            throw new IllegalArgumentException(
+                    "Invalid status: " + status + ". Must be ACTIVE, HIDDEN, or DRAFT.");
         }
+
         int rows = repo.changeStatus(id, status);
+
         if (rows == 0) {
             throw new RuntimeException("ManagerBook not found with id: " + id);
         }
     }
 
+    @Transactional
     public void deleteBook(Long id) {
         int rows = repo.softDelete(id);
+
         if (rows == 0) {
             throw new RuntimeException("ManagerBook not found with id: " + id);
         }
@@ -131,4 +191,3 @@ public class ManagerBookManagementService {
         return repo.findAllAuthors();
     }
 }
-

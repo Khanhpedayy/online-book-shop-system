@@ -67,33 +67,33 @@
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title fw-bold" id="formTitle">➕ Add New Supplier</h5><button type="button"
+                    <h5 class="modal-title fw-bold" id="formTitle">➕ Thêm nhà cung cấp</h5><button type="button"
                         class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <form id="supplierForm" novalidate>
-                        <h6 class="text-muted small fw-bold mb-3">Basic Information</h6>
+                        <h6 class="text-muted small fw-bold mb-3">Thông tin cơ bản </h6>
                         <div class="row g-3 mb-3">
                             <div class="col-md-6">
-                                <label class="form-label">Supplier Name <span class="text-danger">*</span></label>
+                                <label class="form-label">Tên nhà cung cấp <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="f_name" required
                                     placeholder="e.g. Alpha Books">
-                                <div class="invalid-feedback">Name is required</div>
+                                <div class="invalid-feedback">Tên là bắt buộc</div>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label">Supplier Code <span class="text-danger">*</span></label>
+                                <label class="form-label">Mã nhà cung cấp <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="f_code" required placeholder="e.g. SUP-001">
-                                <div class="invalid-feedback">Code is required</div>
+                                <div class="invalid-feedback">Mã là bắt buộc</div>
                             </div>
                         </div>
-                        <h6 class="text-muted small fw-bold mb-3">Contact Details</h6>
+                        <h6 class="text-muted small fw-bold mb-3">Thông tin liên hệ</h6>
                         <div class="row g-3 mb-3">
                             <div class="col-md-6">
-                                <label class="form-label">Contact Person</label>
+                                <label class="form-label">Người liên hệ</label>
                                 <input type="text" class="form-control" id="f_contactPerson" placeholder="Full name">
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label">Phone</label>
+                                <label class="form-label">Số điện thoại</label>
                                 <input type="tel" class="form-control" id="f_phone" placeholder="0901 234 567">
                             </div>
                         </div>
@@ -101,45 +101,45 @@
                             <div class="col-md-6">
                                 <label class="form-label">Email</label>
                                 <input type="email" class="form-control" id="f_email" placeholder="email@supplier.com">
-                                <div class="invalid-feedback">Invalid email format</div>
+                                <div class="invalid-feedback">Email không hợp lệ</div>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label">Tax ID</label>
+                                <label class="form-label">Mã số thuế</label>
                                 <input type="text" class="form-control" id="f_taxId"
                                     placeholder="Tax identification number">
                             </div>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Address</label>
+                            <label class="form-label">Địa chỉ</label>
                             <textarea class="form-control" id="f_address" rows="2"
                                 placeholder="Full address"></textarea>
                         </div>
-                        <h6 class="text-muted small fw-bold mb-3">Additional Settings</h6>
+                        <h6 class="text-muted small fw-bold mb-3">Cài đặt thêm</h6>
                         <div class="row g-3 mb-3">
                             <div class="col-md-6">
-                                <label class="form-label">Payment Terms</label>
+                                <label class="form-label">Điều khoản thanh toán</label>
                                 <select class="form-select" id="f_paymentTerms">
-                                    <option value="">Select terms</option>
-                                    <option value="NET_30">Net 30</option>
-                                    <option value="NET_60">Net 60</option>
-                                    <option value="NET_90">Net 90</option>
-                                    <option value="COD">COD</option>
-                                    <option value="PREPAID">Prepaid</option>
+                                    <option value="">Chọn điều khoản</option>
+                                    <option value="NET_30">Thanh toán 30 ngày</option>
+                                    <option value="NET_60">Thanh toán 60 ngày</option>
+                                    <option value="NET_90">Thanh toán 90 ngày</option>
+                                    <option value="COD">Thanh toán khi nhận hàng</option>
+                                    <option value="PREPAID">Trả trước</option>
                                 </select>
                             </div>
                             <div class="col-md-6" id="activeToggleGroup" style="display:none">
-                                <label class="form-label">Active Status</label>
+                                <label class="form-label">Trạng thái hoạt động</label>
                                 <div class="form-check form-switch mt-2">
                                     <input class="form-check-input" type="checkbox" id="f_isActive" checked>
-                                    <label class="form-check-label" for="f_isActive">Active</label>
+                                    <label class="form-check-label" for="f_isActive">Hoạt động</label>
                                 </div>
                             </div>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary" onclick="saveSupplier()" id="btnSave">Create</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-primary" onclick="saveSupplier()" id="btnSave">Tạo</button>
                 </div>
             </div>
         </div>

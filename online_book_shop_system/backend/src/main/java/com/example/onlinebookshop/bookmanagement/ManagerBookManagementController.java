@@ -27,6 +27,12 @@ public class ManagerBookManagementController {
         return service.getAllBooks();
     }
 
+    @GetMapping("/search")
+    @Operation(summary = "Search books", description = "Search books by Title or ISBN")
+    public List<BookListItemDTO> searchBooks(@RequestParam("q") String query) {
+        return service.searchBooks(query);
+    }
+
     @GetMapping("/{id}")
     @Operation(summary = "Get book detail", description = "Get full book detail with authors, variants, and images")
     public BookDetailDTO getBookById(@PathVariable Long id) {
@@ -46,10 +52,10 @@ public class ManagerBookManagementController {
         return service.updateBook(id, req);
     }
 
-    @PutMapping("/{id}/status")
+    @PatchMapping("/{id}/status")
     @Operation(summary = "Hide/Unhide book", description = "Change book status: ACTIVE (publish) | HIDDEN (hide) | DRAFT")
     public ResponseEntity<Map<String, String>> changeStatus(@PathVariable Long id,
-            @RequestBody ChangeStatusRequest req) {
+                                                            @RequestBody ChangeStatusRequest req) {
         service.changeStatus(id, req.getStatus());
         return ResponseEntity.ok(Map.of("message", "ManagerBook status changed to " + req.getStatus()));
     }

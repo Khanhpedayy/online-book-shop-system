@@ -114,7 +114,8 @@ class CreateBookRequest {
     private String shortDescription;
     private String descriptionHtml;
     private String tagsJson; // e.g. '["fiction","bestseller"]'
-    private String sellMode; // PER_COPY or PER_QUANTITY
+    private String sellMode;
+    private String status;// PER_COPY or PER_QUANTITY
     private Long categoryId;
 
     private List<AuthorInput> authors;
