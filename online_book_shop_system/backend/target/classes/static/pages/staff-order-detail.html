@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Chi tiết Đơn hàng — Quản trị BookStore</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/app.css">
+</head>
+
+<body>
+    <div id="app-layout">
+        <div id="sidebar-slot"></div>
+        <div class="main-area">
+            <div id="header-slot"></div>
+            <main class="content-area p-4">
+                <!-- Back + Header -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <a href="staff-orders.html" class="btn btn-light d-flex align-items-center gap-1"><i
+                            class="bi bi-arrow-left"></i> Trở về Đơn hàng</a>
+                    <div id="actionBtns"></div>
+                </div>
+
+                <!-- Progress Steps -->
+                <div class="card mb-4">
+                    <div class="card-body py-3">
+                        <div class="d-flex justify-content-between" id="progressSteps"></div>
+                    </div>
+                </div>
+
+                <!-- Order Info + Customer -->
+                <div class="row g-4 mb-4">
+                    <div class="col-lg-7">
+                        <div class="card h-100">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h6 class="mb-0 fw-bold">Thông tin Đơn hàng</h6><span id="statusBadge"></span>
+                            </div>
+                            <div class="card-body" id="orderInfo">Đang tải…</div>
+                        </div>
+                    </div>
+                    <div class="col-lg-5">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <h6 class="mb-0 fw-bold">Khách hàng & Giao hàng</h6>
+                            </div>
+                            <div class="card-body" id="customerInfo">Đang tải…</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabs: Items / Picking / Packing / Shipment / Payments / Notes -->
+                <div class="card">
+                    <div class="card-header p-0">
+                        <ul class="nav nav-tabs" id="detailTabs">
+                            <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#tab-items">Sản
+                                    phẩm</a></li>
+                            <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tab-picking">Lấy
+                                    hàng</a></li>
+                            <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tab-packing">Đóng
+                                    gói</a></li>
+                            <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tab-shipment">Giao
+                                    hàng</a></li>
+                            <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tab-payments">Thanh
+                                    toán</a></li>
+                            <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tab-notes">Ghi chú</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="card-body tab-content">
+                        <div class="tab-pane fade show active" id="tab-items"></div>
+                        <div class="tab-pane fade" id="tab-picking"></div>
+                        <div class="tab-pane fade" id="tab-packing"></div>
+                        <div class="tab-pane fade" id="tab-shipment"></div>
+                        <div class="tab-pane fade" id="tab-payments"></div>
+                        <div class="tab-pane fade" id="tab-notes"></div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Shipment Modal -->
+    <div class="modal fade" id="shipModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold">Tạo lô hàng (giao hàng)</h5><button type="button" class="btn-close"
+                        data-bs-dismiss="modal"></button>
+                </div>
+                <form id="shipForm" class="needs-validation" novalidate onsubmit="createShipment(event)">
+                    <div class="modal-body">
+                        <div class="mb-3"><label class="form-label">Đơn vị Vận chuyển <span class="text-danger">*</span></label><input type="text"
+                                class="form-control" id="s_carrier" placeholder="VD: GHTK, GHN" required>
+                            <div class="invalid-feedback">Vui lòng nhập đơn vị vận chuyển</div>
+                        </div>
+                        <div class="mb-3"><label class="form-label">Mã vận đơn <span class="text-danger">*</span></label><input type="text"
+                                class="form-control" id="s_trackingCode" required>
+                            <div class="invalid-feedback">Vui lòng nhập mã vận đơn</div>
+                        </div>
+                        <div class="mb-3"><label class="form-label">Số kiện hàng <span class="text-danger">*</span></label><input type="number"
+                                class="form-control" id="s_boxCount" value="1" min="1" required>
+                            <div class="invalid-feedback">Vui lòng nhập số kiện (ít nhất 1)</div>
+                        </div>
+                        <div class="mb-3"><label class="form-label">Ghi chú</label><textarea class="form-control"
+                                id="s_note" rows="2"></textarea></div>
+                    </div>
+                    <div class="modal-footer"><button type="button" class="btn btn-secondary"
+                            data-bs-dismiss="modal">Hủy</button><button type="submit" class="btn btn-primary">Tạo</button></div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/utils.js"></script>
+    <script src="../js/layout.js"></script>
+    <script>
+        const stSteps = ['NEW', 'CONFIRMED', 'PACKED', 'SHIPPED', 'COMPLETED'];
+        const stLang = { NEW: 'MỚI', CONFIRMED: 'ĐÃ XÁC NHẬN', PACKED: 'ĐÃ ĐÓNG GÓI', SHIPPED: 'ĐÃ GIAO', COMPLETED: 'HOÀN THÀNH', CANCELLED: 'ĐÃ HỦY' };
+        const stColor = { NEW: 'primary', CONFIRMED: 'info', PACKED: 'secondary', SHIPPED: 'warning', COMPLETED: 'success', CANCELLED: 'danger' };
+        const payLang = { PENDING: 'CHỜ THANH TOÁN', PAID: 'ĐÃ THANH TOÁN', FAILED: 'THẤT BẠI', REFUNDED: 'ĐÃ HOÀN TIỀN' };
+        const payColor = { PENDING: 'warning', PAID: 'success', FAILED: 'danger', REFUNDED: 'secondary' };
+        let order = null, pickList = null, packing = null, shipment = null, payments = [];
+        const orderId = new URLSearchParams(window.location.search).get('id');
+
+        async function init() {
+            if (!orderId) { document.querySelector('.content-area').innerHTML = '<div class="text-center py-5 text-muted">Chưa chỉ định ID đơn hàng</div>'; return; }
+            try {
+                [order, pickList, packing, shipment, payments] = await Promise.all([
+                    api.get(`/staff/orders/${orderId}`),
+                    api.get(`/staff/orders/${orderId}/pick-list`).catch(() => null),
+                    api.get(`/staff/orders/${orderId}/packing`).catch(() => null),
+                    api.get(`/staff/orders/${orderId}/shipment`).catch(() => null),
+                    api.get(`/staff/orders/${orderId}/payments`).catch(() => []),
+                ]);
+            } catch (e) { document.querySelector('.content-area').innerHTML = '<div class="alert alert-danger">Tải đơn hàng thất bại</div>'; return; }
+            renderAll();
+        }
+
+        function renderAll() {
+            if (!order) return;
+            // Progress
+            const cur = stSteps.indexOf(order.status);
+            document.getElementById('progressSteps').innerHTML = stSteps.map((s, i) => {
+                let cls = i < cur ? 'bg-success text-white' : i === cur ? 'bg-primary text-white' : 'bg-light text-muted';
+                return `<div class="flex-fill text-center p-2 mx-1 rounded ${cls}" style="font-size:12px;font-weight:600">${stLang[s] || s}</div>`;
+            }).join('');
+
+            // Action Buttons
+            let btns = '';
+            if (order.status === 'NEW') btns += `<button class="btn btn-primary" onclick="confirmOrder()">Xác nhận Đơn hàng</button> `;
+            if (order.status === 'CONFIRMED') btns += `<button class="btn btn-outline-primary" onclick="autoAllocate()">Tự động phân bổ</button> `;
+            if (packing?.status === 'READY_TO_PACK') btns += `<button class="btn btn-secondary" onclick="markPacked()">Đánh dấu Đã đóng gói</button> `;
+            if (order.status === 'PACKED' && !shipment) btns += `<button class="btn btn-success" onclick="new bootstrap.Modal(document.getElementById('shipModal')).show()">Tạo lô hàng</button> `;
+            if (shipment?.status === 'CREATED') btns += `<button class="btn btn-warning" onclick="markShipped()">Đánh dấu Đã giao</button> `;
+            document.getElementById('actionBtns').innerHTML = btns;
+
+            // Status Badge
+            document.getElementById('statusBadge').innerHTML = `<span class="badge bg-${stColor[order.status] || 'secondary'}">${stLang[order.status] || order.status}</span>`;
+
+            // Order Info
+            document.getElementById('orderInfo').innerHTML = `<table class="table table-sm mb-0">
+        <tr><th>Mã Đơn hàng</th><td class="font-monospace fw-bold">${order.orderCode}</td></tr>
+        <tr><th>Thanh toán</th><td><span class="badge bg-${payColor[order.paymentStatus] || 'secondary'}">${payLang[order.paymentStatus] || order.paymentStatus}</span></td></tr>
+        <tr><th>Tạm tính</th><td>${(order.subtotalAmount || 0).toLocaleString()} ${order.currency || 'VND'}</td></tr>
+        <tr><th>Tổng cộng</th><td class="fs-5 fw-bold text-primary">${(order.totalAmount || 0).toLocaleString()} ${order.currency || 'VND'}</td></tr>
+        <tr><th>Ngày đặt</th><td>${order.placedAt ? new Date(order.placedAt).toLocaleString('vi-VN') : '—'}</td></tr>
+        <tr><th>Ngày xác nhận</th><td>${order.confirmedAt ? new Date(order.confirmedAt).toLocaleString('vi-VN') : '—'}</td></tr>
+    </table>`;
+
+            // Customer
+            const addr = [order.shipLine1, order.shipLine2, order.shipDistrict, order.shipWard, order.shipCity].filter(Boolean).join(', ');
+            document.getElementById('customerInfo').innerHTML = `<table class="table table-sm mb-0">
+        <tr><th>Khách hàng</th><td>${order.customerName || '—'}</td></tr>
+        <tr><th>Email</th><td>${order.customerEmail || '—'}</td></tr>
+        <tr><th>Số điện thoại</th><td>${order.customerPhone || '—'}</td></tr>
+        <tr><th>Giao đến</th><td>${order.shipName || ''} — ${order.shipPhone || ''}</td></tr>
+        <tr><th>Địa chỉ</th><td>${addr || '—'}</td></tr>
+    </table>`;
+
+            // Items Tab
+            document.getElementById('tab-items').innerHTML = `<table class="table table-sm table-hover mb-0"><thead><tr><th>Tiêu đề</th><th style="width:120px">SKU</th><th style="width:60px">SL</th><th style="width:110px" class="text-end">Giá</th><th style="width:110px" class="text-end">Tổng</th><th style="width:120px">Bản sao</th></tr></thead><tbody>
+        ${(order.items || []).map(i => `<tr><td>${i.titleSnapshot || '—'}</td><td class="font-monospace small">${i.skuSnapshot || '—'}</td><td class="text-center">${i.quantity}</td><td class="text-end">${(i.unitPrice || 0).toLocaleString()}</td><td class="text-end fw-semibold">${(i.lineTotal || 0).toLocaleString()}</td><td>${i.copyCode ? `<span class="badge bg-light text-dark border">${i.copyCode}</span>` : '<span class="badge bg-warning text-dark">Chưa chỉ định</span>'}</td></tr>`).join('')}
+    </tbody></table>`;
+
+            // Picking Tab
+            const pl = pickList;
+            document.getElementById('tab-picking').innerHTML = pl ? `<table class="table table-sm table-hover mb-0"><thead><tr><th>Tiêu đề</th><th style="width:120px">Bản sao</th><th style="width:100px">Vị trí</th><th style="width:100px">Trạng thái</th><th style="width:160px">Thao tác</th></tr></thead><tbody>
+        ${(pl.items || []).map(i => `<tr><td>${i.titleSnapshot || '—'}</td><td class="font-monospace small">${i.copyCode || '—'}</td><td>${i.location || '—'}</td><td><span class="badge bg-${i.status === 'PICKED' ? 'success' : 'warning'}">${i.status === 'PICKED' ? 'ĐÃ LẤY' : i.status === 'PENDING' ? 'CHỜ XỬ LÝ' : i.status}</span></td><td>${i.status === 'PENDING' ? `<button class="btn btn-sm btn-primary" onclick="confirmPick(${i.id})">Xác nhận</button> ` : ''}${`<button class="btn btn-sm btn-outline-danger" onclick="unpick(${i.id})">Hủy lấy</button>`}</td></tr>`).join('')}
+    </tbody></table>` : '<p class="text-muted">Chưa có danh sách lấy hàng</p>';
+
+            // Packing Tab
+            document.getElementById('tab-packing').innerHTML = packing ? `<table class="table table-bordered table-sm"><tr><th>Trạng thái</th><td><span class="badge bg-${packing.status === 'PACKED' ? 'success' : 'warning'}">${packing.status === 'PACKED' ? 'ĐÃ ĐÓNG GÓI' : packing.status === 'READY_TO_PACK' ? 'CHỜ ĐÓNG GÓI' : packing.status === 'PENDING' ? 'CHỜ XỬ LÝ' : packing.status}</span></td></tr><tr><th>Đã lấy đủ</th><td>${packing.allPicked ? ' Có' : ' Không'}</td></tr><tr><th>Số kiện</th><td>${packing.boxCount || '—'}</td></tr><tr><th>Đóng gói lúc</th><td>${packing.packedAt ? new Date(packing.packedAt).toLocaleString('vi-VN') : '—'}</td></tr></table>` : '<p class="text-muted">Chưa có thông tin đóng gói</p>';
+
+            // Shipment Tab
+            let shipHtml = '';
+            if (shipment) {
+                shipHtml = `<table class="table table-bordered table-sm"><tr><th>ĐV Vận chuyển</th><td>${shipment.carrier}</td></tr><tr><th>Mã vận đơn</th><td>${shipment.trackingCode}</td></tr><tr><th>Trạng thái</th><td><span class="badge bg-${shipment.status === 'DELIVERED' ? 'success' : shipment.status === 'SHIPPED' ? 'warning' : shipment.status === 'FAILED' || shipment.status === 'RETURNED' ? 'danger' : 'primary'}">${shipment.status === 'DELIVERED' ? 'ĐÃ NHẬN' : shipment.status === 'SHIPPED' ? 'ĐANG GIAO' : shipment.status === 'CREATED' ? 'VỪA TẠO' : shipment.status === 'FAILED' ? 'THẤT BẠI' : shipment.status === 'RETURNED' ? 'TRẢ HÀNG' : shipment.status}</span></td></tr><tr><th>Giao lúc</th><td>${shipment.shippedAt ? new Date(shipment.shippedAt).toLocaleString('vi-VN') : '—'}</td></tr><tr><th>Đã nhận lúc</th><td>${shipment.deliveredAt ? new Date(shipment.deliveredAt).toLocaleString('vi-VN') : '—'}</td></tr><tr><th>Số kiện</th><td>${shipment.boxCount}</td></tr></table>`;
+                if (shipment.status === 'SHIPPED' || shipment.status === 'CREATED') shipHtml += `<div class="mt-3"><button class="btn btn-success me-2" onclick="updateDelivery('DELIVERED')">Đánh dấu Đã nhận</button><button class="btn btn-outline-danger" onclick="updateDelivery('FAILED')">Đánh dấu Thất bại</button></div>`;
+            } else { shipHtml = '<p class="text-muted">Chưa có thông tin giao hàng.</p>'; }
+            document.getElementById('tab-shipment').innerHTML = shipHtml;
+
+            // Payments Tab
+            document.getElementById('tab-payments').innerHTML = `<table class="table table-sm table-hover mb-0"><thead><tr><th>Nhà cung cấp</th><th>Mã giao dịch</th><th class="text-end" style="width:120px">Số tiền</th><th style="width:100px">Trạng thái</th><th style="width:80px">Cờ báo</th><th style="width:140px">Ngày</th></tr></thead><tbody>
+        ${(payments || []).map(p => `<tr><td>${p.provider || '—'}</td><td class="text-truncate" style="max-width:200px">${p.transactionId || '—'}</td><td class="text-end">${(p.amount || 0).toLocaleString()}</td><td><span class="badge bg-${payColor[p.status] || 'secondary'}">${payLang[p.status] || p.status}</span></td><td>${p.flagged ? '<span class="badge bg-danger"> CÓ</span>' : '<span class="badge bg-light text-dark">Không</span>'}</td><td class="small">${p.createdAt ? new Date(p.createdAt).toLocaleString('vi-VN') : '—'}</td></tr>`).join('')}
+    </tbody></table>`;
+
+            // Notes Tab
+            const notesList = (order.notes || []).map(n => `<div class="border-start border-3 border-primary ps-3 mb-3"><strong>${n.staffName || 'Nhân viên'}</strong> <span class="text-muted small">— ${n.createdAt ? new Date(n.createdAt).toLocaleString('vi-VN') : ''}</span><p class="mb-0 mt-1">${n.content}</p></div>`).join('');
+            document.getElementById('tab-notes').innerHTML = `${notesList || '<p class="text-muted mb-3">Chưa có ghi chú</p>'}
+        <div class="d-flex gap-2"><textarea class="form-control" id="noteText" rows="2" placeholder="Thêm ghi chú nội bộ…"></textarea><button class="btn btn-primary" onclick="addNote()" style="white-space:nowrap">Thêm</button></div>`;
+        }
+
+        async function confirmOrder() {
+            try { await api.put(`/staff/orders/${orderId}/confirm`); showToast('Đã xác nhận đơn hàng', 'success'); location.reload(); } catch (e) { showToast('Thất bại', 'danger'); }
+        }
+        async function autoAllocate() {
+            try { await api.post(`/staff/orders/${orderId}/auto-allocate`); showToast('Đã phân bổ', 'success'); location.reload(); } catch (e) { showToast('Thất bại', 'danger'); }
+        }
+        async function markPacked() {
+            try { await api.post(`/staff/orders/${orderId}/mark-packed`); showToast('Đã đánh dấu đóng gói', 'success'); location.reload(); } catch (e) { showToast('Thất bại', 'danger'); }
+        }
+        async function markShipped() {
+            try { await api.post(`/staff/orders/${orderId}/mark-shipped`); showToast('Đã giao hàng', 'success'); location.reload(); } catch (e) { showToast('Thất bại', 'danger'); }
+        }
+        async function createShipment(e) {
+            if (e) {
+                e.preventDefault();
+                const form = e.target;
+                if (!form.checkValidity()) {
+                    form.classList.add('was-validated');
+                    return;
+                }
+            }
+            try {
+                await api.post(`/staff/orders/${orderId}/shipment`, {
+                    carrier: document.getElementById('s_carrier').value,
+                    trackingCode: document.getElementById('s_trackingCode').value,
+                    boxCount: Number(document.getElementById('s_boxCount').value),
+                    note: document.getElementById('s_note').value,
+                });
+                showToast('Đã tạo thông tin giao hàng', 'success');
+                bootstrap.Modal.getInstance(document.getElementById('shipModal')).hide();
+                location.reload();
+            } catch (e) { showToast('Thất bại', 'danger'); }
+        }
+        async function updateDelivery(outcome) {
+            try { await api.post(`/staff/orders/${orderId}/delivery`, { outcome }); showToast(outcome === 'DELIVERED' ? 'Đã giao thành công!' : 'Đánh dấu giao thất bại', 'info'); location.reload(); } catch (e) { showToast('Thất bại', 'danger'); }
+        }
+        async function confirmPick(itemId) {
+            try { await api.post(`/staff/orders/${orderId}/pick/${itemId}/confirm`, { staffId: 1 }); showToast('Đã lấy hàng', 'success'); location.reload(); } catch (e) { showToast('Thất bại', 'danger'); }
+        }
+        async function unpick(itemId) {
+            try { await api.post(`/staff/orders/${orderId}/pick/${itemId}/unpick`); showToast('Đã hủy lấy', 'info'); location.reload(); } catch (e) { showToast('Thất bại', 'danger'); }
+        }
+        async function addNote() {
+            const content = document.getElementById('noteText').value.trim();
+            if (!content) return;
+            try { await api.post(`/staff/orders/${orderId}/notes`, { staffId: 1, content }); showToast('Đã thêm ghi chú', 'success'); location.reload(); } catch (e) { showToast('Thất bại', 'danger'); }
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+
+</html>

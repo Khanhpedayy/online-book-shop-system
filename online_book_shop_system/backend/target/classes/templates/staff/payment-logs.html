@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Payment Logs | Staff</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>.mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;}</style>
+</head>
+<body class="bg-light">
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+  <div class="container">
+    <a class="navbar-brand fw-semibold" th:href="@{/staff/dashboard}">Staff Panel</a>
+    <div class="ms-auto d-flex gap-2">
+      <a class="btn btn-outline-light btn-sm" th:href="@{/staff/orders}">Orders</a>
+      <a class="btn btn-outline-light btn-sm" th:href="@{/logout}">Logout</a>
+    </div>
+  </div>
+</nav>
+
+<main class="container py-4">
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <div>
+      <h1 class="h4 mb-1">Payment Logs</h1>
+      <div class="text-muted">Xem payments + mở events_json</div>
+    </div>
+  </div>
+
+  <div class="card border-0 shadow-sm mb-3">
+    <div class="card-body">
+      <form class="row g-2" method="get" th:action="@{/staff/payments}">
+        <div class="col-12 col-md-5">
+          <label class="form-label small text-muted">Search</label>
+          <input class="form-control form-control-sm" name="q" placeholder="order_code / provider_tx_id" th:value="${q}">
+        </div>
+        <div class="col-12 col-md-4">
+          <label class="form-label small text-muted">Status</label>
+          <select class="form-select form-select-sm" name="status">
+            <option value="" th:selected="${status == null or status == ''}">All</option>
+            <option value="CREATED" th:selected="${status == 'CREATED'}">CREATED</option>
+            <option value="PENDING" th:selected="${status == 'PENDING'}">PENDING</option>
+            <option value="SUCCEEDED" th:selected="${status == 'SUCCEEDED'}">SUCCEEDED</option>
+            <option value="FAILED" th:selected="${status == 'FAILED'}">FAILED</option>
+            <option value="CANCELLED" th:selected="${status == 'CANCELLED'}">CANCELLED</option>
+            <option value="REFUNDED" th:selected="${status == 'REFUNDED'}">REFUNDED</option>
+            <option value="EXPIRED" th:selected="${status == 'EXPIRED'}">EXPIRED</option>
+          </select>
+        </div>
+        <div class="col-12 col-md-3 d-flex gap-2 align-items-end">
+          <button class="btn btn-sm btn-primary" type="submit">Filter</button>
+          <a class="btn btn-sm btn-outline-secondary" th:href="@{/staff/payments}">Reset</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="card border-0 shadow-sm">
+    <div class="card-body table-responsive">
+      <table class="table align-middle">
+        <thead>
+        <tr class="text-muted small">
+          <th>PaymentId</th>
+          <th>Order</th>
+          <th>Status</th>
+          <th class="text-end">Amount</th>
+          <th>Provider</th>
+          <th>TxId</th>
+          <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="r : ${rows}">
+          <td class="mono" th:text="${r.paymentId}">1</td>
+          <td>
+            <a class="btn btn-sm btn-outline-primary"
+               th:href="@{/staff/orders/{id}(id=${r.orderId})}">
+              <span class="mono" th:text="${r.orderCode}">ODR</span>
+            </a>
+          </td>
+          <td><span class="badge text-bg-light border mono" th:text="${r.status}">PENDING</span></td>
+          <td class="text-end mono" th:text="${#numbers.formatDecimal(r.amount,0,'COMMA',0,'POINT')}">0</td>
+          <td class="mono" th:text="${r.provider}">PAYOS</td>
+          <td class="mono text-truncate" style="max-width:260px;" th:text="${r.providerTransactionId}">tx</td>
+          <td class="text-end">
+            <a class="btn btn-sm btn-outline-secondary"
+               th:href="@{/staff/payments/{id}(id=${r.paymentId})}">Events</a>
+          </td>
+        </tr>
+        <tr th:if="${rows == null or #lists.isEmpty(rows)}">
+          <td colspan="7" class="text-center text-muted py-4">No payments.</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</main>
+</body>
+</html>

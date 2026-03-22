@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Báo cáo — Quản trị BookStore</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/app.css">
+</head>
+
+<body>
+    <div id="app-layout">
+        <div id="sidebar-slot"></div>
+        <div class="main-area">
+            <div id="header-slot"></div>
+            <main class="content-area p-4">
+                <div class="d-flex justify-content-between align-items-end mb-4">
+                    <div>
+                        <h2 class="fw-bold mb-1"><i class="bi bi-bar-chart-steps me-2"></i>Báo cáo Phân tích</h2>
+                        <p class="text-muted mb-0">Theo dõi doanh số, hàng bán chậm, sự cố, thất thoát và giá trị vốn kho</p>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-outline-success d-flex align-items-center gap-2" onclick="exportActiveTabExcel()">
+                            <i class="bi bi-file-earmark-excel"></i> Trích xuất Excel
+                        </button>
+                        <button class="btn btn-outline-primary d-flex align-items-center gap-2" onclick="exportActiveTabCSV()">
+                            <i class="bi bi-filetype-csv"></i> Trích xuất CSV
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tabs -->
+                <ul class="nav nav-tabs mb-4" id="reportTabs">
+                    <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#tab-overview">Tổng quan</a></li>
+                    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tab-sales">Thống kê Doanh số</a></li>
+                    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tab-slow">Cảnh báo Tồn chậm</a></li>
+                    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tab-aging">Tuổi Thọ Lô hàng</a></li>
+                    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tab-value">Phân bổ Nguồn vốn</a></li>
+                    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tab-shrinkage">Báo cáo Mất mát (Shrinkage)</a></li>
+                </ul>
+                
+                <div class="tab-content">
+                    <!-- Overview -->
+                    <div class="tab-pane fade show active" id="tab-overview">
+                        <div class="row g-3 mb-4" id="summaryKpis"></div>
+                        <div class="row g-4">
+                            <div class="col-lg-8">
+                                <div class="card shadow-sm border-0">
+                                    <div class="card-header bg-white border-0 pt-4 pb-0">
+                                        <h6 class="fw-bold mb-0">Doanh số hằng ngày (30 ngày gần đây)</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div style="height:320px; position:relative;"><canvas id="dailyChart"></canvas></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="card shadow-sm border-0">
+                                    <div class="card-header bg-white border-0 pt-4 pb-0">
+                                        <h6 class="fw-bold mb-0">Tỷ trọng tuổi lô hàng (Aging)</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div style="height:320px; position:relative;"><canvas id="agingPie"></canvas></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Sales -->
+                    <div class="tab-pane fade" id="tab-sales">
+                        <div class="card shadow-sm border-0 mb-4">
+                            <div class="card-header bg-white border-0 pt-4 pb-0">
+                                <h6 class="fw-bold mb-0">Đường cơ sở Doanh thu hằng tháng (VND)</h6>
+                            </div>
+                            <div class="card-body">
+                                <div style="height:320px; position:relative;"><canvas id="monthlyChart"></canvas></div>
+                            </div>
+                        </div>
+                        <div class="card shadow-sm border-0">
+                            <div class="card-header bg-white border-bottom-0 pt-4">
+                                <h6 class="fw-bold mb-0">Danh sách Sách có doanh thu (Bán chạy nhất xếp trước)</h6>
+                            </div>
+                            <div class="card-body p-0" id="topSellingTable"></div>
+                        </div>
+                    </div>
+                    <!-- Slow Movers -->
+                    <div class="tab-pane fade" id="tab-slow">
+                        <div class="card shadow-sm border-0">
+                            <div class="card-body p-0" id="slowTable"></div>
+                        </div>
+                    </div>
+                    <!-- Lot Aging -->
+                    <div class="tab-pane fade" id="tab-aging">
+                        <div class="card shadow-sm border-0">
+                            <div class="card-body p-0" id="agingTable"></div>
+                        </div>
+                    </div>
+                    <!-- Inventory Value -->
+                    <div class="tab-pane fade" id="tab-value">
+                        <div class="card shadow-sm border-0">
+                            <div class="card-body p-0" id="valueTable"></div>
+                        </div>
+                    </div>
+                    <!-- Shrinkage -->
+                    <div class="tab-pane fade" id="tab-shrinkage">
+                        <div class="row g-3 mb-4" id="shrinkageKpis"></div>
+                        <div class="card shadow-sm border-0">
+                            <div class="card-body p-0" id="shrinkageTable"></div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/utils.js"></script>
+    <script src="../js/layout.js"></script>
+    <script>
+        let summary = {}, daily = [], monthly = [], topSelling = [], slowMovers = [], lotAging = [], invValue = [], shrinkage = [];
+        let chartDaily = null, chartMonthly = null, chartAging = null;
+
+        async function init() {
+            try {
+                [summary, daily, monthly, topSelling, slowMovers, lotAging, invValue, shrinkage] = await Promise.all([
+                    api.get('/reports/summary').catch(() => ({})),
+                    api.get('/reports/sales/daily').catch(() => []),
+                    api.get('/reports/sales/monthly').catch(() => []),
+                    api.get('/reports/top-selling').catch(() => []),
+                    api.get('/reports/slow-movers').catch(() => []),
+                    api.get('/reports/lot-aging').catch(() => []),
+                    api.get('/reports/inventory-value').catch(() => []),
+                    api.get('/reports/shrinkage').catch(() => []),
+                ]);
+            } catch (e) { console.error('Error fetching reports:', e); }
+            renderAll();
+        }
+
+        function renderAll() {
+            // Summary KPIs
+            const s = summary || {};
+            const kpis = [
+                { l: 'Tổng số sách', v: s.totalBooks || 0, icon: 'bi-journal-bookmark', bg: '#eff6ff', cl: '#3b82f6' },
+                { l: 'Biến thể SKU', v: s.totalVariants || 0, icon: 'bi-tags', bg: '#f0fdf4', cl: '#22c55e' },
+                { l: 'Gốc Bản sao có sẵn', v: s.totalCopiesAvailable || 0, icon: 'bi-box-seam', bg: '#fef3c7', cl: '#f59e0b' },
+                { l: 'Tổng Vốn trong kho', v: (s.totalInventoryValue || 0).toLocaleString() + ' ₫', icon: 'bi-bank', bg: '#fce7f3', cl: '#ec4899' },
+                { l: 'Tổng Số đơn hàng', v: s.totalOrders || 0, icon: 'bi-cart-check', bg: '#f3e8ff', cl: '#a855f7' },
+                { l: 'Doanh thu Lịch sử', v: (s.totalRevenue || 0).toLocaleString() + ' ₫', icon: 'bi-cash-stack', bg: '#ecfdf5', cl: '#059669' },
+            ];
+            document.getElementById('summaryKpis').innerHTML = kpis.map(k => `<div class="col-md-4 col-lg-2"><div class="stats-card border shadow-sm"><div class="stats-icon" style="background:${k.bg};color:${k.cl}"><i class="bi ${k.icon}"></i></div><div class="stats-label">${k.l}</div><div class="stats-value fs-5">${k.v}</div></div></div>`).join('');
+
+            // Chart.js Setup
+            Chart.defaults.font.family = "'Inter', sans-serif";
+            Chart.defaults.color = '#6b7280';
+
+            // Daily Chart (Bar)
+            const dr = [...daily].reverse().slice(-30);
+            if (chartDaily) chartDaily.destroy();
+            chartDaily = new Chart(document.getElementById('dailyChart'), {
+                type: 'bar',
+                data: {
+                    labels: dr.map(d => d.period),
+                    datasets: [{
+                        label: 'Doanh thu (₫)',
+                        data: dr.map(d => d.totalRevenue),
+                        backgroundColor: '#3b82f6',
+                        borderRadius: 4,
+                        barPercentage: 0.6
+                    }]
+                },
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, border: { display: false }, grid: { color: '#f3f4f6' } },
+                        x: { border: { display: false }, grid: { display: false } }
+                    }
+                }
+            });
+
+            // Aging Pie (Doughnut)
+            const buckets = { '0-30': 0, '31-60': 0, '61-90': 0, '90+': 0 }; // Initialize zero state
+            lotAging.forEach(l => { buckets[l.ageBucket] = (buckets[l.ageBucket] || 0) + (l.qtyAvailable || 0); });
+            
+            const bEntries = Object.entries(buckets);
+            if (chartAging) chartAging.destroy();
+            chartAging = new Chart(document.getElementById('agingPie'), {
+                type: 'doughnut',
+                data: {
+                    labels: bEntries.map(e => e[0] + ' ngày'),
+                    datasets: [{
+                        data: bEntries.map(e => e[1]),
+                        backgroundColor: ['#22c55e', '#3b82f6', '#f59e0b', '#ef4444'],
+                        borderWidth: 2,
+                        hoverOffset: 4
+                    }]
+                },
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false, 
+                    cutout: '65%',
+                    plugins: { 
+                        legend: { position: 'bottom', labels: { padding: 20, usePointStyle: true } }
+                    }
+                }
+            });
+
+            // Monthly Chart (Line/Area)
+            const mr = [...monthly].reverse();
+            if (chartMonthly) chartMonthly.destroy();
+            chartMonthly = new Chart(document.getElementById('monthlyChart'), {
+                type: 'line',
+                data: {
+                    labels: mr.map(m => m.period),
+                    datasets: [{
+                        label: 'Doanh thu Tổng kết (₫)',
+                        data: mr.map(m => m.totalRevenue),
+                        borderColor: '#8b5cf6',
+                        backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 3,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#8b5cf6',
+                        pointBorderWidth: 2,
+                        pointRadius: 4
+                    }]
+                },
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, border: { display: false }, grid: { color: '#f3f4f6' } },
+                        x: { border: { display: false }, grid: { display: false } }
+                    }
+                }
+            });
+
+            // Top Selling Table
+            document.getElementById('topSellingTable').innerHTML = `<div class="table-responsive"><table class="table table-hover align-middle mb-0">
+                <thead class="table-light text-muted" style="font-size:0.85rem"><tr><th class="ps-4">TÊN SÁCH (TITLE)</th><th>MÃ SKU</th><th>TỔNG BÁN RA (CUỐN)</th><th class="text-end pe-4">DOANH THU ĐỘT PHÁ</th></tr></thead>
+                <tbody>${topSelling.map(t => `<tr><td class="ps-4 fw-medium text-dark">${t.title || '—'}</td><td><span class="badge bg-light text-secondary border border-secondary-subtle px-2 py-1">${t.sku || '—'}</span></td><td><span class="fw-bold fs-6 text-primary">${t.totalSold || 0}</span></td><td class="text-end pe-4 fw-semibold text-success">${(t.totalRevenue || 0).toLocaleString()} ₫</td></tr>`).join('') || '<tr><td colspan="4" class="text-center text-muted py-4">Chưa phát sinh dữ liệu mua hàng</td></tr>'}</tbody></table></div>`;
+
+            // Slow Movers Table
+            document.getElementById('slowTable').innerHTML = `<div class="table-responsive"><table class="table table-hover align-middle mb-0">
+                <thead class="table-light text-muted" style="font-size:0.85rem"><tr><th class="ps-4">MÃ SKU</th><th>TÊN SÁCH (TITLE)</th><th>SL TỒN KHO GỐC</th><th>ĐÃ BÁN (30 NGÀY QUA)</th><th class="pe-4">CẢNH BÁO TỬ HUYỆT (TỪ LẦN BÁN CUỐI)</th></tr></thead>
+                <tbody>${slowMovers.map(s => `<tr><td class="ps-4"><span class="badge bg-light text-secondary border px-2 py-1">${s.sku || '—'}</span></td><td class="text-truncate" style="max-width:300px">${s.title || '—'}</td><td>${s.qtyAvailable || 0}</td><td class="${(s.qtySoldLast30Days || 0) === 0 ? 'fw-bold text-danger' : 'fw-medium'}">${s.qtySoldLast30Days || 0}</td><td class="pe-4">${(s.daysSinceLastSale || 0) > 90 ? `<span class="badge bg-danger bg-opacity-10 text-danger border border-danger">Mắc kẹt ${s.daysSinceLastSale} ngày</span>` : `${s.daysSinceLastSale || 0} ngày`}</td></tr>`).join('') || '<tr><td colspan="5" class="text-center text-muted py-4">Mọi thứ đều vận hành trơn tru</td></tr>'}</tbody></table></div>`;
+
+            // Lot Aging Table
+            const bucketColor = b => b === '90+' ? 'danger' : b === '61-90' ? 'warning' : b === '31-60' ? 'info' : 'success';
+            document.getElementById('agingTable').innerHTML = `<div class="table-responsive"><table class="table table-hover align-middle mb-0">
+                <thead class="table-light text-muted" style="font-size:0.85rem"><tr><th class="ps-4">MÃ LÔ NHẬP</th><th>SẢN PHẨM (SKU)</th><th>TÊN SÁCH (TITLE)</th><th>NHÀ CUNG CẤP</th><th>SL CÒN LẠI</th><th>TUỔI THỌ</th><th>PHÂN LOẠI NHÓM</th><th class="text-end pe-4">GIÁ TRỊ VỐN TỒN LẠI</th></tr></thead>
+                <tbody>${lotAging.map(l => `<tr><td class="ps-4 fw-medium">${l.lotCode || '—'}</td><td><span class="badge bg-light text-secondary border px-2 py-1">${l.variantSku || '—'}</span></td><td class="text-truncate" style="max-width:200px" title="${l.title}">${l.title || '—'}</td><td class="text-truncate" style="max-width:150px">${l.supplierName || '—'}</td><td>${l.qtyAvailable || 0}</td><td class="${(l.ageDays || 0) > 90 ? 'fw-bold text-danger' : ''}">${l.ageDays || 0} ngày</td><td><span class="badge bg-${bucketColor(l.ageBucket)}">${l.ageBucket || '—'}</span></td><td class="text-end pe-4 fw-medium text-dark">${(l.totalCostValue || 0).toLocaleString()} ₫</td></tr>`).join('') || '<tr><td colspan="8" class="text-center text-muted py-4">Kho mới tinh! Không có Lô hàng cũ</td></tr>'}</tbody></table></div>`;
+
+            // Inventory Value Table
+            document.getElementById('valueTable').innerHTML = `<div class="table-responsive"><table class="table table-hover align-middle mb-0">
+                <thead class="table-light text-muted" style="font-size:0.85rem"><tr><th class="ps-4">MÃ SKU</th><th>TÊN SÁCH (TITLE)</th><th>CÒN LẠI TRONG KHO</th><th class="text-end">TRUNG BÌNH GIÁ VỐN/CÚỐN</th><th class="text-end">TỔNG VỐN ĐÃ ĐẦU TƯ</th><th class="text-end pe-4">DỰ KIẾN LÃI/BÁN RA</th></tr></thead>
+                <tbody>${invValue.map(v => `<tr><td class="ps-4"><span class="badge bg-light text-secondary border px-2 py-1">${v.sku || '—'}</span></td><td class="text-truncate fw-medium" style="max-width:300px" title="${v.title}">${v.title || '—'}</td><td>${v.totalQtyAvailable || 0}</td><td class="text-end text-muted">${(v.avgUnitCost || 0).toLocaleString()} ₫</td><td class="text-end fw-bold text-danger">${(v.totalCostValue || 0).toLocaleString()} ₫</td><td class="text-end pe-4 fw-bold text-success">${(v.totalRetailValue || 0).toLocaleString()} ₫</td></tr>`).join('') || '<tr><td colspan="6" class="text-center text-muted py-4">Kho chưa có dữ liệu</td></tr>'}</tbody></table></div>`;
+
+            // Shrinkage Reporting
+            const shrinkColor = r => r === 'DAMAGED' ? 'danger' : r === 'LOST' ? 'warning' : 'primary';
+            const reasonMap = { 'DAMAGED': 'Sản Phẩm Hư Hỏng', 'LOST': 'Rơi Rụng / Thất Lạc Kho' };
+            document.getElementById('shrinkageKpis').innerHTML = shrinkage.map(s => `<div class="col-md-6"><div class="stats-card border shadow-sm"><div class="stats-icon" style="background:#fef2f2;color:#ef4444"><i class="bi bi-exclamation-triangle-fill"></i></div><div class="stats-label text-uppercase fw-bold">${reasonMap[s.reason] || s.reason}</div><div class="stats-value" style="color:${s.reason === 'DAMAGED' ? '#ef4444' : s.reason === 'LOST' ? '#f59e0b' : '#3b82f6'}">${s.totalQty} <span class="fs-6 text-muted fw-normal ms-1">quyển (${s.incidentCount} lượt phát hiện)</span></div></div></div>`).join('');
+            document.getElementById('shrinkageTable').innerHTML = `<div class="table-responsive"><table class="table table-hover align-middle mb-0">
+                <thead class="table-light text-muted" style="font-size:0.85rem"><tr><th class="ps-4">PHẦN TỬ (REASON)</th><th>TỔNG THẤT THOÁT KHỐI LƯỢNG (QTY)</th><th class="pe-4">LƯỢT TỐ CÁO/BÁO CÁO MQL</th></tr></thead>
+                <tbody>${shrinkage.map(s => `<tr><td class="ps-4"><span class="badge bg-${shrinkColor(s.reason)} px-2 py-1">${reasonMap[s.reason] || s.reason}</span></td><td class="fw-bold fs-6">${s.totalQty || 0} cuốn</td><td class="pe-4 text-secondary">${s.incidentCount || 0} sự kiện</td></tr>`).join('') || '<tr><td colspan="3" class="text-center text-muted py-4">Tin vui! Quản lý kho quá xuất sắc... Chưa từng mất mát/hư hỏng bao giờ!</td></tr>'}</tbody></table></div>`;
+        }
+
+        // Export active tab data to CSV
+        function exportActiveTabCSV() {
+            const activeTabPane = document.querySelector('.tab-pane.active');
+            if (!activeTabPane) return;
+            const tabId = activeTabPane.id;
+
+            let dataArr = [];
+            let headers = [];
+            let filename = 'bao-cao.csv';
+
+            switch (tabId) {
+                case 'tab-overview':
+                case 'tab-sales':
+                    dataArr = topSelling;
+                    headers = ['TÊN SÁCH (TITLE)', 'MÃ SKU', 'TỔNG ĐÃ BÁN (CUỐN)', 'DOANH THU ĐỘT PHÁ (VND)'];
+                    filename = 'bao-cao-sach-ban-chay.csv';
+                    break;
+                case 'tab-slow':
+                    dataArr = slowMovers;
+                    headers = ['MÃ SKU', 'TÊN SÁCH (TITLE)', 'SỐ LƯỢNG TỒN GỐC', 'SỐ LƯỢNG BÁN TRONG 30 NGÀY', 'SỐ NGÀY MẮC KẸT TỪ LẦN BÁN CUỐI'];
+                    filename = 'bao-cao-hang-ban-cham.csv';
+                    break;
+                case 'tab-aging':
+                    dataArr = lotAging;
+                    headers = ['MÃ LÔ NHẬP', 'MÃ SKU', 'TÊN SÁCH', 'NHÀ CUNG CẤP', 'NHÓM TUỔI (THÁNG/NGÀY)', 'SỐ LƯỢNG CÒN LẠI', 'GIÁ TRỊ VỐN TỒN LẠI (VND)'];
+                    filename = 'bao-cao-tuoi-tho-lo-hang.csv';
+                    break;
+                case 'tab-value':
+                    dataArr = invValue;
+                    headers = ['MÃ SKU', 'TÊN SÁCH', 'TỔNG SỐ LƯỢNG KHO GỐC', 'TRUNG BÌNH GIÁ VỐN NHẬP', 'TỔNG VỐN ĐÃ ĐẦU TƯ', 'DỰ KIẾN DOANH THU BÁN LẺ'];
+                    filename = 'bao-cao-gia-tri-ton-kho.csv';
+                    break;
+                case 'tab-shrinkage':
+                    dataArr = shrinkage;
+                    headers = ['LÝ DO MẤT MÁT (REASON)', 'TỔNG SỐ LƯỢNG RƠI RỤNG (CUỐN)', 'SỐ LƯỢNG SỰ CỐ (LƯỢT REPORT)'];
+                    filename = 'bao-cao-hao-hut-kho.csv';
+                    break;
+                default:
+                    showToast('Không xác định được trang báo cáo để xuất.', 'warning');
+                    return;
+            }
+
+            if (!dataArr || dataArr.length === 0) {
+                showToast('Không có dữ liệu trong báo cáo này để trích xuất.', 'warning');
+                return;
+            }
+
+            // Simple map row logic mapped to specific tab fields
+            const mapRow = (row, id) => {
+                if (id === 'tab-overview' || id === 'tab-sales') return [row.title, row.sku, row.totalSold, row.totalRevenue];
+                if (id === 'tab-slow') return [row.sku, row.title, row.qtyAvailable, row.qtySoldLast30Days, row.daysSinceLastSale];
+                if (id === 'tab-aging') return [row.lotCode, row.variantSku, row.title, row.supplierName, row.ageBucket, row.qtyAvailable, row.totalCostValue];
+                if (id === 'tab-value') return [row.sku, row.title, row.totalQtyAvailable, row.avgUnitCost, row.totalCostValue, row.totalRetailValue];
+                if (id === 'tab-shrinkage') return [row.reason, row.totalQty, row.incidentCount];
+                return [];
+            };
+
+            // BOM for standard UTF-8 Excel support
+            let csvContent = "\uFEFF"; 
+            csvContent += headers.map(h => `"${h}"`).join(',') + '\n';
+            
+            dataArr.forEach(row => {
+                let columns = mapRow(row, tabId);
+                let formattedRow = columns.map(val => {
+                    let str = (val === null || val === undefined) ? '' : val.toString();
+                    str = str.replace(/"/g, '""'); // Escape double quotes
+                    return `"${str}"`; // Enclose all fields in double quotes for full safety
+                }).join(',');
+                csvContent += formattedRow + '\n';
+            });
+
+            // Create and click dynamic download link
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+            
+            showToast('Đang tiến hành Trích xuất dữ liệu thành công!', 'success');
+        }
+
+        // Export active tab content to Excel (.xlsx)
+        function exportActiveTabExcel() {
+            const activeTabPane = document.querySelector('.tab-pane.active');
+            if (!activeTabPane) return;
+            
+            const tabId = activeTabPane.id;
+            let dataArr = [];
+            let headers = [];
+            let filename = 'bao-cao-' + tabId;
+
+            switch (tabId) {
+                case 'tab-overview':
+                case 'tab-sales':
+                    dataArr = topSelling;
+                    headers = ['TÊN SÁCH (TITLE)', 'MÃ SKU', 'TỔNG ĐÃ BÁN (CUỐN)', 'DOANH THU ĐỘT PHÁ (VND)'];
+                    break;
+                case 'tab-slow':
+                    dataArr = slowMovers;
+                    headers = ['MÃ SKU', 'TÊN SÁCH (TITLE)', 'SỐ LƯỢNG TỒN GỐC', 'SỐ LƯỢNG BÁN TRONG 30 NGÀY', 'SỐ NGÀY MẮC KẸT TỪ LẦN BÁN CUỐI'];
+                    break;
+                case 'tab-aging':
+                    dataArr = lotAging;
+                    headers = ['MÃ LÔ NHẬP', 'MÃ SKU', 'TÊN SÁCH', 'NHÀ CUNG CẤP', 'NHÓM TUỔI (THÁNG/NGÀY)', 'SỐ LƯỢNG CÒN LẠI', 'GIÁ TRỊ VỐN TỒN LẠI (VND)'];
+                    break;
+                case 'tab-value':
+                    dataArr = invValue;
+                    headers = ['MÃ SKU', 'TÊN SÁCH', 'TỔNG SỐ LƯỢNG KHO GỐC', 'TRUNG BÌNH GIÁ VỐN NHẬP', 'TỔNG VỐN ĐÃ ĐẦU TƯ', 'DỰ KIẾN DOANH THU BÁN LẺ'];
+                    break;
+                case 'tab-shrinkage':
+                    dataArr = shrinkage;
+                    headers = ['LÝ DO MẤT MÁT (REASON)', 'TỔNG SỐ LƯỢNG RƠI RỤNG (CUỐN)', 'SỐ LƯỢNG SỰ CỐ (LƯỢT REPORT)'];
+                    break;
+                default:
+                    showToast('Không xác định được trang báo cáo để xuất.', 'warning');
+                    return;
+            }
+
+            if (!dataArr || dataArr.length === 0) {
+                showToast('Không có dữ liệu trong báo cáo này để trích xuất.', 'warning');
+                return;
+            }
+
+            const mapRow = (row, id) => {
+                if (id === 'tab-overview' || id === 'tab-sales') return [row.title, row.sku, row.totalSold, row.totalRevenue];
+                if (id === 'tab-slow') return [row.sku, row.title, row.qtyAvailable, row.qtySoldLast30Days, row.daysSinceLastSale];
+                if (id === 'tab-aging') return [row.lotCode, row.variantSku, row.title, row.supplierName, row.ageBucket, row.qtyAvailable, row.totalCostValue];
+                if (id === 'tab-value') return [row.sku, row.title, row.totalQtyAvailable, row.avgUnitCost, row.totalCostValue, row.totalRetailValue];
+                if (id === 'tab-shrinkage') return [row.reason, row.totalQty, row.incidentCount];
+                return [];
+            };
+
+            const mappedData = dataArr.map(row => {
+                let cols = mapRow(row, tabId);
+                let obj = {};
+                for (let i = 0; i < cols.length; i++) {
+                    obj[headers[i]] = cols[i];
+                }
+                return obj;
+            });
+
+            // Make use of SheetJS (XLSX) to compose binary sheet
+            const worksheet = XLSX.utils.json_to_sheet(mappedData);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+            XLSX.writeFile(workbook, filename + '.xlsx');
+            
+            showToast('Trích xuất tập tin Excel thành công!', 'success');
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

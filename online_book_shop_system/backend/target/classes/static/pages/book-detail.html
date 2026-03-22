@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Chi tiết Sách — Quản trị BookStore</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/app.css">
+</head>
+
+<body>
+<div id="app-layout">
+    <div id="sidebar-slot"></div>
+    <div class="main-area">
+        <div id="header-slot"></div>
+        <main class="content-area p-4" id="bookDetailContent">
+            <div class="text-center py-5 text-muted">Đang tải…</div>
+        </main>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../js/api.js"></script>
+<script src="../js/utils.js"></script>
+<script src="../js/layout.js"></script>
+<script>
+    const statusConfig = { ACTIVE: { color: 'success', label: 'Hoạt động' }, HIDDEN: { color: 'secondary', label: 'Ẩn' }, DRAFT: { color: 'warning', label: 'Bản nháp' } };
+    const formatLabels = { HARDCOVER: 'Bìa cứng', PAPERBACK: 'Bìa mềm', BOXSET: 'Boxset', PDF: 'PDF', EPUB: 'EPUB' };
+
+    async function init() {
+        const id = new URLSearchParams(window.location.search).get('id');
+        if (!id) { document.getElementById('bookDetailContent').innerHTML = '<div class="text-center py-5 text-muted">Chưa cung cấp ID sách</div>'; return; }
+        try {
+            const book = await api.get(`/management/books/${id}`);
+            renderDetail(book);
+        } catch (e) {
+            document.getElementById('bookDetailContent').innerHTML = '<div class="text-center py-5 text-danger">Không tìm thấy sách</div>';
+        }
+    }
+
+    function renderDetail(book) {
+        const st = statusConfig[book.status] || { color: 'secondary', label: book.status };
+        const cover = book.images?.find(i => i.isCover) || book.images?.[0];
+        let tags = [];
+        try { tags = JSON.parse(book.tagsJson || '[]'); } catch { }
+
+        let html = `
+<!-- Header -->
+<div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
+    <div class="d-flex align-items-center gap-3">
+        <a href="books.html" class="btn btn-light btn-sm"><i class="bi bi-arrow-left"></i></a>
+        <div>
+            <h2 class="fw-bold mb-1">${book.title}</h2>
+            ${book.subtitle ? `<p class="text-muted mb-0">${book.subtitle}</p>` : ''}
+        </div>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="book-form.html?id=${book.id}" class="btn btn-outline-secondary d-flex align-items-center gap-1">
+            <i class="bi bi-pencil"></i> Sửa
+        </a>
+        <div class="dropdown">
+            <button class="btn btn-outline-secondary dropdown-toggle d-flex align-items-center gap-1" data-bs-toggle="dropdown">
+                <i class="bi bi-three-dots-vertical"></i> Thao tác
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+                ${book.status !== 'ACTIVE' ? `<li><a class="dropdown-item" href="javascript:void(0)" onclick="changeStatus(${book.id},'ACTIVE')">Xuất bản</a></li>` : ''}
+                ${book.status !== 'HIDDEN' ? `<li><a class="dropdown-item" href="javascript:void(0)" onclick="changeStatus(${book.id},'HIDDEN')">Ẩn</a></li>` : ''}
+                ${book.status !== 'DRAFT' ? `<li><a class="dropdown-item" href="javascript:void(0)" onclick="changeStatus(${book.id},'DRAFT')">Bản nháp</a></li>` : ''}
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item text-danger" href="javascript:void(0)" onclick="deleteBook(${book.id})">Xóa</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Left: Images -->
+    <div class="col-lg-4">
+        <div class="card mb-3">
+            <div class="card-body p-3">
+                <div style="aspect-ratio:3/4;background:#f1f5f9;border-radius:8px;overflow:hidden;display:flex;align-items:center;justify-content:center">
+                    ${cover ? `<img src="${cover.url}" alt="${cover.altText || book.title}" style="width:100%;height:100%;object-fit:cover">` :
+                `<i class="bi bi-journal-bookmark"></i>`}
+                </div>
+            </div>
+        </div>
+        ${book.images && book.images.length > 1 ? `
+        <div class="card">
+            <div class="card-body p-3">
+                <h6 class="fw-bold mb-2">Thư viện ảnh (${book.images.length})</h6>
+                <div class="row g-2">
+                    ${book.images.map(img => `
+                        <div class="col-4">
+                            <div style="aspect-ratio:1;border-radius:6px;overflow:hidden;background:#f1f5f9">
+                                <img src="${img.url}" alt="${img.altText || ''}" style="width:100%;height:100%;object-fit:cover">
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        </div>` : ''}
+    </div>
+
+    <!-- Right: Details -->
+    <div class="col-lg-8">
+        <!-- Metadata -->
+        <div class="card mb-3">
+            <div class="card-body">
+                <table class="table table-bordered table-sm mb-0">
+                    <tbody>
+                        <tr><th style="width:140px">Trạng thái</th><td><span class="badge bg-${st.color}">${st.label}</span></td>
+                            <th style="width:140px">Danh mục</th><td>${book.categoryName || '—'}</td></tr>
+                        <tr><th>ISBN-13</th><td class="font-monospace">${book.isbn13 || '—'}</td>
+                            <th>ISBN-10</th><td class="font-monospace">${book.isbn10 || '—'}</td></tr>
+                        <tr><th>Nhà Xuất bản</th><td>${book.publisherName || '—'}</td>
+                            <th>Năm XB</th><td>${book.publicationYear || '—'}</td></tr>
+                        <tr><th>Ngôn ngữ</th><td>${book.language || '—'}</td>
+                            <th>Chế độ bán</th><td>${book.sellMode === 'PER_COPY' ? 'Theo bản sao' : (book.sellMode === 'PER_QUANTITY' ? 'Theo số lượng' : book.sellMode) || '—'}</td></tr>
+                        <tr><th>Ngày tạo</th><td>${book.createdAt ? new Date(book.createdAt).toLocaleDateString('vi-VN') : '—'}</td>
+                            <th>Cập nhật</th><td>${book.updatedAt ? new Date(book.updatedAt).toLocaleDateString('vi-VN') : '—'}</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        ${tags.length > 0 ? `
+        <div class="card mb-3">
+            <div class="card-body">
+                <h6 class="fw-bold mb-2">Thẻ (Tags)</h6>
+                <div class="d-flex flex-wrap gap-2">
+                    ${tags.map(t => `<span class="badge bg-primary">${t}</span>`).join('')}
+                </div>
+            </div>
+        </div>` : ''}
+
+        ${book.shortDescription ? `
+        <div class="card mb-3">
+            <div class="card-body">
+                <h6 class="fw-bold mb-2">Mô tả ngắn</h6>
+                <p class="text-muted mb-0">${book.shortDescription}</p>
+            </div>
+        </div>` : ''}
+
+        ${book.descriptionHtml ? `
+        <div class="card mb-3">
+            <div class="card-body">
+                <h6 class="fw-bold mb-2">Mô tả chi tiết</h6>
+                <div class="text-secondary">${book.descriptionHtml}</div>
+            </div>
+        </div>` : ''}
+
+        ${book.authors && book.authors.length > 0 ? `
+        <div class="card mb-3">
+            <div class="card-body">
+                <h6 class="fw-bold mb-2">Tác giả</h6>
+                ${book.authors.map(a => `
+                    <div class="d-flex align-items-center gap-3 p-2 rounded hover-bg-light">
+                        <div style="width:32px;height:32px;border-radius:50%;background:#e2e8f0;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:12px;color:#64748b">${(a.name || '?').charAt(0).toUpperCase()}</div>
+                        <div>
+                            <div class="fw-semibold small">${a.name}</div>
+                            <div class="text-muted" style="font-size:11px">${a.role || 'Tác giả'}</div>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        </div>` : ''}
+
+        ${book.variants && book.variants.length > 0 ? `
+        <div class="card mb-3">
+            <div class="card-body">
+                <h6 class="fw-bold mb-2">Phiên bản (Biến thể)</h6>
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover mb-0">
+                        <thead><tr>
+                            <th>SKU</th><th>Định dạng</th><th>Phiên bản</th><th class="text-end">Giá niêm yết</th><th class="text-end">Giá bán</th><th class="text-end">Số trang</th><th>Trạng thái</th>
+                        </tr></thead>
+                        <tbody>${book.variants.map(v => `
+                            <tr>
+                                <td class="fw-medium font-monospace">${v.sku}</td>
+                                <td><span class="badge bg-light text-dark border">${formatLabels[v.format] || v.format || '—'}</span></td>
+                                <td class="text-muted">${v.edition || '—'}</td>
+                                <td class="text-end">${v.listPrice?.toLocaleString() || '—'}</td>
+                                <td class="text-end fw-semibold">${v.salePrice?.toLocaleString() || '—'}</td>
+                                <td class="text-end text-muted">${v.pageCount || '—'}</td>
+                                <td><span class="d-inline-block rounded-circle" style="width:8px;height:8px;background:${v.isActive ? '#10b981' : '#cbd5e1'}"></span></td>
+                            </tr>
+                        `).join('')}</tbody>
+                    </table>
+                </div>
+            </div>
+        </div>` : ''}
+    </div>
+</div>`;
+
+        document.getElementById('bookDetailContent').innerHTML = html;
+    }
+
+    async function changeStatus(id, status) {
+        try {
+            const sLabel = { ACTIVE: 'Hoạt động', HIDDEN: 'Ẩn', DRAFT: 'Bản nháp' };
+            await api.patch(`/management/books/${id}/status`, { status });
+            showToast(`Đã đổi trạng thái thành ${sLabel[status] || status}`, 'success');
+            setTimeout(() => location.reload(), 500);
+        } catch (e) { showToast('Thất bại', 'danger'); }
+    }
+
+    async function deleteBook(id) {
+        if (!confirm('Bạn có chắc chắn muốn xóa sách này không?')) return;
+        try {
+            await api.delete(`/management/books/${id}`);
+            showToast('Đã xóa sách', 'success');
+            setTimeout(() => location.href = 'books.html', 500);
+        } catch (e) { showToast('Thất bại', 'danger'); }
+    }
+
+    function editBook(id) {
+        window.location.href = `book-form.html?id=${id}`;
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+
+</html>

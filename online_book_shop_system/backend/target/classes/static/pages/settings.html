@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Cài đặt — Quản trị BookStore</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/app.css">
+</head>
+
+<body>
+    <div id="app-layout">
+        <div id="sidebar-slot"></div>
+        <div class="main-area">
+            <div id="header-slot"></div>
+            <main class="content-area p-4">
+                <div class="mb-4">
+                    <h2 class="fw-bold mb-1"><i class="bi bi-gear"></i>Cài đặt</h2>
+                    <p class="text-muted mb-0">Quản lý cài đặt và tùy chọn ứng dụng</p>
+                </div>
+
+                <div class="row g-4">
+                    <!-- General Settings -->
+                    <div class="col-lg-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="fw-bold mb-0 d-flex align-items-center gap-2"><i
+                                        class="bi bi-sliders"></i>Chung</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3"><label class="form-label">Tên cửa hàng</label><input type="text"
+                                        class="form-control" id="s_storeName" value="BookStore"></div>
+                                <div class="mb-3"><label class="form-label">Tiền tệ</label><select class="form-select"
+                                        id="s_currency">
+                                        <option value="VND" selected>VND (₫)</option>
+                                        <option value="USD">USD ($)</option>
+                                    </select></div>
+                                <div class="mb-3"><label class="form-label">Múi giờ</label><select class="form-select"
+                                        id="s_timezone">
+                                        <option value="Asia/Ho_Chi_Minh" selected>Asia/Ho Chi Minh (UTC+7)</option>
+                                        <option value="UTC">UTC</option>
+                                    </select></div>
+                                <div class="form-check form-switch mb-3"><input class="form-check-input" type="checkbox"
+                                        id="s_maintenance"><label class="form-check-label" for="s_maintenance">Chế độ
+                                        bảo trì</label></div>
+                                <button class="btn btn-primary" onclick="saveGeneral()">Lưu thay đổi</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Notification Settings -->
+                    <div class="col-lg-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="fw-bold mb-0 d-flex align-items-center gap-2"><i class="bi bi-bell"></i>Thông
+                                    báo</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-check form-switch mb-3"><input class="form-check-input" type="checkbox"
+                                        id="n_email" checked><label class="form-check-label" for="n_email">Thông báo qua
+                                        Email
+                                    </label></div>
+                                <div class="form-check form-switch mb-3"><input class="form-check-input" type="checkbox"
+                                        id="n_lowStock" checked><label class="form-check-label" for="n_lowStock">Cảnh
+                                        báo sắp hết hàng
+                                    </label></div>
+                                <div class="form-check form-switch mb-3"><input class="form-check-input" type="checkbox"
+                                        id="n_newOrders" checked><label class="form-check-label" for="n_newOrders">Cảnh
+                                        báo đơn hàng mới
+                                    </label></div>
+                                <div class="form-check form-switch mb-3"><input class="form-check-input" type="checkbox"
+                                        id="n_returns"><label class="form-check-label" for="n_returns">Cảnh báo trả hàng
+                                    </label></div>
+                                <button class="btn btn-primary" onclick="saveNotifications()">Lưu thay đổi</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Inventory Settings -->
+                    <div class="col-lg-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="fw-bold mb-0 d-flex align-items-center gap-2"><i
+                                        class="bi bi-box-seam"></i>Kho hàng</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3"><label class="form-label">Ngưỡng đặt lại hàng mặc định</label><input
+                                        type="number" class="form-control" id="i_reorderThreshold" value="5" min="0">
+                                </div>
+                                <div class="mb-3"><label class="form-label">Tồn kho tối đa mặc định</label><input
+                                        type="number" class="form-control" id="i_maxStock" value="100" min="0"></div>
+                                <div class="form-check form-switch mb-3"><input class="form-check-input" type="checkbox"
+                                        id="i_autoAllocate" checked><label class="form-check-label"
+                                        for="i_autoAllocate">Tự động phân bổ khi xác nhận đơn hàng</label></div>
+                                <button class="btn btn-primary" onclick="saveInventory()">Lưu thay đổi</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Account Settings -->
+                    <div class="col-lg-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="fw-bold mb-0 d-flex align-items-center gap-2"><i class="bi bi-person"></i>Tài
+                                    khoản
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3"><label class="form-label">Tên hiển thị</label><input type="text"
+                                        class="form-control" id="a_name" value="Admin"></div>
+                                <div class="mb-3"><label class="form-label">Email</label><input type="email"
+                                        class="form-control" id="a_email" value="admin@bookstore.com"></div>
+                                <hr>
+                                <div class="mb-3"><label class="form-label">Mật khẩu hiện tại</label><input
+                                        type="password" class="form-control" id="a_oldPwd"></div>
+                                <div class="mb-3"><label class="form-label">Mật khẩu mới</label><input type="password"
+                                        class="form-control" id="a_newPwd"></div>
+                                <div class="mb-3"><label class="form-label">Xác nhận mật khẩu</label><input
+                                        type="password" class="form-control" id="a_confirmPwd"></div>
+                                <button class="btn btn-primary me-2" onclick="saveAccount()">Lưu hồ sơ</button>
+                                <button class="btn btn-outline-danger" onclick="changePassword()">Đổi mật khẩu</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/utils.js"></script>
+    <script src="../js/layout.js"></script>
+    <script>
+        async function loadSettings() {
+            try {
+                const s = await api.get('/management/settings');
+                if (s) {
+                    document.getElementById('s_storeName').value = s.storeName || 'BookStore';
+                    document.getElementById('s_currency').value = s.currency || 'VND';
+                    document.getElementById('s_timezone').value = s.timezone || 'Asia/Ho_Chi_Minh';
+                    document.getElementById('s_maintenance').checked = s.maintenanceMode || false;
+                    document.getElementById('i_reorderThreshold').value = s.reorderThreshold || 5;
+                    document.getElementById('i_maxStock').value = s.maxStock || 100;
+                }
+            } catch (e) { }
+        }
+
+        async function saveGeneral() {
+            try {
+                await api.put('/management/settings/general', {
+                    storeName: document.getElementById('s_storeName').value,
+                    currency: document.getElementById('s_currency').value,
+                    timezone: document.getElementById('s_timezone').value,
+                    maintenanceMode: document.getElementById('s_maintenance').checked,
+                });
+                showToast('Đã lưu cài đặt chung', 'success');
+            } catch (e) { showToast('Thất bại', 'danger'); }
+        }
+
+        async function saveNotifications() {
+            try {
+                await api.put('/management/settings/notifications', {
+                    emailNotifications: document.getElementById('n_email').checked,
+                    lowStockAlerts: document.getElementById('n_lowStock').checked,
+                    newOrderAlerts: document.getElementById('n_newOrders').checked,
+                    returnAlerts: document.getElementById('n_returns').checked,
+                });
+                showToast('Đã lưu cài đặt thông báo', 'success');
+            } catch (e) { showToast('Thất bại', 'danger'); }
+        }
+
+        async function saveInventory() {
+            try {
+                await api.put('/management/settings/inventory', {
+                    reorderThreshold: +document.getElementById('i_reorderThreshold').value,
+                    maxStock: +document.getElementById('i_maxStock').value,
+                    autoAllocate: document.getElementById('i_autoAllocate').checked,
+                });
+                showToast('Đã lưu cài đặt kho hàng', 'success');
+            } catch (e) { showToast('Thất bại', 'danger'); }
+        }
+
+        async function saveAccount() {
+            try {
+                await api.put('/management/settings/account', {
+                    displayName: document.getElementById('a_name').value,
+                    email: document.getElementById('a_email').value,
+                });
+                showToast('Đã cập nhật tài khoản', 'success');
+            } catch (e) { showToast('Thất bại', 'danger'); }
+        }
+
+        async function changePassword() {
+            const o = document.getElementById('a_oldPwd').value;
+            const n = document.getElementById('a_newPwd').value;
+            const c = document.getElementById('a_confirmPwd').value;
+            if (!o || !n) { showToast('Vui lòng điền tất cả các trường mật khẩu', 'warning'); return; }
+            if (n !== c) { showToast('Mật khẩu không khớp', 'warning'); return; }
+            if (n.length < 6) { showToast('Mật khẩu phải có ít nhất 6 ký tự', 'warning'); return; }
+            try {
+                await api.put('/management/settings/password', { currentPassword: o, newPassword: n });
+                showToast('Đã đổi mật khẩu', 'success');
+                document.getElementById('a_oldPwd').value = '';
+                document.getElementById('a_newPwd').value = '';
+                document.getElementById('a_confirmPwd').value = '';
+            } catch (e) { showToast('Thất bại', 'danger'); }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadSettings);
+    </script>
+</body>
+
+</html>

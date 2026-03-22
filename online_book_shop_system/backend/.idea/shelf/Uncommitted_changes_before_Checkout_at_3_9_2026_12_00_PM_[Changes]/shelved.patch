@@ -1,0 +1,42 @@
+Index: src/main/resources/application.properties
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>spring.application.name=OnlineBookShop\r\n\r\nspring.datasource.url=jdbc:sqlserver://localhost:1433;databaseName=BOOKSTORE_DATABASE;encrypt=false;trustServerCertificate=true\r\nspring.datasource.username=sa\r\nspring.datasource.password=123456\r\nspring.datasource.driver-class-name=com.microsoft.sqlserver.jdbc.SQLServerDriver\r\n\r\n# Use 'none' - schema must be created by SQL script (avoids conflicts with identity/computed columns)\r\nspring.jpa.hibernate.ddl-auto=none\r\nspring.jpa.show-sql=true\r\nspring.jpa.database-platform=org.hibernate.dialect.SQLServerDialect\r\n\r\n# JWT Configuration\r\njwt.secret=OnlineBookShopSecretKeyForJWTAuthenticationMustBe256BitsLong!!\r\njwt.expiration=86400000\r\nspring.web.resources.cache.cachecontrol.max-age=0\r\nspring.web.resources.cache.cachecontrol.no-cache=true\r\nspring.web.resources.cache.cachecontrol.no-store=true\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>ISO-8859-1
+===================================================================
+diff --git a/src/main/resources/application.properties b/src/main/resources/application.properties
+--- a/src/main/resources/application.properties	(revision 26e3d8857e0775955145008c36f815e3ed8da49f)
++++ b/src/main/resources/application.properties	(date 1772696913964)
+@@ -1,8 +1,8 @@
+ spring.application.name=OnlineBookShop
+ 
+-spring.datasource.url=jdbc:sqlserver://localhost:1433;databaseName=BOOKSTORE_DATABASE;encrypt=false;trustServerCertificate=true
++spring.datasource.url=jdbc:sqlserver://localhost:1433;databaseName=bookstore;encrypt=false;trustServerCertificate=true
+ spring.datasource.username=sa
+-spring.datasource.password=123456
++spring.datasource.password=123
+ spring.datasource.driver-class-name=com.microsoft.sqlserver.jdbc.SQLServerDriver
+ 
+ # Use 'none' - schema must be created by SQL script (avoids conflicts with identity/computed columns)
+Index: target/classes/application.properties
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>spring.application.name=OnlineBookShop\r\n\r\nspring.datasource.url=jdbc:sqlserver://localhost:1433;databaseName=BOOKSTORE_DATABASE;encrypt=false;trustServerCertificate=true\r\nspring.datasource.username=sa\r\nspring.datasource.password=123456\r\nspring.datasource.driver-class-name=com.microsoft.sqlserver.jdbc.SQLServerDriver\r\n\r\n# Use 'none' - schema must be created by SQL script (avoids conflicts with identity/computed columns)\r\nspring.jpa.hibernate.ddl-auto=none\r\nspring.jpa.show-sql=true\r\nspring.jpa.database-platform=org.hibernate.dialect.SQLServerDialect\r\n\r\n# JWT Configuration\r\njwt.secret=OnlineBookShopSecretKeyForJWTAuthenticationMustBe256BitsLong!!\r\njwt.expiration=86400000\r\nspring.web.resources.cache.cachecontrol.max-age=0\r\nspring.web.resources.cache.cachecontrol.no-cache=true\r\nspring.web.resources.cache.cachecontrol.no-store=true\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>ISO-8859-1
+===================================================================
+diff --git a/target/classes/application.properties b/target/classes/application.properties
+--- a/target/classes/application.properties	(revision 26e3d8857e0775955145008c36f815e3ed8da49f)
++++ b/target/classes/application.properties	(date 1772696914349)
+@@ -1,8 +1,8 @@
+ spring.application.name=OnlineBookShop
+ 
+-spring.datasource.url=jdbc:sqlserver://localhost:1433;databaseName=BOOKSTORE_DATABASE;encrypt=false;trustServerCertificate=true
++spring.datasource.url=jdbc:sqlserver://localhost:1433;databaseName=bookstore;encrypt=false;trustServerCertificate=true
+ spring.datasource.username=sa
+-spring.datasource.password=123456
++spring.datasource.password=123
+ spring.datasource.driver-class-name=com.microsoft.sqlserver.jdbc.SQLServerDriver
+ 
+ # Use 'none' - schema must be created by SQL script (avoids conflicts with identity/computed columns)

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Bảng điều khiển Nhân viên — Quản trị BookStore</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/app.css">
+</head>
+
+<body>
+    <div id="app-layout">
+        <div id="sidebar-slot"></div>
+        <div class="main-area">
+            <div id="header-slot"></div>
+            <main class="content-area p-4">
+                <div class="mb-4">
+                    <h2 class="fw-bold mb-1"><i class="bi bi-speedometer2"></i>Bảng điều khiển Nhân viên</h2>
+                    <p class="text-muted mb-0">Tổng quan về đơn hàng, nhiệm vụ và thông báo</p>
+                </div>
+
+                <!-- KPI Cards -->
+                <div class="row g-3 mb-4" id="kpiCards">
+                    <div class="col-6 col-md-3">
+                        <div class="stats-card">
+                            <div class="stats-icon" style="background:#dbeafe;color:#3b82f6"><i class="bi bi-cart"></i>
+                            </div>
+                            <div class="stats-label">Đơn hàng mới</div>
+                            <div class="stats-value" id="kpi_newOrders">—</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="stats-card">
+                            <div class="stats-icon" style="background:#fef3c7;color:#f59e0b"><i
+                                    class="bi bi-credit-card"></i></div>
+                            <div class="stats-label">Chờ thanh toán</div>
+                            <div class="stats-value" id="kpi_pendingPayments">—</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="stats-card">
+                            <div class="stats-icon" style="background:#ede9fe;color:#8b5cf6"><i
+                                    class="bi bi-box-seam"></i></div>
+                            <div class="stats-label">Đơn cần đóng gói</div>
+                            <div class="stats-value" id="kpi_ordersToPack">—</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="stats-card">
+                            <div class="stats-icon" style="background:#d1fae5;color:#10b981"><i class="bi bi-truck"></i>
+                            </div>
+                            <div class="stats-label">Đã giao hôm nay</div>
+                            <div class="stats-value" id="kpi_shippedToday">—</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-4 mb-4">
+                    <!-- To-Do List -->
+                    <div class="col-lg-8">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h6 class="mb-0 fw-bold"><i class="bi bi-list-check"></i>Danh sách việc cần làm</h6>
+                                <span class="badge bg-primary" id="todoCount">0</span>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th style="width:120px">Đơn hàng</th>
+                                                <th>Khách hàng</th>
+                                                <th style="width:100px">Hành động</th>
+                                                <th style="width:80px">Ưu tiên</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="todoBody">
+                                            <tr>
+                                                <td colspan="4" class="text-center py-4 text-muted">Đang tải…</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Alerts -->
+                    <div class="col-lg-4">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h6 class="mb-0 fw-bold"><i class="bi bi-bell"></i>Cảnh báo</h6>
+                                <span class="badge bg-danger" id="alertCount">0</span>
+                            </div>
+                            <div class="card-body p-0">
+                                <div id="alertList" class="list-group list-group-flush"
+                                    style="max-height:400px;overflow-y:auto">
+                                    <div class="text-center py-4 text-muted">Đang tải…</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="card">
+                    <div class="card-body d-flex flex-wrap gap-2">
+                        <a href="staff-orders.html" class="btn btn-primary d-flex align-items-center gap-1"><i
+                                class="bi bi-list-ul"></i> Tất cả Đơn hàng</a>
+                        <a href="staff-returns.html"
+                            class="btn btn-outline-secondary d-flex align-items-center gap-1"><i
+                                class="bi bi-arrow-return-left"></i>
+                            Trả hàng</a>
+                        <a href="staff-customers.html"
+                            class="btn btn-outline-secondary d-flex align-items-center gap-1"><i
+                                class="bi bi-person-lines-fill"></i> Tra cứu Khách hàng</a>
+                        <a href="staff-incidents.html"
+                            class="btn btn-outline-secondary d-flex align-items-center gap-1"><i
+                                class="bi bi-exclamation-triangle"></i> Sự cố</a>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/utils.js"></script>
+    <script src="../js/layout.js"></script>
+    <script>
+        const actionColor = { CONFIRM: 'primary', PICK: 'warning', PACK: 'secondary', SHIP: 'success' };
+        const actionLang = { CONFIRM: 'XÁC NHẬN', PICK: 'LẤY HÀNG', PACK: 'ĐÓNG GÓI', SHIP: 'GIAO HÀNG' };
+        
+        const severityColor = { HIGH: 'danger', MEDIUM: 'warning', LOW: 'secondary' };
+        const severityLang = { HIGH: 'CAO', MEDIUM: 'TRUNG BÌNH', LOW: 'THẤP' };
+        
+        const alertIcon = { OVERDUE_ORDER: 'bi-clock', PAYMENT_MISMATCH: 'bi-credit-card', LOW_STOCK: 'bi-boxes' };
+        const alertTypeLang = { OVERDUE_ORDER: 'ĐƠN QUÁ HẠN', PAYMENT_MISMATCH: 'LỖI THANH TOÁN', LOW_STOCK: 'SẮP HẾT HÀNG' };
+
+        async function init() {
+            try {
+                const [kpis, todos, alerts] = await Promise.all([
+                    api.get('/staff/dashboard/kpis'),
+                    api.get('/staff/dashboard/todo'),
+                    api.get('/staff/dashboard/alerts'),
+                ]);
+                renderKPIs(kpis);
+                renderTodos(todos);
+                renderAlerts(alerts);
+            } catch (e) {
+                console.error('Lỗi Bảng điều khiển:', e);
+            }
+        }
+
+        function renderKPIs(k) {
+            if (!k) return;
+            document.getElementById('kpi_newOrders').textContent = k.newOrders ?? 0;
+            document.getElementById('kpi_pendingPayments').textContent = k.pendingPayments ?? 0;
+            document.getElementById('kpi_ordersToPack').textContent = k.ordersToPack ?? 0;
+            document.getElementById('kpi_shippedToday').textContent = k.shippedToday ?? 0;
+        }
+
+        function renderTodos(todos) {
+            const list = todos || [];
+            document.getElementById('todoCount').textContent = list.length;
+            const tbody = document.getElementById('todoBody');
+            if (!list.length) { tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-muted">Không có nhiệm vụ</td></tr>'; return; }
+            tbody.innerHTML = list.map(t => {
+                const pLabel = t.priority >= 3 ? '<span class="badge bg-danger">CAO</span>' : t.priority >= 1 ? '<span class="badge bg-warning text-dark">TRUNG</span>' : '<span class="badge bg-secondary">THẤP</span>';
+                return `<tr class="cursor-pointer" onclick="location.href='staff-order-detail.html?id=${t.orderId}'">
+            <td class="font-monospace small fw-semibold">${t.orderCode || '—'}</td>
+            <td>${t.customerName || '—'}</td>
+            <td><span class="badge bg-${actionColor[t.action] || 'secondary'}">${actionLang[t.action] || t.action}</span></td>
+            <td>${pLabel}</td>
+        </tr>`;
+            }).join('');
+        }
+
+        function renderAlerts(alerts) {
+            const list = alerts || [];
+            document.getElementById('alertCount').textContent = list.length;
+            const el = document.getElementById('alertList');
+            if (!list.length) { el.innerHTML = '<div class="text-center py-4 text-muted">Không có cảnh báo</div>'; return; }
+            el.innerHTML = list.map(a => {
+                const icon = alertIcon[a.type] || 'warning';
+                const color = a.severity === 'HIGH' ? '#ef4444' : '#f59e0b';
+                return `<a href="${a.referenceId ? 'staff-order-detail.html?id=' + a.referenceId : '#'}" class="list-group-item list-group-item-action p-3">
+            <div class="d-flex gap-3 align-items-start">
+                <i class="bi ${icon}" style="font-size:22px;color:${color}"></i>
+                <div>
+                    <span class="badge bg-${severityColor[a.severity] || 'secondary'} mb-1">${alertTypeLang[a.type] || (a.type || '').replace(/_/g, ' ')}</span>
+                    <p class="mb-0 small text-muted">${a.message || ''}</p>
+                </div>
+            </div>
+        </a>`;
+            }).join('');
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Cài đặt Điều phối (Allocation) — Quản trị BookStore</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/app.css">
+    <style>
+        .setting-card {
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .setting-item {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            padding: 1.25rem 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .setting-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .setting-item:first-child {
+            padding-top: 0;
+        }
+
+        .setting-info h6 {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            color: #111827;
+        }
+
+        .setting-info p {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-bottom: 0;
+            max-width: 500px;
+        }
+
+        .form-switch .form-check-input {
+            width: 3em;
+            height: 1.5em;
+            cursor: pointer;
+        }
+
+        .form-switch .form-check-input:checked {
+            background-color: #3b82f6;
+            border-color: #3b82f6;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app-layout">
+        <div id="sidebar-slot"></div>
+        <div class="main-area">
+            <div id="header-slot"></div>
+            <main class="content-area p-4">
+                <form id="settingsForm" onsubmit="event.preventDefault(); saveSettings();">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div>
+                            <h2 class="fw-bold mb-1"><i class="bi bi-gear-wide-connected me-2"></i>Cài đặt Phân bổ & Điều phối</h2>
+                            <p class="text-muted mb-0">Cấu hình các quy luật xuất hàng (FIFO), giữ hàng và chính sách vận hành kho</p>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-outline-secondary" onclick="loadSettings()"><i class="bi bi-arrow-clockwise me-1"></i>Tải lại</button>
+                            <button type="submit" class="btn btn-primary d-flex align-items-center gap-2" id="saveBtn">
+                                <i class="bi bi-floppy"></i> Lưu Cài đặt
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="row align-items-start">
+                        <div class="col-xl-8 col-lg-10">
+                            
+                            <!-- Section: Xuất hàng & Tự động hóa -->
+                            <h5 class="fw-bold mb-3 mt-2">Luật tự động hóa xuất hàng</h5>
+                            <div class="setting-card shadow-sm">
+                                
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <h6>Quy tắc xếp/xuất kho (FIFO Rules) <span class="badge bg-primary ms-1">Hệ thống</span></h6>
+                                        <p>Thiết lập luật Phân bổ tự động: xuất hàng theo chuẩn "Lô nhập trước xuất trước" hay rà soát đến từng "Bản sao (Copy) có mã riêng biệt".</p>
+                                    </div>
+                                    <div style="width: 280px;">
+                                        <select class="form-select" id="f_fifoBy" required>
+                                            <option value="LOT">Ưu tiên Lô nhập trước (LOT)</option>
+                                            <option value="COPY">Ưu tiên Bản sao nhập trước (COPY)</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <h6>Độ ưu tiên Tình trạng (Condition Priority)</h6>
+                                        <p>Khi các bản sao nhập cùng ngày, hệ thống sẽ ưu tiên chọn cuốn Sách Mới tinh xuất trước hay cuốn Rẻ xuất trước.</p>
+                                    </div>
+                                    <div style="width: 280px;">
+                                        <select class="form-select" id="f_condition" required>
+                                            <option value="NEWEST_FIRST">Sách mới nhất xuất trước</option>
+                                            <option value="CHEAPEST_FIRST">Sách có giá vốn rẻ nhất xuất trước</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <h6>Thời hạn giữ hàng tự động (Reservation TTL)</h6>
+                                        <p>Thời gian (tính bằng Phút) hệ thống tự động khóa "Số lượng khả dụng" của kho hàng cho các đơn hàng ở trạng thái Chưa Thanh Toán. Hết giờ, kho tự động mở lại số lượng.</p>
+                                    </div>
+                                    <div style="width: 280px;" class="input-group">
+                                        <input type="number" class="form-control" id="f_ttl" min="0" required placeholder="VD: 1440">
+                                        <span class="input-group-text">Phút</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Section: Chính sách Nhân sự -->
+                            <h5 class="fw-bold mb-3 mt-4">Chính sách Quản lý Kho</h5>
+                            <div class="setting-card shadow-sm">
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <h6>Ghi đè thủ công (Staff Override Policy)</h6>
+                                        <p>Cho phép quản lý hoặc nhân viên kho quyền <strong>thay đổi thủ công</strong> bản sao/lô hàng mà hệ thống đã tự động gán lúc đóng gói hàng (Pack).</p>
+                                    </div>
+                                    <div class="d-flex align-items-center h-100 mt-2">
+                                        <div class="form-check form-switch m-0">
+                                            <input class="form-check-input shadow-none" type="checkbox" role="switch" id="f_override">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </form>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/utils.js"></script>
+    <script src="../js/layout.js"></script>
+    <script>
+        async function loadSettings() {
+            try {
+                const settings = await api.get('/settings/allocation');
+                if (settings) {
+                    document.getElementById('f_fifoBy').value = settings.fifoBy || 'LOT';
+                    document.getElementById('f_condition').value = settings.conditionPriority || 'NEWEST_FIRST';
+                    document.getElementById('f_ttl').value = settings.reservationTtlMin ?? 60;
+                    document.getElementById('f_override').checked = !!settings.allowStaffOverride;
+                }
+            } catch (e) {
+                showToast('Không thể tải cài đặt. Vui lòng kiểm tra API.', 'danger');
+            }
+        }
+
+        async function saveSettings() {
+            const btn = document.getElementById('saveBtn');
+            const originalContent = btn.innerHTML;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Đang lưu...';
+            btn.disabled = true;
+
+            const payload = {
+                fifoBy: document.getElementById('f_fifoBy').value,
+                conditionPriority: document.getElementById('f_condition').value,
+                reservationTtlMin: parseInt(document.getElementById('f_ttl').value, 10),
+                allowStaffOverride: document.getElementById('f_override').checked
+            };
+
+            try {
+                await api.put('/settings/allocation', payload);
+                showToast('Chỉnh sửa cài đặt thành công!', 'success');
+            } catch (e) {
+                console.error(e);
+                showToast('Lưu cài đặt thất bại: ' + (e.message || ''), 'danger');
+            } finally {
+                btn.innerHTML = originalContent;
+                btn.disabled = false;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadSettings);
+    </script>
+</body>
+</html>

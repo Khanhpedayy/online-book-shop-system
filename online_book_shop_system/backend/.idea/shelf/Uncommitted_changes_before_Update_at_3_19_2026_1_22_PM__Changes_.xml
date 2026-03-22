@@ -1,0 +1,127 @@
+<changelist name="Uncommitted_changes_before_Update_at_3_19_2026_1_22_PM_[Changes]" date="1773901348559" recycled="false" toDelete="true">
+  <option name="PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_3_19_2026_1_22_PM_[Changes]/shelved.patch" />
+  <option name="DESCRIPTION" value="Uncommitted changes before Update at 3/19/2026 1:22 PM [Changes]" />
+  <binary>
+    <option name="BEFORE_PATH" value="target/test-classes/com/example/onlinebookshop/OnlineBookShopApplicationTests.class" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" value="target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" value="target/classes/com/example/onlinebookshop/Service/UserServiceImpl.class" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" value="target/classes/com/example/onlinebookshop/Config/JwtAuthenticationFilter.class" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" value="target/classes/com/example/onlinebookshop/dto/BookVariantDTO$BookVariantDTOBuilder.class" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" value="target/classes/com/example/onlinebookshop/dto/LoginRequest.class" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" value="target/classes/com/example/onlinebookshop/dto/RegisterRequest.class" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" value="target/classes/com/example/onlinebookshop/Config/SecurityConfig.class" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" value="target/classes/com/example/onlinebookshop/Controller/BookController.class" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" value="target/classes/com/example/onlinebookshop/Repository/OrderRepository.class" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" value="target/classes/com/example/onlinebookshop/dto/CreateUserRequest.class" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" value="target/classes/com/example/onlinebookshop/dto/OrderItemRequest.class" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" value="target/classes/com/example/onlinebookshop/Service/CustomUserDetailsService.class" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" value="target/classes/com/example/onlinebookshop/Entity/User.class" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" value="target/classes/com/example/onlinebookshop/Config/JwtUtils.class" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" value="target/classes/com/example/onlinebookshop/Entity/CartItem.class" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" value="target/classes/com/example/onlinebookshop/Entity/Role.class" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" value="target/maven-status/maven-compiler-plugin/testCompile/default-testCompile/inputFiles.lst" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" value="target/classes/com/example/onlinebookshop/dto/LoginResponse$LoginResponseBuilder.class" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" value="target/classes/com/example/onlinebookshop/Controller/UserController.class" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" value="target/classes/com/example/onlinebookshop/Config/JacksonConfig.class" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" value="target/classes/com/example/onlinebookshop/dto/LoginResponse.class" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" value="target/test-classes/com/example/onlinebookshop/OrderServiceTest.class" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" value="target/classes/com/example/onlinebookshop/Repository/BookInfoRepository.class" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" value="target/classes/com/example/onlinebookshop/dto/UserDTO$UserDTOBuilder.class" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" value="target/classes/com/example/onlinebookshop/dto/OrderRequest.class" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" value="target/classes/com/example/onlinebookshop/Service/UserService.class" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" value="target/surefire-reports/2026-02-28T15-26-58_901.dumpstream" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" value="target/classes/com/example/onlinebookshop/dto/BookVariantDTO.class" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" value="target/classes/com/example/onlinebookshop/Repository/OrderItemRepository.class" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" value="target/classes/com/example/onlinebookshop/dto/CheckoutRequest.class" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" value="target/classes/com/example/onlinebookshop/Config/DataInitializer.class" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" value="target/classes/com/example/onlinebookshop/dto/UserDTO.class" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" value="target/maven-status/maven-compiler-plugin/testCompile/default-testCompile/createdFiles.lst" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" value="target/classes/com/example/onlinebookshop/Controller/AuthController.class" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" value="target/classes/com/example/onlinebookshop/dto/UpdateCartItemRequest.class" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" value="target/classes/com/example/onlinebookshop/Service/CartService.class" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" value="target/classes/com/example/onlinebookshop/OnlineBookShopApplication.class" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" value="target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" value="target/classes/com/example/onlinebookshop/dto/AddToCartRequest.class" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" value="target/classes/com/example/onlinebookshop/Repository/RoleRepository.class" />
+  </binary>
+</changelist>
