@@ -8,7 +8,8 @@ import lombok.*;
 @AllArgsConstructor
 class AdjustmentDTO {
     private Long id;
-    private String movementType;
+    private String type;
+    private String direction;
     private Long variantId;
     private String variantSku;
     private String bookTitle;
@@ -35,7 +36,10 @@ class CreateAdjustmentRequest {
     private Long variantId;
     private Long lotId;
     private Long copyId;
-    private int quantity; // positive = add, negative = subtract
-    private String reason; // DAMAGED, LOST, FOUND, COUNT_DIFF, TRANSFER
+    private String type;
+    private String direction;
+    private int quantity;
+    private String reason;
     private String note;
+    private Long createdBy;
 }

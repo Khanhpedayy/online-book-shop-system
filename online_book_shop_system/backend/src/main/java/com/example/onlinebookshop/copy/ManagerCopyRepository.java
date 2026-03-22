@@ -169,7 +169,7 @@ public class ManagerCopyRepository {
 
     /* â”€â”€ Log transaction â”€â”€ */
     public void logTransaction(String movementType, Long variantId, Long lotId, Long copyId,
-            int qty, String fromLoc, String toLoc, String refType, Long refId, String reason, String note) {
+                               int qty, String fromLoc, String toLoc, String refType, Long refId, String reason, String note) {
         String sql = "INSERT INTO inventory_transactions (movement_type, variant_id, lot_id, copy_id, quantity, "
                 + "from_location, to_location, reference_type, reference_id, reason, note) "
                 + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";

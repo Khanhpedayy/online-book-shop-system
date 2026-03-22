@@ -2,6 +2,9 @@ package com.example.onlinebookshop.config;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -17,15 +20,30 @@ public class ManagerGlobalExceptionHandler {
         return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
 
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<Map<String, Object>> handleJsonParseError(HttpMessageNotReadableException ex) {
+        return buildResponse(HttpStatus.BAD_REQUEST, "Dữ liệu gửi lên không đúng định dạng. Có trường dữ liệu không hợp lệ hoặc không tồn tại trên hệ thống.");
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Map<String, Object>> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        StringBuilder errors = new StringBuilder();
+        for (FieldError error : ex.getBindingResult().getFieldErrors()) {
+            errors.append(error.getField()).append(": ").append(error.getDefaultMessage()).append("; ");
+        }
+        return buildResponse(HttpStatus.BAD_REQUEST, "Dữ liệu không hợp lệ: " + errors.toString());
+    }
+
     /* â”€â”€ 404: Not found (RuntimeException with "not found" convention) â”€â”€ */
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<Map<String, Object>> handleRuntimeException(RuntimeException ex) {
+        ex.printStackTrace(); // FOR DEBUGGING: Print exception to backend console
         String msg = ex.getMessage();
         if (msg != null && msg.toLowerCase().contains("not found")) {
             return buildResponse(HttpStatus.NOT_FOUND, msg);
         }
-        // Other runtime errors â†’ 400 to avoid leaking stack traces
-        return buildResponse(HttpStatus.BAD_REQUEST, msg != null ? msg : "An unexpected error occurred");
+        // Return exact message instead of generic to debug what's causing 400
+        return buildResponse(HttpStatus.BAD_REQUEST, "System Error: " + msg);
     }
 
     /* â”€â”€ 500: Catch-all â”€â”€ */

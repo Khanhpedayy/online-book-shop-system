@@ -46,7 +46,7 @@ public class ManagerPickingController {
     @PutMapping("/pick/{itemId}/confirm")
     @Operation(summary = "Confirm picked", description = "Mark a pick item as confirmed (scan confirm)")
     public ResponseEntity<Void> confirmPick(@PathVariable Long orderId, @PathVariable Long itemId,
-            @RequestParam Long staffId) {
+                                            @RequestParam Long staffId) {
         try {
             service.confirmPick(itemId, staffId);
             return ResponseEntity.ok().build();

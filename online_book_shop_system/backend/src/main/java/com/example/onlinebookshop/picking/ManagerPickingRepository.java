@@ -121,21 +121,21 @@ public class ManagerPickingRepository {
                         + "oi.title_snapshot, oi.sku_snapshot, c.condition_grade, p.picked_at, p.picked_by "
                         + "FROM pick_list_items p JOIN order_items oi ON p.order_item_id = oi.id "
                         + "LEFT JOIN copies c ON p.copy_id = c.id WHERE p.id = ?", (rs, i) -> {
-                            PickItemDTO d = new PickItemDTO();
-                            d.setId(rs.getLong("id"));
-                            d.setOrderItemId(rs.getLong("order_item_id"));
-                            d.setCopyId(rs.getObject("copy_id") != null ? rs.getLong("copy_id") : null);
-                            d.setCopyCode(rs.getString("copy_code"));
-                            d.setLocation(rs.getString("location"));
-                            d.setStatus(rs.getString("status"));
-                            d.setTitleSnapshot(rs.getString("title_snapshot"));
-                            d.setSkuSnapshot(rs.getString("sku_snapshot"));
-                            d.setConditionGrade(rs.getString("condition_grade"));
-                            if (rs.getTimestamp("picked_at") != null)
-                                d.setPickedAt(rs.getTimestamp("picked_at").toLocalDateTime().toString());
-                            d.setPickedBy(rs.getObject("picked_by") != null ? rs.getLong("picked_by") : null);
-                            return d;
-                        }, itemId);
+                    PickItemDTO d = new PickItemDTO();
+                    d.setId(rs.getLong("id"));
+                    d.setOrderItemId(rs.getLong("order_item_id"));
+                    d.setCopyId(rs.getObject("copy_id") != null ? rs.getLong("copy_id") : null);
+                    d.setCopyCode(rs.getString("copy_code"));
+                    d.setLocation(rs.getString("location"));
+                    d.setStatus(rs.getString("status"));
+                    d.setTitleSnapshot(rs.getString("title_snapshot"));
+                    d.setSkuSnapshot(rs.getString("sku_snapshot"));
+                    d.setConditionGrade(rs.getString("condition_grade"));
+                    if (rs.getTimestamp("picked_at") != null)
+                        d.setPickedAt(rs.getTimestamp("picked_at").toLocalDateTime().toString());
+                    d.setPickedBy(rs.getObject("picked_by") != null ? rs.getLong("picked_by") : null);
+                    return d;
+                }, itemId);
         return list.isEmpty() ? null : list.get(0);
     }
 

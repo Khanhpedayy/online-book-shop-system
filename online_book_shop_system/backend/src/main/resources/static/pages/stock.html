@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Quản lý Tồn kho — Quản trị BookStore</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/app.css">
+</head>
+
+<body>
+    <div id="app-layout">
+        <div id="sidebar-slot"></div>
+        <div class="main-area">
+            <div id="header-slot"></div>
+            <main class="content-area p-4">
+                <div class="d-flex justify-content-between align-items-start mb-4">
+                    <div>
+                        <h2 class="fw-bold mb-1"><i class="bi bi-box-seam me-2"></i>Quản lý Tồn kho</h2>
+                        <p class="text-muted mb-0">Xem và điều chỉnh số lượng tồn kho sách</p>
+                    </div>
+                </div>
+
+                <!-- Tabs -->
+                <ul class="nav nav-tabs mb-4" id="stockTabs">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#" onclick="switchTab('stock')">
+                            <i class="bi bi-box me-1"></i>Tồn kho
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="switchTab('history')">
+                            <i class="bi bi-clock-history me-1"></i>Lịch sử điều chỉnh
+                        </a>
+                    </li>
+                </ul>
+
+                <!-- KPI Cards -->
+                <div class="row g-3 mb-4" id="kpiCards"></div>
+
+                <!-- Stock Tab -->
+                <div id="stockTab">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="mb-3"><input type="text" class="form-control" style="max-width:350px"
+                                    placeholder="Tìm kiếm theo tên sách, ISBN…" id="searchInput" oninput="renderStock()">
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Sách</th>
+                                            <th style="width:120px">ISBN</th>
+                                            <th style="width:120px">Danh mục</th>
+                                            <th style="width:100px">Trạng thái</th>
+                                            <th style="width:120px">Tồn kho</th>
+                                            <th style="width:200px">Hành động</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="stockBody">
+                                        <tr><td colspan="6" class="text-center py-5 text-muted">Đang tải…</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- History Tab -->
+                <div id="historyTab" style="display:none">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Thời gian</th>
+                                            <th>Sách</th>
+                                            <th>Loại</th>
+                                            <th style="width:80px">SL</th>
+                                            <th style="width:80px">Trước</th>
+                                            <th style="width:80px">Sau</th>
+                                            <th>Lý do</th>
+                                            <th>Ghi chú</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="historyBody">
+                                        <tr><td colspan="8" class="text-center py-5 text-muted">Đang tải…</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Set Stock Modal -->
+    <div class="modal fade" id="setStockModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold"><i class="bi bi-pencil-square me-1"></i>Cập nhật Tồn kho</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="fw-semibold mb-3" id="setStockBookTitle"></p>
+                    <div class="mb-3">
+                        <label class="form-label">Số lượng tồn kho <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" id="f_setQty" min="0" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Ghi chú</label>
+                        <textarea class="form-control" id="f_setNote" rows="2" placeholder="Lý do cập nhật"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-primary" onclick="saveSetStock()">Cập nhật</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Adjust Stock Modal -->
+    <div class="modal fade" id="adjustModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold"><i class="bi bi-arrow-down-up me-1"></i>Điều chỉnh Tồn kho</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="fw-semibold mb-3" id="adjustBookTitle"></p>
+                    <div class="mb-3">
+                        <label class="form-label">Loại điều chỉnh <span class="text-danger">*</span></label>
+                        <select class="form-select" id="f_adjType" required>
+                            <option value="">Chọn loại</option>
+                            <option value="IMPORT">📦 Nhập hàng</option>
+                            <option value="EXPORT">📤 Xuất hàng</option>
+                            <option value="DAMAGE">💔 Hư hỏng</option>
+                            <option value="RETURN">🔄 Trả hàng</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Số lượng <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" id="f_adjQty" min="1" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Lý do</label>
+                        <input type="text" class="form-control" id="f_adjReason" placeholder="VD: Nhập lô mới từ NXB">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Ghi chú</label>
+                        <textarea class="form-control" id="f_adjNote" rows="2"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-primary" onclick="saveAdjustStock()">Xác nhận</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/utils.js"></script>
+    <script src="../js/layout.js"></script>
+    <script>
+        let stockItems = [];
+        let adjustments = [];
+        let currentTab = 'stock';
+        let editingBookId = null;
+
+        async function init() {
+            try { stockItems = await api.get('/management/stock'); } catch { stockItems = []; }
+            renderKPI();
+            renderStock();
+        }
+
+        function switchTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('#stockTabs .nav-link').forEach(el => el.classList.remove('active'));
+            if (tab === 'stock') {
+                document.querySelectorAll('#stockTabs .nav-link')[0].classList.add('active');
+                document.getElementById('stockTab').style.display = 'block';
+                document.getElementById('historyTab').style.display = 'none';
+            } else {
+                document.querySelectorAll('#stockTabs .nav-link')[1].classList.add('active');
+                document.getElementById('stockTab').style.display = 'none';
+                document.getElementById('historyTab').style.display = 'block';
+                loadHistory();
+            }
+        }
+
+        async function loadHistory() {
+            try { adjustments = await api.get('/management/stock/adjustments'); } catch { adjustments = []; }
+            renderHistory();
+        }
+
+        function renderKPI() {
+            const total = stockItems.length;
+            const totalQty = stockItems.reduce((s, b) => s + (b.stockQuantity || 0), 0);
+            const outOfStock = stockItems.filter(b => (b.stockQuantity || 0) === 0).length;
+            const lowStock = stockItems.filter(b => b.stockQuantity > 0 && b.stockQuantity <= 5).length;
+            document.getElementById('kpiCards').innerHTML = `
+                <div class="col-md-3"><div class="stats-card"><div class="stats-icon" style="background:#eef2ff;color:#4f46e5"><i class="bi bi-book"></i></div><div class="stats-label">Tổng sách</div><div class="stats-value">${total}</div></div></div>
+                <div class="col-md-3"><div class="stats-card"><div class="stats-icon" style="background:#ecfdf5;color:#059669"><i class="bi bi-box-seam"></i></div><div class="stats-label">Tổng tồn kho</div><div class="stats-value">${totalQty.toLocaleString()}</div></div></div>
+                <div class="col-md-3"><div class="stats-card"><div class="stats-icon" style="background:#fef2f2;color:#dc2626"><i class="bi bi-exclamation-circle"></i></div><div class="stats-label">Hết hàng</div><div class="stats-value">${outOfStock}</div></div></div>
+                <div class="col-md-3"><div class="stats-card"><div class="stats-icon" style="background:#fffbeb;color:#d97706"><i class="bi bi-exclamation-triangle"></i></div><div class="stats-label">Sắp hết (≤5)</div><div class="stats-value">${lowStock}</div></div></div>`;
+        }
+
+        function renderStock() {
+            const q = (document.getElementById('searchInput').value || '').toLowerCase();
+            const filtered = stockItems.filter(b => !q || b.title.toLowerCase().includes(q)
+                || (b.isbn13 || '').toLowerCase().includes(q));
+            const tbody = document.getElementById('stockBody');
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center py-5 text-muted">Không tìm thấy sách nào</td></tr>';
+                return;
+            }
+            tbody.innerHTML = filtered.map(b => {
+                const qty = b.stockQuantity || 0;
+                let badgeClass = 'success', label = qty.toLocaleString();
+                if (qty === 0) { badgeClass = 'danger'; label = 'Hết hàng'; }
+                else if (qty <= 5) { badgeClass = 'warning'; }
+                return `<tr>
+                    <td>
+                        <div class="d-flex align-items-center gap-3">
+                            ${b.coverImageUrl
+                                ? `<img src="${b.coverImageUrl}" style="width:40px;height:50px;object-fit:cover;border-radius:4px">`
+                                : `<div style="width:40px;height:50px;border-radius:4px;background:#f1f5f9;display:flex;align-items:center;justify-content:center"><i class="bi bi-book" style="color:#94a3b8"></i></div>`}
+                            <div class="fw-semibold">${b.title}</div>
+                        </div>
+                    </td>
+                    <td><code class="small">${b.isbn13 || '—'}</code></td>
+                    <td>${b.categoryName || '—'}</td>
+                    <td><span class="badge bg-${b.status === 'ACTIVE' ? 'success' : 'secondary'}">${b.status}</span></td>
+                    <td><span class="badge bg-${badgeClass} fs-6">${label}</span></td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary" title="Cập nhật SL" onclick="openSetStock(${b.bookId})"><i class="bi bi-pencil-square me-1"></i>Sửa</button>
+                        <button class="btn btn-sm btn-outline-success" title="Nhập/Xuất" onclick="openAdjust(${b.bookId})"><i class="bi bi-arrow-down-up me-1"></i>Điều chỉnh</button>
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+
+        function renderHistory() {
+            const tbody = document.getElementById('historyBody');
+            if (adjustments.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" class="text-center py-5 text-muted">Chưa có lịch sử điều chỉnh</td></tr>';
+                return;
+            }
+            const typeLabels = { IMPORT: '📦 Nhập', EXPORT: '📤 Xuất', SET: '✏️ Đặt', DAMAGE: '💔 Hư hỏng', RETURN: '🔄 Trả' };
+            const typeColors = { IMPORT: 'success', EXPORT: 'danger', SET: 'primary', DAMAGE: 'warning', RETURN: 'info' };
+            tbody.innerHTML = adjustments.map(a => `<tr>
+                <td class="small">${a.createdAt ? new Date(a.createdAt).toLocaleString('vi-VN') : '—'}</td>
+                <td class="fw-semibold">${a.bookTitle}</td>
+                <td><span class="badge bg-${typeColors[a.adjustmentType] || 'secondary'}">${typeLabels[a.adjustmentType] || a.adjustmentType}</span></td>
+                <td class="${a.quantity >= 0 ? 'text-success' : 'text-danger'} fw-bold">${a.quantity >= 0 ? '+' : ''}${a.quantity}</td>
+                <td>${a.oldQuantity}</td>
+                <td>${a.newQuantity}</td>
+                <td>${a.reason || '—'}</td>
+                <td class="small text-muted">${a.note || '—'}</td>
+            </tr>`).join('');
+        }
+
+        /* ═══ SET STOCK ═══ */
+
+        function openSetStock(bookId) {
+            const b = stockItems.find(x => x.bookId === bookId);
+            if (!b) return;
+            editingBookId = bookId;
+            document.getElementById('setStockBookTitle').textContent = b.title;
+            document.getElementById('f_setQty').value = b.stockQuantity || 0;
+            document.getElementById('f_setNote').value = '';
+            new bootstrap.Modal(document.getElementById('setStockModal')).show();
+        }
+
+        async function saveSetStock() {
+            const qty = parseInt(document.getElementById('f_setQty').value);
+            if (isNaN(qty) || qty < 0) { showToast('Số lượng không hợp lệ', 'warning'); return; }
+            const payload = { quantity: qty, note: document.getElementById('f_setNote').value.trim() || null };
+            try {
+                await api.put(`/management/stock/${editingBookId}`, payload);
+                showToast('Cập nhật tồn kho thành công', 'success');
+                bootstrap.Modal.getInstance(document.getElementById('setStockModal')).hide();
+                stockItems = await api.get('/management/stock');
+                renderKPI(); renderStock();
+            } catch (e) { showToast(e.message || 'Lỗi cập nhật', 'danger'); }
+        }
+
+        /* ═══ ADJUST STOCK ═══ */
+
+        function openAdjust(bookId) {
+            const b = stockItems.find(x => x.bookId === bookId);
+            if (!b) return;
+            editingBookId = bookId;
+            document.getElementById('adjustBookTitle').textContent = `${b.title} (Tồn kho hiện tại: ${b.stockQuantity || 0})`;
+            document.getElementById('f_adjType').value = '';
+            document.getElementById('f_adjQty').value = '';
+            document.getElementById('f_adjReason').value = '';
+            document.getElementById('f_adjNote').value = '';
+            new bootstrap.Modal(document.getElementById('adjustModal')).show();
+        }
+
+        async function saveAdjustStock() {
+            const type = document.getElementById('f_adjType').value;
+            const qty = parseInt(document.getElementById('f_adjQty').value);
+            if (!type) { showToast('Vui lòng chọn loại điều chỉnh', 'warning'); return; }
+            if (isNaN(qty) || qty <= 0) { showToast('Số lượng phải lớn hơn 0', 'warning'); return; }
+            const payload = {
+                type, quantity: qty,
+                reason: document.getElementById('f_adjReason').value.trim() || null,
+                note: document.getElementById('f_adjNote').value.trim() || null,
+            };
+            try {
+                await api.post(`/management/stock/${editingBookId}/adjust`, payload);
+                const typeLabels = { IMPORT: 'Nhập hàng', EXPORT: 'Xuất hàng', DAMAGE: 'Ghi hư hỏng', RETURN: 'Trả hàng' };
+                showToast(`${typeLabels[type] || type} thành công: ${qty} cuốn`, 'success');
+                bootstrap.Modal.getInstance(document.getElementById('adjustModal')).hide();
+                stockItems = await api.get('/management/stock');
+                renderKPI(); renderStock();
+            } catch (e) { showToast(e.message || 'Lỗi điều chỉnh', 'danger'); }
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+
+</html>

@@ -15,7 +15,7 @@ public class ManagerOrderService {
     }
 
     public List<OrderListDTO> getAll(String status, String paymentStatus, String deliveryStatus,
-            String search, String sortBy, String sortDir) {
+                                     String search, String sortBy, String sortDir) {
         return repo.findAll(status, paymentStatus, deliveryStatus, search, sortBy, sortDir);
     }
 

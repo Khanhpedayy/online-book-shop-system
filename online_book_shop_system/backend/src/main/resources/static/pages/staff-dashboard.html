@@ -131,8 +131,13 @@
     <script src="../js/layout.js"></script>
     <script>
         const actionColor = { CONFIRM: 'primary', PICK: 'warning', PACK: 'secondary', SHIP: 'success' };
+        const actionLang = { CONFIRM: 'XÁC NHẬN', PICK: 'LẤY HÀNG', PACK: 'ĐÓNG GÓI', SHIP: 'GIAO HÀNG' };
+        
         const severityColor = { HIGH: 'danger', MEDIUM: 'warning', LOW: 'secondary' };
+        const severityLang = { HIGH: 'CAO', MEDIUM: 'TRUNG BÌNH', LOW: 'THẤP' };
+        
         const alertIcon = { OVERDUE_ORDER: 'bi-clock', PAYMENT_MISMATCH: 'bi-credit-card', LOW_STOCK: 'bi-boxes' };
+        const alertTypeLang = { OVERDUE_ORDER: 'ĐƠN QUÁ HẠN', PAYMENT_MISMATCH: 'LỖI THANH TOÁN', LOW_STOCK: 'SẮP HẾT HÀNG' };
 
         async function init() {
             try {
@@ -167,7 +172,7 @@
                 return `<tr class="cursor-pointer" onclick="location.href='staff-order-detail.html?id=${t.orderId}'">
             <td class="font-monospace small fw-semibold">${t.orderCode || '—'}</td>
             <td>${t.customerName || '—'}</td>
-            <td><span class="badge bg-${actionColor[t.action] || 'secondary'}">${t.action}</span></td>
+            <td><span class="badge bg-${actionColor[t.action] || 'secondary'}">${actionLang[t.action] || t.action}</span></td>
             <td>${pLabel}</td>
         </tr>`;
             }).join('');
@@ -185,7 +190,7 @@
             <div class="d-flex gap-3 align-items-start">
                 <i class="bi ${icon}" style="font-size:22px;color:${color}"></i>
                 <div>
-                    <span class="badge bg-${severityColor[a.severity] || 'secondary'} mb-1">${(a.type || '').replace(/_/g, ' ')}</span>
+                    <span class="badge bg-${severityColor[a.severity] || 'secondary'} mb-1">${alertTypeLang[a.type] || (a.type || '').replace(/_/g, ' ')}</span>
                     <p class="mb-0 small text-muted">${a.message || ''}</p>
                 </div>
             </div>

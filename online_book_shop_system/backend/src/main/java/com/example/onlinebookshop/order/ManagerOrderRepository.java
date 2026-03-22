@@ -17,7 +17,7 @@ public class ManagerOrderRepository {
 
     /* â”€â”€ List orders with filters â”€â”€ */
     public List<OrderListDTO> findAll(String status, String paymentStatus, String deliveryStatus,
-            String search, String sortBy, String sortDir) {
+                                      String search, String sortBy, String sortDir) {
         StringBuilder sql = new StringBuilder(
                 "SELECT o.id, o.order_code, u.full_name AS customer_name, u.phone AS customer_phone, "
                         + "o.status, o.payment_status, o.delivery_status, o.total_amount, o.currency, o.priority, "

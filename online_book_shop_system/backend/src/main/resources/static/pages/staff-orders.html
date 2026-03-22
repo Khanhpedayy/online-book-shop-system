@@ -128,8 +128,13 @@
         const pageSize = 15;
 
         const stColor = { NEW: 'primary', CONFIRMED: 'info', PACKED: 'secondary', SHIPPED: 'warning', COMPLETED: 'success', CANCELLED: 'dark' };
+        const stLang = { NEW: 'MỚI', CONFIRMED: 'ĐÃ XÁC NHẬN', PACKED: 'ĐÃ ĐÓNG GÓI', SHIPPED: 'ĐÃ GIAO', COMPLETED: 'HOÀN THÀNH', CANCELLED: 'ĐÃ HỦY' };
+        
         const payColor = { PENDING: 'warning', PAID: 'success', FAILED: 'danger', REFUNDED: 'secondary' };
+        const payLang = { PENDING: 'CHỜ THANH TOÁN', PAID: 'ĐÃ THANH TOÁN', FAILED: 'THẤT BẠI', REFUNDED: 'HOÀN TIỀN' };
+        
         const delColor = { NOT_SHIPPED: 'secondary', IN_TRANSIT: 'primary', DELIVERED: 'success', RETURNED: 'danger' };
+        const delLang = { NOT_SHIPPED: 'CHƯA GIAO', IN_TRANSIT: 'ĐANG GIAO', DELIVERED: 'ĐÃ GIAO', RETURNED: 'TRẢ HÀNG' };
 
         async function loadOrders() {
             const params = new URLSearchParams();
@@ -176,9 +181,9 @@
                 return `<tr class="cursor-pointer" onclick="location.href='staff-order-detail.html?id=${o.id}'">
             <td class="font-monospace small fw-bold text-primary">${o.orderCode || '—'}</td>
             <td class="text-truncate" style="max-width:160px">${o.customerName || '—'}</td>
-            <td><span class="badge bg-${stColor[o.status] || 'secondary'}">${o.status}</span></td>
-            <td><span class="badge bg-${payColor[o.paymentStatus] || 'secondary'}">${o.paymentStatus || '—'}</span></td>
-            <td><span class="badge bg-${delColor[o.deliveryStatus] || 'secondary'}">${(o.deliveryStatus || '—').replace(/_/g, ' ')}</span></td>
+            <td><span class="badge bg-${stColor[o.status] || 'secondary'}">${stLang[o.status] || o.status}</span></td>
+            <td><span class="badge bg-${payColor[o.paymentStatus] || 'secondary'}">${payLang[o.paymentStatus] || o.paymentStatus || '—'}</span></td>
+            <td><span class="badge bg-${delColor[o.deliveryStatus] || 'secondary'}">${delLang[o.deliveryStatus] || (o.deliveryStatus || '—').replace(/_/g, ' ')}</span></td>
             <td class="text-end fw-semibold">${(o.totalAmount || 0).toLocaleString()} ${o.currency || 'VND'}</td>
             <td class="text-center">${o.itemCount || 0}</td>
             <td class="text-center">${pLabel}</td>

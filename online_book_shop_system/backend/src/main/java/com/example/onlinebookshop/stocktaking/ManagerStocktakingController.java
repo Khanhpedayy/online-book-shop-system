@@ -42,14 +42,14 @@ public class ManagerStocktakingController {
     @PostMapping("/{code}/count")
     @Operation(summary = "Record count for a variant/lot")
     public StocktakingSessionDTO recordCount(@PathVariable String code,
-            @RequestBody RecordCountRequest req) {
+                                             @RequestBody RecordCountRequest req) {
         return service.recordCount(code, req);
     }
 
     @PostMapping("/{code}/apply")
     @Operation(summary = "Apply adjustments from stocktaking")
     public ResponseEntity<Map<String, Object>> apply(@PathVariable String code,
-            @RequestBody(required = false) Map<String, String> body) {
+                                                     @RequestBody(required = false) Map<String, String> body) {
         String note = body != null ? body.get("note") : null;
         StocktakingSessionDTO session = service.applyAdjustments(code, note);
         return ResponseEntity.ok(Map.of("message", "Stocktaking adjustments applied", "session", session));

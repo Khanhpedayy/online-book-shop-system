@@ -63,7 +63,22 @@ public class ManagerVariantPricingRepository {
         return list.isEmpty() ? null : list.get(0);
     }
 
-    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• VARIANT â€” CREATE â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• VARIANT â€” GET BY SKU â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+
+    public VariantDTO findVariantBySku(String sku) {
+        String sql = """
+                    SELECT bv.*, b.title AS book_title,
+                           (SELECT COUNT(*) FROM copies c WHERE c.variant_id = bv.id AND c.deleted_at IS NULL) AS total_copies,
+                           (SELECT COUNT(*) FROM copies c WHERE c.variant_id = bv.id AND c.status = 'AVAILABLE' AND c.deleted_at IS NULL) AS available_copies
+                    FROM book_variants bv
+                    JOIN books b ON b.id = bv.book_id
+                    WHERE bv.sku = ? AND bv.deleted_at IS NULL
+                """;
+        List<VariantDTO> list = jdbc.query(sql, (rs, rn) -> mapVariant(rs), sku);
+        return list.isEmpty() ? null : list.get(0);
+    }
+
+    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• VARIANT â€” CREATE â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 
     public Long insertVariant(CreateVariantRequest req) {
         String sql = """

@@ -25,7 +25,7 @@ public class ManagerVariantPricingController {
 
     @GetMapping
     @Operation(summary = "List variants", description = "Get all variants, optionally filter by bookId")
-    public List<VariantDTO> getAllVariants(@RequestParam(required = false) Long bookId) {
+    public List<VariantDTO> getAllVariants(@RequestParam(name = "bookId", required = false) Long bookId) {
         if (bookId != null)
             return service.getVariantsByBook(bookId);
         return service.getAllVariants();
@@ -33,8 +33,14 @@ public class ManagerVariantPricingController {
 
     @GetMapping("/{id}")
     @Operation(summary = "Get variant detail")
-    public VariantDTO getVariant(@PathVariable Long id) {
+    public VariantDTO getVariant(@PathVariable("id") Long id) {
         return service.getVariantById(id);
+    }
+
+    @GetMapping("/sku/{sku}")
+    @Operation(summary = "Get variant detail by SKU")
+    public VariantDTO getVariantBySku(@PathVariable("sku") String sku) {
+        return service.getVariantBySku(sku);
     }
 
     @PostMapping
@@ -46,13 +52,13 @@ public class ManagerVariantPricingController {
 
     @PutMapping("/{id}")
     @Operation(summary = "Update variant", description = "Update variant settings and inventory mapping")
-    public VariantDTO updateVariant(@PathVariable Long id, @RequestBody UpdateVariantRequest req) {
+    public VariantDTO updateVariant(@PathVariable("id") Long id, @RequestBody UpdateVariantRequest req) {
         return service.updateVariant(id, req);
     }
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Soft delete variant")
-    public ResponseEntity<Map<String, String>> deleteVariant(@PathVariable Long id) {
+    public ResponseEntity<Map<String, String>> deleteVariant(@PathVariable("id") Long id) {
         service.deleteVariant(id);
         return ResponseEntity.ok(Map.of("message", "Variant deleted successfully"));
     }
@@ -61,7 +67,7 @@ public class ManagerVariantPricingController {
 
     @PutMapping("/{id}/price")
     @Operation(summary = "Set base price", description = "Set standard selling price (listPrice + salePrice) at variant level")
-    public VariantDTO setBasePrice(@PathVariable Long id, @RequestBody SetBasePriceRequest req) {
+    public VariantDTO setBasePrice(@PathVariable("id") Long id, @RequestBody SetBasePriceRequest req) {
         return service.setBasePrice(id, req.getListPrice(), req.getSalePrice());
     }
 
@@ -69,7 +75,7 @@ public class ManagerVariantPricingController {
 
     @PutMapping("/{id}/condition-prices")
     @Operation(summary = "Set price by condition", description = "Set pricing rules by condition tier (LIKE_NEW / GOOD / FAIR) as JSON")
-    public VariantDTO setConditionPrices(@PathVariable Long id, @RequestBody SetConditionPricesRequest req) {
+    public VariantDTO setConditionPrices(@PathVariable("id") Long id, @RequestBody SetConditionPricesRequest req) {
         return service.setConditionPrices(id, req.getConditionPricesJson());
     }
 
@@ -77,7 +83,7 @@ public class ManagerVariantPricingController {
 
     @GetMapping("/{variantId}/copies")
     @Operation(summary = "List copies for per-copy pricing", description = "Get all copies of a variant with their pricing info")
-    public List<CopyPricingDTO> getCopiesByVariant(@PathVariable Long variantId) {
+    public List<CopyPricingDTO> getCopiesByVariant(@PathVariable("variantId") Long variantId) {
         return service.getCopiesByVariant(variantId);
     }
 
@@ -85,8 +91,8 @@ public class ManagerVariantPricingController {
 
     @PutMapping("/copies/{copyId}/price-override")
     @Operation(summary = "Override price per copy", description = "Set a custom selling price for an individual copy. Pass null to clear.")
-    public ResponseEntity<Map<String, String>> overrideCopyPrice(@PathVariable Long copyId,
-            @RequestBody OverrideCopyPriceRequest req) {
+    public ResponseEntity<Map<String, String>> overrideCopyPrice(@PathVariable("copyId") Long copyId,
+                                                                 @RequestBody OverrideCopyPriceRequest req) {
         service.overrideCopyPrice(copyId, req.getSellPriceOverride());
         return ResponseEntity.ok(Map.of("message", "Price override saved"));
     }

@@ -23,27 +23,19 @@ public class ManagerAdjustmentService {
         // Validate required fields
         if (req.getVariantId() == null)
             throw new IllegalArgumentException("Variant is required");
-        if (req.getQuantity() == 0)
-            throw new IllegalArgumentException("Quantity must not be zero");
-        if (req.getReason() == null || req.getReason().isBlank())
-            throw new IllegalArgumentException("Reason is required");
-        String validReasons = "DAMAGED,LOST,FOUND,COUNT_DIFF,TRANSFER";
-        if (!validReasons.contains(req.getReason()))
-            throw new IllegalArgumentException(
-                    "Invalid reason: " + req.getReason() + ". Must be one of: " + validReasons);
+        if (req.getQuantity() <= 0)
+            throw new IllegalArgumentException("Quantity must be greater than zero");
+        if (req.getType() == null || req.getType().isBlank())
+            throw new IllegalArgumentException("Type is required");
 
         Long id = repo.insert(req);
-        // Update lot quantities based on reason
+        // Update lot quantities based on direction and type
         if (req.getLotId() != null) {
-            if ("DAMAGED".equals(req.getReason()) || "LOST".equals(req.getReason())) {
-                repo.updateLotQtyAvailable(req.getLotId(), -Math.abs(req.getQuantity()));
-                if ("DAMAGED".equals(req.getReason())) {
-                    repo.updateLotQtyDamaged(req.getLotId(), Math.abs(req.getQuantity()));
-                }
-            } else if ("FOUND".equals(req.getReason())) {
-                repo.updateLotQtyAvailable(req.getLotId(), Math.abs(req.getQuantity()));
-            } else if ("COUNT_DIFF".equals(req.getReason())) {
-                repo.updateLotQtyAvailable(req.getLotId(), req.getQuantity());
+            int signedQty = "OUT".equals(req.getDirection()) ? -Math.abs(req.getQuantity()) : Math.abs(req.getQuantity());
+            repo.updateLotQtyAvailable(req.getLotId(), signedQty);
+            if ("DAMAGE".equals(req.getType()) && signedQty < 0) {
+                // If damaged and moving out, increase qtyDamaged in lot
+                repo.updateLotQtyDamaged(req.getLotId(), Math.abs(signedQty));
             }
         }
         return id;
