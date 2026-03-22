@@ -1,6 +1,6 @@
 package com.example.onlinebookshop.staff.repo;
 
-import com.example.onlinebookshop.entity.Order;
+import com.example.onlinebookshop.Entity.Order;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;

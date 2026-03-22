@@ -1,4 +1,4 @@
-package com.example.onlinebookshop.config;
+package com.example.onlinebookshop.Config;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

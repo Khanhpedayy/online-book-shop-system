@@ -1,6 +1,6 @@
 package com.example.onlinebookshop.staff.service;
 
-import com.example.onlinebookshop.entity.Order;
+import com.example.onlinebookshop.Entity.Order;
 import com.example.onlinebookshop.staff.repo.StaffOrderRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

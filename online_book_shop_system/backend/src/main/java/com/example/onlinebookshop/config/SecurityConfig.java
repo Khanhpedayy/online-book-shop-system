@@ -1,6 +1,6 @@
-package com.example.onlinebookshop.config;
+package com.example.onlinebookshop.Config;
 
-import com.example.onlinebookshop.service.CustomUserDetailsService;
+import com.example.onlinebookshop.Service.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;

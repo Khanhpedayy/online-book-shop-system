@@ -1,6 +1,6 @@
-package com.example.onlinebookshop.repository;
+package com.example.onlinebookshop.Repository;
 
-import com.example.onlinebookshop.entity.BookVariant;
+import com.example.onlinebookshop.Entity.BookVariant;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

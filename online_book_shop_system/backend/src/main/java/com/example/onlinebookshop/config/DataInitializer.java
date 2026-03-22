@@ -1,9 +1,9 @@
-package com.example.onlinebookshop.config;
+package com.example.onlinebookshop.Config;
 
-import com.example.onlinebookshop.entity.Role;
-import com.example.onlinebookshop.entity.User;
-import com.example.onlinebookshop.repository.RoleRepository;
-import com.example.onlinebookshop.repository.UserRepository;
+import com.example.onlinebookshop.Entity.Role;
+import com.example.onlinebookshop.Entity.User;
+import com.example.onlinebookshop.Repository.RoleRepository;
+import com.example.onlinebookshop.Repository.UserRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -4,7 +4,7 @@ import com.example.onlinebookshop.staff.dto.ShippingItemRow;
 import com.example.onlinebookshop.staff.repo.StaffShippingRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.example.onlinebookshop.entity.Order;
+import com.example.onlinebookshop.Entity.Order;
 
 import java.util.List;
 

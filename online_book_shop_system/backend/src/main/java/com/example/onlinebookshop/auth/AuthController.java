@@ -1,13 +1,13 @@
 package com.example.onlinebookshop.auth;
 
-import com.example.onlinebookshop.config.JwtUtils;
+import com.example.onlinebookshop.Config.JwtUtils;
 import com.example.onlinebookshop.dto.LoginRequest;
 import com.example.onlinebookshop.dto.LoginResponse;
 import com.example.onlinebookshop.dto.RegisterRequest;
-import com.example.onlinebookshop.entity.Role;
-import com.example.onlinebookshop.entity.User;
-import com.example.onlinebookshop.repository.RoleRepository;
-import com.example.onlinebookshop.repository.UserRepository;
+import com.example.onlinebookshop.Entity.Role;
+import com.example.onlinebookshop.Entity.User;
+import com.example.onlinebookshop.Repository.RoleRepository;
+import com.example.onlinebookshop.Repository.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;

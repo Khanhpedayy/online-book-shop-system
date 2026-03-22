@@ -1,11 +1,11 @@
-package com.example.onlinebookshop.service;
+package com.example.onlinebookshop.Service;
 
-import com.example.onlinebookshop.entity.BookVariant;
-import com.example.onlinebookshop.entity.CartItem;
-import com.example.onlinebookshop.entity.User;
-import com.example.onlinebookshop.repository.BookVariantRepository;
-import com.example.onlinebookshop.repository.CartItemRepository;
-import com.example.onlinebookshop.repository.UserRepository;
+import com.example.onlinebookshop.Entity.BookVariant;
+import com.example.onlinebookshop.Entity.CartItem;
+import com.example.onlinebookshop.Entity.User;
+import com.example.onlinebookshop.Repository.BookVariantRepository;
+import com.example.onlinebookshop.Repository.CartItemRepository;
+import com.example.onlinebookshop.Repository.UserRepository;
 import com.example.onlinebookshop.dto.AddToCartRequest;
 import com.example.onlinebookshop.dto.UpdateCartItemRequest;
 import org.springframework.stereotype.Service;

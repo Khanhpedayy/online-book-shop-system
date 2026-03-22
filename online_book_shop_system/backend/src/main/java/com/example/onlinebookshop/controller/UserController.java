@@ -1,6 +1,6 @@
 package com.example.onlinebookshop.controller;
 
-import com.example.onlinebookshop.service.UserService;
+import com.example.onlinebookshop.Service.UserService;
 import com.example.onlinebookshop.dto.CreateUserRequest;
 import com.example.onlinebookshop.dto.UserDTO;
 import org.springframework.http.HttpStatus;

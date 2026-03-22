@@ -1,9 +1,9 @@
-package com.example.onlinebookshop.service;
+package com.example.onlinebookshop.Service;
 
-import com.example.onlinebookshop.entity.BookInfo;
-import com.example.onlinebookshop.entity.BookVariant;
-import com.example.onlinebookshop.repository.BookInfoRepository;
-import com.example.onlinebookshop.repository.BookVariantRepository;
+import com.example.onlinebookshop.Entity.BookInfo;
+import com.example.onlinebookshop.Entity.BookVariant;
+import com.example.onlinebookshop.Repository.BookInfoRepository;
+import com.example.onlinebookshop.Repository.BookVariantRepository;
 import com.example.onlinebookshop.dto.BookVariantDTO;
 import org.springframework.stereotype.Service;
 

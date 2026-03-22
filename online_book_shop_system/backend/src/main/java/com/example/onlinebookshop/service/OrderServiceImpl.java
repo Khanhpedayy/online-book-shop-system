@@ -1,7 +1,7 @@
-package com.example.onlinebookshop.service;
+package com.example.onlinebookshop.Service;
 
-import com.example.onlinebookshop.entity.*;
-import com.example.onlinebookshop.repository.*;
+import com.example.onlinebookshop.Entity.*;
+import com.example.onlinebookshop.Repository.*;
 import com.example.onlinebookshop.dto.CheckoutRequest;
 import com.example.onlinebookshop.dto.OrderItemRequest;
 import com.example.onlinebookshop.dto.OrderRequest;
