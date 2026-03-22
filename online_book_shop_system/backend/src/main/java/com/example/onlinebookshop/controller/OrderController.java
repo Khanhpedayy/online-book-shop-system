@@ -5,6 +5,7 @@ import com.example.onlinebookshop.Service.OrderService;
 import com.example.onlinebookshop.dto.CheckoutRequest;
 import com.example.onlinebookshop.dto.OrderRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -46,6 +47,19 @@ public class OrderController {
         return response;
     }
 
+
+    @GetMapping("/me")
+    public List<Order> getMyOrders(
+            Authentication auth,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String fromDate,
+            @RequestParam(required = false) String toDate
+    ) {
+        String email = auth.getName();
+        return orderService.getOrdersByEmail(email, status, keyword, fromDate, toDate);
+    }
+
     @GetMapping("/{id}")
     public Order getOrderById(@PathVariable Long id) {
         return orderService.getOrderById(id);
@@ -72,6 +86,16 @@ public class OrderController {
         }
 
         return response;
+    }
+
+    @GetMapping("/{id}/me")
+    public Order getMyOrder(@PathVariable Long id, Authentication auth) {
+        return orderService.getOrderDetailByEmail(id, auth.getName());
+    }
+
+    @PostMapping("/{id}/cancel")
+    public void cancel(@PathVariable Long id, Authentication auth) {
+        orderService.cancelOrder(id, auth.getName());
     }
 
     @PostMapping("/{id}/repay")

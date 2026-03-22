@@ -30,6 +30,29 @@ function isLoggedIn() {
     return !!localStorage.getItem("token");
 }
 
+function logout() {
+    localStorage.removeItem("token");
+    alert("Logged out!");
+    window.location = "login.html";
+}
+
+function updateAuthUI() {
+    const token = localStorage.getItem("token");
+
+    const loginLink = document.getElementById("loginLink");
+    const logoutLink = document.getElementById("logoutLink");
+
+    if (token) {
+        loginLink.style.display = "none";
+        logoutLink.style.display = "inline";
+    } else {
+        loginLink.style.display = "inline";
+        logoutLink.style.display = "none";
+    }
+}
+
+document.addEventListener("DOMContentLoaded", updateAuthUI);
+
 async function apiGet(path){
     const headers = {};
 

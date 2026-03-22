@@ -17,6 +17,12 @@ public interface OrderService {
 
     Order getOrderById(Long id);
 
+    List<Order> getOrdersByEmail(String email, String status, String keyword, String fromDate, String toDate);
+
+    Order getOrderDetailByEmail(Long orderId, String email);
+
+    void cancelOrder(Long orderId, String email);
+
     String createPayment(Order order);
 
     List<Order> getOrdersByCustomerId(Long customerId);

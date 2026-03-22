@@ -174,4 +174,51 @@ public class OrderServiceImpl implements OrderService {
         // Fake payment URL để test trước
         return "http://localhost:5500/payment-result.html?status=success&orderId=" + order.getId();
     }
+
+    @Override
+    public List<Order> getOrdersByEmail(String email, String status, String keyword,
+                                        String fromDate, String toDate) {
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        return orderRepository.searchOrders(
+                user.getId(),
+                status,
+                keyword
+        );
+    }
+
+    @Override
+    public Order getOrderDetailByEmail(Long orderId, String email) {
+
+        Order order = orderRepository.findByIdWithItems(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        if (!order.getUser().getEmail().equals(email)) {
+            throw new RuntimeException("Unauthorized");
+        }
+
+        return order;
+    }
+
+    @Override
+    @Transactional
+    public void cancelOrder(Long orderId, String email) {
+
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        if (!order.getUser().getEmail().equals(email)) {
+            throw new RuntimeException("Unauthorized");
+        }
+
+        // RULE: chỉ cho cancel khi CONFIRMED
+        if (!order.getStatus().equals("CONFIRMED")) {
+            throw new RuntimeException("Cannot cancel this order");
+        }
+
+        order.setStatus("CANCELLED");
+        orderRepository.save(order);
+    }
 }
