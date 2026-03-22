@@ -926,14 +926,22 @@
             try { return JSON.parse(localStorage.getItem('user')); } catch { return null; }
         }
         function authHeaders() {
-            return { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken() };
+           const token = getToken();
+           const headers = { 'Content-Type': 'application/json' };
+           if (token) {
+                headers['Authorization'] = 'Bearer ' + token;
+           }
+           return headers;
         }
         (function checkAdmin() {
             const user = getUser();
-            if (!getToken() || !user || user.role !== 'ADMIN') {
-                window.location.href = '/login.html';
+            const token = getToken();
+
+            if (!token || !user || user.role !== 'ADMIN') {
+                window.location.href = '/login';
                 return;
             }
+
             document.getElementById('adminName').textContent = user.fullName || 'Admin';
             document.getElementById('adminAvatar').textContent = (user.fullName || 'A').charAt(0).toUpperCase();
         })();
@@ -941,7 +949,7 @@
         function logout() {
             localStorage.removeItem('token');
             localStorage.removeItem('user');
-            window.location.href = '/login.html';
+            window.location.href = '/logout';
         }
 
         // === Load users ===
