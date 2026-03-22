@@ -36,3 +36,21 @@ async function syncAuthFromServerSession(apiBase) {
     }
     return false;
 }
+
+/**
+ * Clear JWT and Spring session (JSESSIONID). Without server logout, /login still sees you as logged in
+ * and redirects back to the shop.
+ */
+async function performLogout(apiBase) {
+    const base = apiBase != null ? String(apiBase) : '';
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    const root = base.endsWith('/') ? base.slice(0, -1) : base;
+    const logoutUrl = root ? root + '/logout' : '/logout';
+    try {
+        await fetch(logoutUrl, { method: 'POST', credentials: 'include' });
+    } catch (e) {
+        console.debug('performLogout', e);
+    }
+    window.location.assign(root ? root + '/login?logout' : '/login?logout');
+}

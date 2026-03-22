@@ -2,7 +2,7 @@
 <project version="4">
   <component name="dataSourceStorageLocal" created-in="IU-252.26830.84">
     <data-source name="bookstore@localhost" uuid="6a6badd2-bdf8-48ae-a050-57d5bc9e8b97">
-      <database-info product="" version="" jdbc-version="" driver-name="" driver-version="" />
+      <database-info product="" version="" jdbc-version="" driver-name="" driver-version="" dbms="MSSQL" />
       <schema-mapping />
     </data-source>
   </component>

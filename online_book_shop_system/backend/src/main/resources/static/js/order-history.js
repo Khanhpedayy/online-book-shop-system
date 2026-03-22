@@ -4,9 +4,8 @@ function getToken() {
     return localStorage.getItem("token");
 }
 
-function logout() {
-    localStorage.removeItem("token");
-    window.location = "login.html";
+async function logout() {
+    await performLogout(API_BASE);
 }
 
 async function apiGet(path) {

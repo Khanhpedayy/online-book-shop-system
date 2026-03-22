@@ -53,10 +53,8 @@ async function apiPost(path, body){
 }
 
 
-function logout() {
-    localStorage.removeItem("token");
-    alert("Logged out!");
-    window.location = "login.html";
+async function logout() {
+    await performLogout(API_BASE);
 }
 
 function updateAuthUI() {

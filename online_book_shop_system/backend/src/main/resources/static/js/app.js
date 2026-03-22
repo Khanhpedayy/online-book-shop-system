@@ -19,10 +19,8 @@ function isLoggedIn() {
     return !!getToken();
 }
 
-function logout() {
-    localStorage.removeItem("token");
-    alert("Logged out!");
-    window.location = "login.html";
+async function logout() {
+    await performLogout(API_BASE);
 }
 
 function updateAuthUI() {
