@@ -1,6 +1,6 @@
-package com.example.onlinebookshop.repository;
+package com.example.onlinebookshop.Repository;
 
-import com.example.onlinebookshop.entity.User;
+import com.example.onlinebookshop.Entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

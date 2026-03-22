@@ -4,7 +4,7 @@ import com.example.onlinebookshop.staff.dto.OrderDetailView;
 import com.example.onlinebookshop.staff.dto.OrderFilter;
 import com.example.onlinebookshop.staff.dto.OrderListRow;
 import com.example.onlinebookshop.staff.dto.StaffAlert;
-import com.example.onlinebookshop.entity.Order;
+import com.example.onlinebookshop.Entity.Order;
 import com.example.onlinebookshop.staff.repo.StaffOrderRepository;
 import com.example.onlinebookshop.staff.repo.StaffAlertRepository;
 import com.example.onlinebookshop.staff.repo.StaffOrderQueryRepository;

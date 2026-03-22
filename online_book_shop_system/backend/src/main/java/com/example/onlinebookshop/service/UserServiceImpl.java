@@ -1,9 +1,9 @@
-package com.example.onlinebookshop.service;
+package com.example.onlinebookshop.Service;
 
-import com.example.onlinebookshop.entity.Role;
-import com.example.onlinebookshop.entity.User;
+import com.example.onlinebookshop.Entity.Role;
+import com.example.onlinebookshop.Entity.User;
 import com.example.onlinebookshop.repository.RoleRepository;
-import com.example.onlinebookshop.repository.UserRepository;
+import com.example.onlinebookshop.Repository.UserRepository;
 import com.example.onlinebookshop.dto.CreateUserRequest;
 import com.example.onlinebookshop.dto.UserDTO;
 import org.springframework.security.crypto.password.PasswordEncoder;

@@ -1,6 +1,6 @@
-package com.example.onlinebookshop.service;
+package com.example.onlinebookshop.Service;
 
-import com.example.onlinebookshop.entity.CartItem;
+import com.example.onlinebookshop.Entity.CartItem;
 import com.example.onlinebookshop.dto.AddToCartRequest;
 import com.example.onlinebookshop.dto.UpdateCartItemRequest;
 

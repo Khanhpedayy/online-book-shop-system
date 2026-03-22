@@ -1,7 +1,7 @@
-package com.example.onlinebookshop.service;
+package com.example.onlinebookshop.Service;
 
-import com.example.onlinebookshop.entity.User;
-import com.example.onlinebookshop.repository.UserRepository;
+import com.example.onlinebookshop.Entity.User;
+import com.example.onlinebookshop.Repository.UserRepository;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
