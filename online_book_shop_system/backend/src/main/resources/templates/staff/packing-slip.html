@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Packing Slip</title>
+    <style>
+        body { font-family: Arial, Helvetica, sans-serif; margin: 24px; }
+        .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+        .box { border: 1px solid #333; padding: 12px; border-radius: 8px; }
+        .row { display: flex; gap: 12px; flex-wrap: wrap; }
+        .col { flex: 1; min-width: 280px; }
+        .muted { color: #666; font-size: 12px; }
+        h1 { font-size: 18px; margin: 0 0 8px; }
+        h2 { font-size: 14px; margin: 0 0 8px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+        th, td { border: 1px solid #333; padding: 6px; font-size: 12px; }
+        th { background: #f2f2f2; text-align: left; }
+        @media print {
+          .no-print { display: none; }
+          body { margin: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="no-print" style="margin-bottom:12px;">
+    <button onclick="window.print()">Print</button>
+</div>
+
+<h1>Packing Slip</h1>
+<div class="muted">
+    Order: <span class="mono" th:text="${v.orderCode}">ORD</span>
+    • Status: <span class="mono" th:text="${v.status}">PACKED</span>
+    • Picked: <span class="mono" th:text="${v.pickedItems}">0</span>/<span class="mono" th:text="${v.allocatedItems}">0</span>
+</div>
+
+<div class="row" style="margin-top:12px;">
+    <div class="col box">
+        <h2>Ship to</h2>
+        <div><span class="muted">Name</span><br><span th:text="${v.shipName}">-</span></div>
+        <div style="margin-top:6px;"><span class="muted">Phone</span><br><span class="mono" th:text="${v.shipPhone}">-</span></div>
+        <div style="margin-top:6px;"><span class="muted">Address</span><br>
+            <span th:text="${v.shipLine1}"></span>
+            <span th:if="${v.shipLine2}">, <span th:text="${v.shipLine2}"></span></span>
+            <span th:if="${v.shipWard}">, <span th:text="${v.shipWard}"></span></span>
+            <span th:if="${v.shipDistrict}">, <span th:text="${v.shipDistrict}"></span></span>
+            <span th:if="${v.shipCity}">, <span th:text="${v.shipCity}"></span></span>
+            <span th:if="${v.shipProvince}">, <span th:text="${v.shipProvince}"></span></span>
+        </div>
+    </div>
+
+    <div class="col box">
+        <h2>Carrier / Tracking</h2>
+        <div><span class="muted">Carrier</span><br><span th:text="${v.carrier}">-</span></div>
+        <div style="margin-top:6px;"><span class="muted">Tracking</span><br><span class="mono" th:text="${v.trackingCode}">-</span></div>
+
+        <div style="margin-top:10px;" class="muted">
+            In slip này để staff kẹp vào thùng hàng.
+        </div>
+    </div>
+</div>
+
+<h2 style="margin-top:14px;">Items</h2>
+<table>
+    <thead>
+    <tr>
+        <th style="width:36px;">#</th>
+        <th style="width:110px;">Location</th>
+        <th style="width:120px;">Copy</th>
+        <th style="width:140px;">SKU</th>
+        <th>Title</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="it, idx : ${v.items}">
+        <td class="mono" th:text="${idx.index + 1}">1</td>
+        <td class="mono" th:text="${it.location}">A1-01</td>
+        <td class="mono" th:text="${it.copyCode}">C0001</td>
+        <td class="mono" th:text="${it.skuSnapshot}">SKU</td>
+        <td th:text="${it.titleSnapshot}">Title</td>
+    </tr>
+    <tr th:if="${#lists.isEmpty(v.items)}">
+        <td colspan="5" class="muted">No items.</td>
+    </tr>
+    </tbody>
+</table>
+
+</body>
+</html>

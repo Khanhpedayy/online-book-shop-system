@@ -1,0 +1,100 @@
+package com.example.onlinebookshop.config;
+
+import com.example.onlinebookshop.entity.Role;
+import com.example.onlinebookshop.entity.User;
+import com.example.onlinebookshop.repository.RoleRepository;
+import com.example.onlinebookshop.repository.UserRepository;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.time.LocalDateTime;
+
+@Configuration
+@Profile("!test")
+public class DataInitializer {
+
+    @Bean
+    CommandLineRunner initData(RoleRepository roleRepo, UserRepository userRepo, PasswordEncoder passwordEncoder) {
+        return args -> {
+            if (roleRepo.count() == 0) {
+                LocalDateTime now = LocalDateTime.now();
+
+                Role adminRole = new Role();
+                adminRole.setCode("ADMIN");
+                adminRole.setName("Administrator");
+                adminRole.setCreatedAt(now);
+                adminRole.setUpdatedAt(now);
+                roleRepo.save(adminRole);
+
+                Role customerRole = new Role();
+                customerRole.setCode("CUSTOMER");
+                customerRole.setName("Customer");
+                customerRole.setCreatedAt(now);
+                customerRole.setUpdatedAt(now);
+                roleRepo.save(customerRole);
+
+                Role staffRole = new Role();
+                staffRole.setCode("STAFF");
+                staffRole.setName("Staff");
+                staffRole.setCreatedAt(now);
+                staffRole.setUpdatedAt(now);
+                roleRepo.save(staffRole);
+
+                Role managerRole = new Role();
+                managerRole.setCode("MANAGER");
+                managerRole.setName("Manager");
+                managerRole.setCreatedAt(now);
+                managerRole.setUpdatedAt(now);
+                roleRepo.save(managerRole);
+            }
+
+            if (userRepo.count() == 0) {
+                LocalDateTime now = LocalDateTime.now();
+
+                Role adminRole = roleRepo.findByCode("ADMIN").orElseThrow();
+                Role customerRole = roleRepo.findByCode("CUSTOMER").orElseThrow();
+                Role staffRole = roleRepo.findByCode("STAFF").orElseThrow();
+                Role managerRole = roleRepo.findByCode("MANAGER").orElseThrow();
+
+                User admin = new User();
+                admin.setRole(adminRole);
+                admin.setEmail("admin@bookshop.com");
+                admin.setPasswordHash(passwordEncoder.encode("admin123"));
+                admin.setFullName("Admin");
+                admin.setStatus("ACTIVE");
+                admin.setCreatedAt(now);
+                userRepo.save(admin);
+
+                User customer = new User();
+                customer.setRole(customerRole);
+                customer.setEmail("customer@example.com");
+                customer.setPasswordHash(passwordEncoder.encode("123456"));
+                customer.setFullName("Test Customer");
+                customer.setStatus("ACTIVE");
+                customer.setCreatedAt(now);
+                userRepo.save(customer);
+
+                User staff = new User();
+                staff.setRole(staffRole);
+                staff.setEmail("staff@bookshop.com");
+                staff.setPasswordHash(passwordEncoder.encode("staff123"));
+                staff.setFullName("Staff User");
+                staff.setStatus("ACTIVE");
+                staff.setCreatedAt(now);
+                userRepo.save(staff);
+
+                User manager = new User();
+                manager.setRole(managerRole);
+                manager.setEmail("manager@bookshop.com");
+                manager.setPasswordHash(passwordEncoder.encode("manager123"));
+                manager.setFullName("Manager User");
+                manager.setStatus("ACTIVE");
+                manager.setCreatedAt(now);
+                userRepo.save(manager);
+            }
+        };
+    }
+}
