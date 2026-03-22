@@ -1,4 +1,4 @@
-package com.example.onlinebookshop.config;
+package com.example.onlinebookshop.Config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;

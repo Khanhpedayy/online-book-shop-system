@@ -1,4 +1,4 @@
-package com.example.onlinebookshop.config;
+package com.example.onlinebookshop.Config;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
