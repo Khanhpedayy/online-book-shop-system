@@ -30,10 +30,22 @@ public class CartServiceImpl implements CartService {
         this.userRepository = userRepository;
     }
 
+    private Long resolveUserIdByEmail(String email) {
+        return userRepository.findByEmailAndDeletedAtIsNull(email)
+                .map(User::getId)
+                .orElseThrow(() -> new RuntimeException("User not found: " + email));
+    }
+
     @Override
     @Transactional(readOnly = true)
     public List<CartItem> getCart(Long userId) {
         return cartItemRepository.findByUser_IdOrderByAddedAtDesc(userId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<CartItem> getCartByEmail(String email) {
+        return getCart(resolveUserIdByEmail(email));
     }
 
     @Override
@@ -68,6 +80,12 @@ public class CartServiceImpl implements CartService {
 
     @Override
     @Transactional
+    public CartItem addItemByEmail(String email, AddToCartRequest request) {
+        return addItem(resolveUserIdByEmail(email), request);
+    }
+
+    @Override
+    @Transactional
     public CartItem updateItem(Long userId, Long variantId, UpdateCartItemRequest request) {
         CartItem item = cartItemRepository.findByUser_IdAndVariant_IdAndCopyId(userId, variantId, null)
                 .orElseThrow(() -> new RuntimeException("Cart item not found for variant: " + variantId));
@@ -88,5 +106,11 @@ public class CartServiceImpl implements CartService {
         CartItem item = cartItemRepository.findByUser_IdAndVariant_IdAndCopyId(userId, variantId, null)
                 .orElseThrow(() -> new RuntimeException("Cart item not found for variant: " + variantId));
         cartItemRepository.delete(item);
+    }
+
+    @Override
+    @Transactional
+    public void removeItemByEmail(String email, Long variantId) {
+        removeItem(resolveUserIdByEmail(email), variantId);
     }
 }
