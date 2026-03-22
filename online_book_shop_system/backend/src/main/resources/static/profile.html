@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Profile – Online Book Shop</title>
+    <link rel="stylesheet" href="css/shop.css">
+    <style>
+        main.shop-main h1 { font-size: 1.75rem; margin-bottom: 24px; }
+        main.shop-main section {
+            background: var(--shop-card-bg);
+            border-radius: 12px;
+            padding: 20px 22px;
+            margin-bottom: 22px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+        }
+        main.shop-main section h2 {
+            font-size: 1.15rem;
+            margin-bottom: 16px;
+            border-bottom: 1px solid var(--shop-border);
+            padding-bottom: 8px;
+        }
+        main.shop-main label { display: block; font-size: 0.88rem; margin-bottom: 4px; color: #555; }
+        main.shop-main input[type="text"],
+        main.shop-main input[type="password"],
+        main.shop-main input[type="email"] {
+            width: 100%;
+            max-width: 420px;
+            padding: 10px 12px;
+            border: 1px solid var(--shop-border);
+            border-radius: 8px;
+            margin-bottom: 12px;
+            font: inherit;
+        }
+        main.shop-main input[readonly] { background: #f1f5f9; color: #64748b; }
+        .row-check { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+        .row-check label { margin: 0; }
+        .msg { min-height: 1.2em; font-size: 0.9rem; margin-top: 8px; }
+        .addr-card {
+            border: 1px solid var(--shop-border);
+            border-radius: 10px;
+            padding: 12px 14px;
+            margin-bottom: 12px;
+            background: #f8fafc;
+        }
+        .addr-head { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+        .badge-def { font-size: 0.75rem; background: #166534; color: #fff; padding: 2px 8px; border-radius: 4px; }
+        .addr-actions { margin-top: 10px; }
+        .btn-sm { padding: 6px 12px; font-size: 0.85rem; margin-right: 6px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; }
+        .btn-sm.secondary { background: #4b5563; color: #fff; }
+        .btn-sm.secondary:hover { background: #374151; }
+        .btn-sm.danger { background: #b91c1c; color: #fff; }
+        .btn-sm.danger:hover { background: #991b1b; }
+    </style>
+</head>
+<body class="shop-page">
+
+<header class="shop-header">
+    <div class="logo"><a href="index.html">📚 Online Book Shop</a></div>
+    <div class="search-bar">
+        <input type="search" id="searchInput" placeholder="Search books..." aria-label="Search books">
+        <button type="button" id="searchBtn">Search</button>
+    </div>
+    <nav class="nav">
+        <a href="index.html">Home</a>
+        <a href="profile.html" id="profileLink" style="display:none;">Profile</a>
+        <a href="order-history.html" id="ordersLink" style="display:none;">Orders</a>
+        <a href="login.html" id="loginLink">Login</a>
+        <a href="#" id="logoutLink" style="display:none;">Logout</a>
+        <a href="cart.html" class="cart shop-cart-link">🛒 <span id="headerCartCount">$0.00 (0)</span></a>
+    </nav>
+</header>
+
+<main class="shop-main shop-main--sm">
+    <h1>My account</h1>
+
+    <section>
+        <h2>Profile</h2>
+        <label for="pfEmail">Email</label>
+        <input type="email" id="pfEmail" readonly>
+        <label for="pfFullName">Full name</label>
+        <input type="text" id="pfFullName" autocomplete="name">
+        <label for="pfPhone">Phone</label>
+        <input type="text" id="pfPhone" autocomplete="tel">
+        <label for="pfAvatar">Avatar URL</label>
+        <input type="text" id="pfAvatar" placeholder="https://...">
+        <button type="button" class="btn" id="btnSaveProfile">Save profile</button>
+        <div class="msg" id="pfMsg"></div>
+    </section>
+
+    <section>
+        <h2>Change password</h2>
+        <label for="pwCurrent">Current password</label>
+        <input type="password" id="pwCurrent" autocomplete="current-password">
+        <label for="pwNew">New password</label>
+        <input type="password" id="pwNew" autocomplete="new-password">
+        <label for="pwConfirm">Confirm new password</label>
+        <input type="password" id="pwConfirm" autocomplete="new-password">
+        <button type="button" class="btn" id="btnChangePw">Update password</button>
+        <div class="msg" id="pwMsg"></div>
+    </section>
+
+    <section>
+        <h2>Address book</h2>
+        <div id="addrList"></div>
+
+        <h3 style="margin-top:20px;font-size:1rem;" id="addrFormTitle">Add address</h3>
+        <label for="addrLabel">Label (optional)</label>
+        <input type="text" id="addrLabel" placeholder="Home, Office…">
+        <label for="addrRecipient">Recipient</label>
+        <input type="text" id="addrRecipient" required>
+        <label for="addrPhone">Phone</label>
+        <input type="text" id="addrPhone">
+        <label for="addrLine1">Address line 1</label>
+        <input type="text" id="addrLine1" required>
+        <label for="addrLine2">Address line 2</label>
+        <input type="text" id="addrLine2">
+        <label for="addrCity">City / Province</label>
+        <input type="text" id="addrCity">
+        <div class="row-check">
+            <input type="checkbox" id="addrDefault">
+            <label for="addrDefault">Set as default</label>
+        </div>
+        <button type="button" class="btn" id="btnAddrSubmit">Save address</button>
+        <button type="button" class="btn btn-secondary" id="btnAddrCancel" style="margin-left:8px;">Cancel edit</button>
+        <div class="msg" id="addrMsg"></div>
+    </section>
+</main>
+
+<footer class="shop-footer">© Online Book Shop</footer>
+
+<script src="js/auth-session.js"></script>
+<script src="js/shop-header.js"></script>
+<script src="js/profile.js"></script>
+</body>
+</html>

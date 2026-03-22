@@ -33,9 +33,10 @@ public class BookController {
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) String publisherName,
             @RequestParam(required = false) Double minPrice,
-            @RequestParam(required = false) Double maxPrice
+            @RequestParam(required = false) Double maxPrice,
+            @RequestParam(required = false) Long categoryId
     ) {
-        return bookService.findBooks(keyword, publisherName, minPrice, maxPrice);
+        return bookService.findBooks(keyword, publisherName, minPrice, maxPrice, categoryId);
     }
 
     @GetMapping("/{id}")

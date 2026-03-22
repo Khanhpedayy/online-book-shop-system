@@ -22,8 +22,11 @@ console.log("TOKEN:", localStorage.getItem("token"));
 function updateHeaderCart(total, count) {
     if (!headerCartCount) return;
     headerCartCount.textContent =
-        '$ ' + (total != null ? Number(total).toFixed(2) : '0.00') +
-        ' (' + (count || 0) + ')';
+        "$" +
+        (total != null ? Number(total).toFixed(2) : "0.00") +
+        " (" +
+        (count || 0) +
+        ")";
 }
 
 function isLoggedIn() {
@@ -32,21 +35,6 @@ function isLoggedIn() {
 
 async function logout() {
     await performLogout(API_BASE);
-}
-
-function updateAuthUI() {
-    const token = localStorage.getItem("token");
-
-    const loginLink = document.getElementById("loginLink");
-    const logoutLink = document.getElementById("logoutLink");
-
-    if (token) {
-        loginLink.style.display = "none";
-        logoutLink.style.display = "inline";
-    } else {
-        loginLink.style.display = "inline";
-        logoutLink.style.display = "none";
-    }
 }
 
 async function apiGet(path){
@@ -182,7 +170,9 @@ function goToCheckout() {
 
 document.addEventListener("DOMContentLoaded", async () => {
     await syncAuthFromServerSession(API_BASE);
-    updateAuthUI();
+    if (typeof updateShopHeaderAuth === "function") {
+        updateShopHeaderAuth();
+    }
     if (!isLoggedIn()) {
         alert("Please login first!");
         window.location = "login.html";

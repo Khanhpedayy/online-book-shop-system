@@ -4,10 +4,6 @@ function getToken() {
     return localStorage.getItem("token");
 }
 
-async function logout() {
-    await performLogout(API_BASE);
-}
-
 async function apiGet(path) {
     const headers = {};
     const t = getToken();
@@ -83,14 +79,14 @@ async function loadOrders() {
                     </div>
 
                     <div style="margin-top:10px;">
-                        <button onclick="viewOrder(${o.id})">View</button>
+                        <button type="button" class="shop-btn" onclick="viewOrder(${o.id})">View</button>
 
                         ${o.status === "PENDING" ?
-                `<button onclick="cancelOrder(${o.id})">Cancel</button>` : ""
+                `<button type="button" class="shop-btn shop-btn--secondary" onclick="cancelOrder(${o.id})">Cancel</button>` : ""
             }
 
                         ${o.paymentStatus === "UNPAID" && o.paymentMethod === "PAYOS" ?
-                `<button onclick="repay(${o.id})">Pay Again</button>` : ""
+                `<button type="button" class="shop-btn" onclick="repay(${o.id})">Pay again</button>` : ""
             }
                     </div>
                 </div>

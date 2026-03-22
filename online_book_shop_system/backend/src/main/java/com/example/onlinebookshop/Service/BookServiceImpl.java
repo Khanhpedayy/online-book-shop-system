@@ -55,13 +55,24 @@ public class BookServiceImpl implements BookService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<BookVariantDTO> findBooks(String keyword, String publisherName, Double minPrice, Double maxPrice) {
+    public List<BookVariantDTO> findBooks(String keyword, String publisherName, Double minPrice, Double maxPrice, Long categoryId) {
         return variantRepository.findAllActiveWithBook().stream()
                 .filter(v -> matchesKeyword(v, keyword))
                 .filter(v -> matchesPublisher(v, publisherName))
                 .filter(v -> matchesPrice(v, minPrice, maxPrice))
+                .filter(v -> matchesCategory(v, categoryId))
                 .map(this::toDTO)
                 .collect(Collectors.toList());
+    }
+
+    private boolean matchesCategory(BookVariant v, Long categoryId) {
+        if (categoryId == null) {
+            return true;
+        }
+        if (v.getBook() == null || v.getBook().getCategoryId() == null) {
+            return false;
+        }
+        return categoryId.equals(v.getBook().getCategoryId());
     }
 
     private boolean matchesKeyword(BookVariant v, String keyword) {

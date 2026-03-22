@@ -1,272 +1,123 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Book Details</title>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Book details – Online Book Shop</title>
+    <link rel="stylesheet" href="css/shop.css">
     <style>
-
-        body{
-            font-family:Segoe UI;
-            background:#f8f6f1;
-            margin:0;
+        .book-detail-wrap {
+            max-width: 1100px;
+            margin: 24px auto;
+            padding: 0 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 32px;
+            align-items: flex-start;
         }
-
-        .header-top{
-            background:#1a1a2e;
-            color:white;
-            padding:12px 24px;
-            display:flex;
-            align-items:center;
-            justify-content:space-between;
+        .book-detail-wrap img#bookImage {
+            width: 100%;
+            max-width: 280px;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
         }
-
-        .logo{
-            font-size:20px;
-            font-weight:bold;
+        .book-info { flex: 1; min-width: 260px; }
+        .book-info h1 { margin-top: 0; font-size: 1.65rem; }
+        .price { font-size: 1.5rem; color: var(--shop-price); font-weight: 700; margin: 12px 0; }
+        .variant select {
+            width: 100%;
+            max-width: 360px;
+            padding: 10px 12px;
+            margin-top: 8px;
+            border-radius: 8px;
+            border: 1px solid var(--shop-border);
+            font: inherit;
         }
-
-        .search-bar{
-            display:flex;
-            justify-content:center;
-            align-items:center;
-            gap:10px;
+        .qty { margin-top: 16px; }
+        .qty input { width: 72px; padding: 8px; border-radius: 8px; border: 1px solid var(--shop-border); }
+        .related { max-width: 1100px; margin: 40px auto; padding: 0 20px; }
+        .related h2 { margin-bottom: 16px; font-size: 1.25rem; }
+        .related-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 16px;
         }
-
-        .search-bar input{
-            width:1000px;
-            padding:8px 14px;
-            border-radius:20px;
-            border:1px solid #ccc;
+        .related-grid .card {
+            cursor: pointer;
+            text-align: center;
+            padding: 12px;
+            transition: transform 0.2s, box-shadow 0.2s;
         }
-
-        #searchBtn{
-            padding:8px 16px;
-            border:none;
-            background:#c9a227;
-            color:white;
-            border-radius:20px;
-            cursor:pointer;
+        .related-grid .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(0,0,0,0.1);
         }
-
-        #searchBtn:hover{
-            background:#a88b1f;
+        .related-grid .card img {
+            width: 100%;
+            aspect-ratio: 2/3;
+            object-fit: cover;
+            border-radius: 8px;
         }
-
-        .nav{
-            display:flex;
-            gap:20px;
-        }
-
-        .nav a{
-            color:white;
-            text-decoration:none;
-            font-weight:500;
-        }
-
-        .nav a:hover{
-            color:#c9a227;
-        }
-        header{
-            background:white;
-            padding:15px 30px;
-            display:flex;
-            justify-content:space-between;
-            align-items:center;
-            box-shadow:0 2px 6px rgba(0,0,0,0.08);
-        }
-
-        header a{
-            text-decoration:none;
-            font-weight:bold;
-            color:#333;
-        }
-
-        .breadcrumb{
-            max-width:1000px;
-            margin:20px auto;
-            font-size:14px;
-        }
-
-        .breadcrumb a{
-            text-decoration:none;
-            color:#555;
-        }
-
-        .breadcrumb a:hover{
-            color:#c9a227;
-        }
-
-        .variant{
-            margin-top:10px;
-        }
-
-        .variant select{
-            padding:6px;
-            margin-top:4px;
-        }
-
-        #stockStatus{
-            font-weight:bold;
-        }
-
-        .container{
-            max-width:1000px;
-            margin:40px auto;
-            display:flex;
-            gap:40px;
-        }
-
-        img{
-            width:280px;
-            border-radius:8px;
-        }
-
-        .book-info h1{
-            margin-top:0;
-        }
-
-        .price{
-            font-size:24px;
-            color:#b45309;
-            font-weight:bold;
-        }
-
-        .qty{
-            margin-top:15px;
-        }
-
-        input{
-            width:60px;
-            padding:6px;
-        }
-
-        .btn{
-            background:#c9a227;
-            border:none;
-            padding:12px 18px;
-            border-radius:6px;
-            cursor:pointer;
-            margin-top:20px;
-            font-weight:bold;
-        }
-
-        .btn:hover{
-            background:#b8951f;
-        }
-
-        .related{
-            max-width:1000px;
-            margin:40px auto;
-        }
-
-        .related h2{
-            margin-bottom:20px;
-        }
-
-        .related-grid{
-            display:grid;
-            grid-template-columns:repeat(4,1fr);
-            gap:20px;
-        }
-
-        .card{
-            background:white;
-            padding:10px;
-            border-radius:6px;
-            text-align:center;
-            cursor:pointer;
-        }
-
-        .card img{
-            width:100%;
-            height:200px;
-            object-fit:cover;
-        }
-
     </style>
 </head>
+<body class="shop-page">
 
-<body>
-
-<header class="header-top">
-
-    <div class="logo">
-        <a href="index.html">📚 Online Book Shop</a>
-    </div>
-
+<header class="shop-header">
+    <div class="logo"><a href="index.html">📚 Online Book Shop</a></div>
     <div class="search-bar">
-
-        <input type="text" id="searchInput" placeholder="Search books...">
-
-        <button id="searchBtn">Search</button>
-
+        <input type="search" id="searchInput" placeholder="Search books..." aria-label="Search books">
+        <button type="button" id="searchBtn">Search</button>
     </div>
-
     <nav class="nav">
         <a href="index.html">Home</a>
-        <a href="login.html">Login</a>
-        <a href="cart.html" class="header-cart">
-            Cart (<span id="headerCartCount">0</span>)
-        </a>
+        <a href="profile.html" id="profileLink" style="display:none;">Profile</a>
+        <a href="order-history.html" id="ordersLink" style="display:none;">Orders</a>
+        <a href="login.html" id="loginLink">Login</a>
+        <a href="#" id="logoutLink" style="display:none;">Logout</a>
+        <a href="cart.html" class="cart shop-cart-link">🛒 <span id="headerCartCount">$0.00 (0)</span></a>
     </nav>
-
 </header>
 
-<div class="breadcrumb">
+<div class="shop-breadcrumb">
     <a href="index.html">Home</a> /
     <span id="breadcrumbCategory">Books</span> /
     <span id="breadcrumbTitle"></span>
 </div>
 
-<div class="container">
-
-    <img id="bookImage">
+<div class="book-detail-wrap">
+    <img id="bookImage" alt="Cover">
 
     <div class="book-info">
-
         <h1 id="title"></h1>
-
         <p class="price" id="price"></p>
-
-        <p><b>ISBN:</b> <span id="isbn"></span></p>
-
-        <p><b>Publisher:</b> <span id="publisherName"></span></p>
-
-        <p><b>Year:</b> <span id="publicationYear"></span></p>
-
-        <p><b>Availability:</b> <span id="stockStatus"></span></p>
-
+        <p><strong>ISBN:</strong> <span id="isbn"></span></p>
+        <p><strong>Publisher:</strong> <span id="publisherName"></span></p>
+        <p><strong>Year:</strong> <span id="publicationYear"></span></p>
+        <p><strong>Availability:</strong> <span id="stockStatus"></span></p>
         <div class="variant">
-            <label>Format</label>
+            <label for="variantSelect">Format</label>
             <select id="variantSelect">
                 <option value="">Select version</option>
             </select>
         </div>
-
         <p id="description"></p>
-
         <div class="qty">
-            Quantity
+            <label for="qty">Quantity</label><br>
             <input type="number" id="qty" value="1" min="1">
         </div>
-
-        <button class="btn" id="addCartBtn">
-            Add to Cart
-        </button>
-
+        <button type="button" class="btn" id="addCartBtn" style="margin-top:16px;">Add to cart</button>
     </div>
-
 </div>
 
 <div class="related">
-
-    <h2>Related Books</h2>
-
+    <h2>Related books</h2>
     <div class="related-grid" id="relatedBooks"></div>
-
 </div>
 
-<script src="js/book.js"></script>
+<footer class="shop-footer">© Online Book Shop</footer>
 
+<script src="js/auth-session.js"></script>
+<script src="js/shop-header.js"></script>
+<script src="js/book.js"></script>
 </body>
 </html>

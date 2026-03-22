@@ -11,7 +11,7 @@ public interface BookService {
 
     List<BookVariantDTO> getAllBookVariants();
 
-    List<BookVariantDTO> findBooks(String keyword, String publisherName, Double minPrice, Double maxPrice);
+    List<BookVariantDTO> findBooks(String keyword, String publisherName, Double minPrice, Double maxPrice, Long categoryId);
 
     BookDetailDTO getBookDetail(Long variantId);
 

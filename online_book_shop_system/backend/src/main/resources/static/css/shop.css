@@ -1,0 +1,349 @@
+/**
+ * Online Book Shop — unified customer storefront theme
+ * Use: <body class="shop-page"> + <header class="shop-header"> …
+ */
+
+:root {
+    --shop-header-bg: #1a1a2e;
+    --shop-header-text: #ffffff;
+    --shop-accent: #ee4d2d;
+    --shop-accent-hover: #c0392b;
+    --shop-body-bg: #f8f9fa;
+    --shop-text: #333333;
+    --shop-border: #e0ddd8;
+    --shop-card-bg: #ffffff;
+    --shop-price: #b45309;
+    --shop-muted: #64748b;
+
+    /* Aliases for pages that still use shorter names in local CSS */
+    --header-bg: var(--shop-header-bg);
+    --accent: var(--shop-accent);
+    --accent-hover: var(--shop-accent-hover);
+    --body-bg: var(--shop-body-bg);
+    --card-bg: var(--shop-card-bg);
+    --text: var(--shop-text);
+    --border: var(--shop-border);
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+body.shop-page {
+    margin: 0;
+    font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--shop-body-bg);
+    color: var(--shop-text);
+    line-height: 1.5;
+}
+
+.shop-page a {
+    text-decoration: none;
+    color: inherit;
+}
+
+/* ── Header ── */
+.shop-header,
+.header-top {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: var(--shop-header-bg);
+    color: var(--shop-header-text);
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px 20px;
+}
+
+.shop-logo,
+.shop-header .logo,
+.header-top .logo {
+    font-size: clamp(1.05rem, 2vw, 1.35rem);
+    font-weight: 700;
+}
+
+.shop-logo a,
+.shop-header .logo a,
+.header-top .logo a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.shop-nav,
+.shop-header .nav,
+.header-top .nav {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 18px;
+}
+
+.shop-nav a,
+.shop-header .nav a,
+.header-top .nav a {
+    color: rgba(255, 255, 255, 0.92);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.95rem;
+}
+
+.shop-nav a:hover,
+.shop-header .nav a:hover,
+.header-top .nav a:hover {
+    color: var(--shop-accent);
+}
+
+.shop-cart-link,
+.header-cart,
+.shop-header a.cart {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    border-radius: 8px;
+    transition: background 0.2s;
+    font-weight: 500;
+}
+
+.shop-header a.cart:hover,
+.header-cart:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+/* Search (index, book detail) */
+.search-bar,
+.shop-search {
+    display: flex;
+    flex: 1;
+    min-width: 160px;
+    max-width: 560px;
+    margin: 0 12px;
+}
+
+.search-bar input,
+.shop-search input {
+    flex: 1;
+    padding: 8px 14px;
+    border-radius: 20px 0 0 20px;
+    border: none;
+    font: inherit;
+}
+
+.search-bar button,
+.shop-search button {
+    border: none;
+    background: var(--shop-accent);
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 0 20px 20px 0;
+    cursor: pointer;
+    font-weight: 600;
+    font: inherit;
+}
+
+.search-bar button:hover,
+.shop-search button:hover {
+    background: var(--shop-accent-hover);
+}
+
+/* ── Layout ── */
+.shop-main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 28px 20px 48px;
+}
+
+.shop-main--sm {
+    max-width: 720px;
+}
+
+.shop-main--md {
+    max-width: 900px;
+}
+
+.shop-main--lg {
+    max-width: 1200px;
+}
+
+.shop-main--xl {
+    max-width: 1280px;
+}
+
+/* ── Cards & panels ── */
+.shop-card,
+.shop-page .card {
+    background: var(--shop-card-bg);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+}
+
+.shop-card + .shop-card,
+.shop-page .card + .card {
+    margin-top: 16px;
+}
+
+/* ── Forms ── */
+.shop-input,
+.shop-select,
+.shop-page .shop-field input,
+.shop-page .shop-field select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--shop-border);
+    border-radius: 8px;
+    font: inherit;
+    margin-top: 6px;
+    margin-bottom: 12px;
+}
+
+.shop-filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.shop-filter-row input,
+.shop-filter-row select {
+    flex: 1;
+    min-width: 140px;
+    padding: 10px 12px;
+    border: 1px solid var(--shop-border);
+    border-radius: 8px;
+    font: inherit;
+}
+
+/* ── Buttons ── */
+.shop-btn {
+    display: inline-block;
+    background: var(--shop-accent);
+    color: #fff !important;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-weight: 600;
+    font: inherit;
+    cursor: pointer;
+    text-align: center;
+}
+
+.shop-btn:hover {
+    background: var(--shop-accent-hover);
+}
+
+.shop-btn:disabled {
+    background: #94a3b8;
+    cursor: not-allowed;
+}
+
+.shop-btn--secondary {
+    background: #4b5563;
+}
+
+.shop-btn--secondary:hover {
+    background: #374151;
+}
+
+.shop-page .btn {
+    background: var(--shop-accent);
+    color: #fff;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font: inherit;
+}
+
+.shop-page .btn:hover {
+    background: var(--shop-accent-hover);
+}
+
+.shop-page .btn-secondary {
+    background: #4b5563;
+    color: #fff;
+}
+
+.shop-page .btn-secondary:hover {
+    background: #374151;
+}
+
+.shop-page .page-btn {
+    padding: 8px 14px;
+    border: 1px solid var(--shop-border);
+    border-radius: 8px;
+    cursor: pointer;
+    background: #fff;
+    font: inherit;
+}
+
+.shop-page .page-btn.active {
+    background: var(--shop-accent);
+    color: #fff;
+    border-color: var(--shop-accent);
+}
+
+/* ── Footer ── */
+.shop-footer {
+    background: var(--shop-header-bg);
+    color: rgba(255, 255, 255, 0.55);
+    text-align: center;
+    padding: 20px 24px;
+    font-size: 0.875rem;
+    margin-top: auto;
+}
+
+/* ── Utilities ── */
+.shop-muted {
+    color: var(--shop-muted);
+}
+
+.shop-price {
+    color: var(--shop-price);
+    font-weight: 700;
+}
+
+.shop-breadcrumb {
+    max-width: 1100px;
+    margin: 16px auto;
+    padding: 0 20px;
+    font-size: 0.9rem;
+    color: #555;
+}
+
+.shop-breadcrumb a {
+    color: #555;
+    text-decoration: none;
+}
+
+.shop-breadcrumb a:hover {
+    color: var(--shop-accent);
+}
+
+/* Checkout grid */
+.shop-checkout-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+}
+
+@media (min-width: 900px) {
+    .shop-checkout-grid {
+        grid-template-columns: 2fr 1fr;
+    }
+}
+
+/* Home: align banner & category strip with main column */
+.shop-page .home-hero-wrap {
+    max-width: 1280px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0 20px;
+}

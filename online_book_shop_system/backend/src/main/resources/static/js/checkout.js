@@ -57,21 +57,6 @@ async function logout() {
     await performLogout(API_BASE);
 }
 
-function updateAuthUI() {
-    const token = localStorage.getItem("token");
-
-    const loginLink = document.getElementById("loginLink");
-    const logoutLink = document.getElementById("logoutLink");
-
-    if (token) {
-        loginLink.style.display = "none";
-        logoutLink.style.display = "inline";
-    } else {
-        loginLink.style.display = "inline";
-        logoutLink.style.display = "none";
-    }
-}
-
 // ===== UPDATE TOTALS =====
 function updateTotals() {
     discountAmount = 0;
@@ -245,7 +230,9 @@ async function payAgain(orderId) {
 // ===== INIT =====
 document.addEventListener("DOMContentLoaded", async () => {
     await syncAuthFromServerSession(API_BASE);
-    updateAuthUI();
+    if (typeof updateShopHeaderAuth === "function") {
+        updateShopHeaderAuth();
+    }
     loadCheckoutSummary();
     handlePaymentResult();
 });

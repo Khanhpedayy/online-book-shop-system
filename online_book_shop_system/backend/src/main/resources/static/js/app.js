@@ -23,21 +23,6 @@ async function logout() {
     await performLogout(API_BASE);
 }
 
-function updateAuthUI() {
-    const token = localStorage.getItem("token");
-
-    const loginLink = document.getElementById("loginLink");
-    const logoutLink = document.getElementById("logoutLink");
-
-    if (token) {
-        loginLink.style.display = "none";
-        logoutLink.style.display = "inline";
-    } else {
-        loginLink.style.display = "inline";
-        logoutLink.style.display = "none";
-    }
-}
-
 /* ===== API ===== */
 async function apiGet(path) {
     const headers = {};
@@ -146,12 +131,13 @@ async function loadBooks(filters = {}) {
         const params = new URLSearchParams();
 
         for (const key in filters) {
-            if (filters[key]) {
-                if (key === "minPrice" || key === "maxPrice") {
-                    params.append(key, Number(filters[key]));
-                } else {
-                    params.append(key, filters[key]);
-                }
+            if (filters[key] === undefined || filters[key] === null || filters[key] === "") {
+                continue;
+            }
+            if (key === "minPrice" || key === "maxPrice" || key === "categoryId") {
+                params.append(key, Number(filters[key]));
+            } else {
+                params.append(key, filters[key]);
             }
         }
 
@@ -174,8 +160,19 @@ async function loadBooks(filters = {}) {
     }
 }
 
-/* ===== SEARCH ===== */
-function applyFilters() {
+/* ===== SEARCH / FILTERS ===== */
+function escapeHtmlAttr(s) {
+    if (s == null) {
+        return "";
+    }
+    return String(s)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+}
+
+function collectFiltersFromForm() {
     const filters = {
         keyword: document.getElementById("searchInput")?.value?.trim(),
         publisherName: document.getElementById("publisherFilter")?.value,
@@ -184,13 +181,70 @@ function applyFilters() {
         format: document.getElementById("formatFilter")?.value,
         condition: document.getElementById("conditionFilter")?.value
     };
-
+    const cf = document.getElementById("categoryFilter");
+    if (cf && cf.value) {
+        const cid = Number(cf.value);
+        if (Number.isFinite(cid)) {
+            filters.categoryId = cid;
+        }
+    }
     Object.keys(filters).forEach(key => {
-        if (!filters[key]) delete filters[key];
+        const v = filters[key];
+        if (v === undefined || v === null || v === "") {
+            delete filters[key];
+        }
+    });
+    return filters;
+}
+
+function applyFilters() {
+    currentPage = 1;
+    loadBooks(collectFiltersFromForm());
+}
+
+async function loadCategoryFilters() {
+    const sel = document.getElementById("categoryFilter");
+    const icons = document.getElementById("categoryIcons");
+    if (!sel || !icons) {
+        return;
+    }
+    let cats = [];
+    try {
+        cats = await apiGet("/api/categories");
+    } catch (e) {
+        console.warn("loadCategoryFilters", e);
+    }
+    sel.innerHTML = '<option value="">All categories</option>' +
+        cats.map(c => `<option value="${c.id}">${escapeHtmlAttr(c.name || ("Category " + c.id))}</option>`).join("");
+
+    const chipIcons = ["📖", "💼", "💻", "🔬", "🧠", "📚", "🎨", "🌍", "📕", "📗"];
+    icons.innerHTML =
+        '<div class="cat active" data-id="" role="button" tabindex="0">📚<span>All</span></div>' +
+        cats.map((c, i) =>
+            `<div class="cat" data-id="${c.id}" role="button" tabindex="0">${chipIcons[i % chipIcons.length]}<span>${escapeHtmlAttr(c.name || "")}</span></div>`
+        ).join("");
+
+    function markActiveChip() {
+        const v = sel.value;
+        icons.querySelectorAll(".cat").forEach(el => {
+            const id = el.getAttribute("data-id");
+            const match = (v === "" && id === "") || (v !== "" && id === v);
+            el.classList.toggle("active", match);
+        });
+    }
+
+    icons.querySelectorAll(".cat").forEach(el => {
+        el.addEventListener("click", () => {
+            sel.value = el.getAttribute("data-id") || "";
+            markActiveChip();
+            applyFilters();
+        });
     });
 
-    currentPage = 1;
-    loadBooks(filters);
+    sel.addEventListener("change", () => {
+        markActiveChip();
+        applyFilters();
+    });
 }
 
 /* ===== CART ===== */
@@ -270,7 +324,9 @@ function nextSlide() {
 /* ===== INIT ===== */
 document.addEventListener("DOMContentLoaded", async () => {
     await syncAuthFromServerSession(API_BASE);
-    updateAuthUI();
+    if (typeof updateShopHeaderAuth === "function") {
+        updateShopHeaderAuth();
+    }
 
     document.getElementById("searchBtn")?.addEventListener("click", applyFilters);
 
@@ -285,7 +341,18 @@ document.addEventListener("DOMContentLoaded", async () => {
         setInterval(nextSlide, 4000);
     }
 
-    loadBooks();
+    const kw = new URLSearchParams(window.location.search).get("keyword");
+    const si = document.getElementById("searchInput");
+    if (kw && si) {
+        si.value = kw;
+    }
+
+    await loadCategoryFilters();
+    if (kw) {
+        applyFilters();
+    } else {
+        loadBooks();
+    }
 
     if (isLoggedIn()) {
         loadCart();
