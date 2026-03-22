@@ -49,4 +49,11 @@ public class User {
 
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
+
+
+
+    @Transient
+    public boolean isActive() {
+        return "ACTIVE".equalsIgnoreCase(status) && deletedAt == null;
+    }
 }

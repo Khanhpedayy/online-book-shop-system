@@ -29,11 +29,9 @@ public class OrderItem {
     @JoinColumn(name = "variant_id", nullable = false)
     private BookVariant variant;
 
-    @Column(name = "book_id")
-    private Long bookId;
-
-    @Column(name = "copy_id")
-    private Long copyId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "book_id", nullable = false)
+    private BookInfo book;
 
     @Column(name = "title_snapshot", nullable = false, length = 255)
     private String titleSnapshot;

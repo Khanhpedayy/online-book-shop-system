@@ -9,11 +9,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -30,9 +34,6 @@ public class OrderServiceImpl implements OrderService {
         this.userRepository = userRepository;
         this.cartItemRepository = cartItemRepository;
     }
-
-
-
 
     @Override
     @Transactional
@@ -55,13 +56,11 @@ public class OrderServiceImpl implements OrderService {
         order.setUser(user);
         order.setStatus("NEW");
         order.setPaymentStatus("PENDING");
-        order.setPaymentMethod(request.getPaymentMethod());
         order.setShipName(request.getRecipientName() != null ? request.getRecipientName() : user.getFullName());
-        order.setShipPhone(
-                request.getPhone() != null && !request.getPhone().isBlank()
-                        ? request.getPhone()
-                        : (user.getPhone() != null ? user.getPhone() : "")
-        );
+        String phone = request.getPhone() != null && !request.getPhone().isBlank()
+                ? request.getPhone().trim()
+                : (user.getPhone() != null ? user.getPhone() : "");
+        order.setShipPhone(phone);
         order.setShipLine1(request.getShippingAddress());
 
         BigDecimal total = BigDecimal.ZERO;
@@ -70,11 +69,12 @@ public class OrderServiceImpl implements OrderService {
         for (OrderItemRequest itemReq : request.getItems()) {
             BookVariant variant = variantRepository.findById(itemReq.getVariantId())
                     .orElseThrow(() -> new RuntimeException("Book not found: " + itemReq.getVariantId()));
-            if (variant.getBook() == null || variant.getBook().getId() == null) {
-                throw new IllegalArgumentException("Book variant must have an associated book: " + itemReq.getVariantId());
+            BookInfo book = variant.getBook();
+            if (book == null) {
+                throw new IllegalArgumentException("Book is not available: variant has no book (" + variant.getSku() + ")");
             }
-            if (!variant.getIsActive() || !"ACTIVE".equalsIgnoreCase(variant.getBook().getStatus())) {
-                throw new IllegalArgumentException("Book is not available: " + variant.getBook().getTitle());
+            if (!variant.getIsActive() || !"ACTIVE".equalsIgnoreCase(book.getStatus())) {
+                throw new IllegalArgumentException("Book is not available: " + book.getTitle());
             }
 
             int qty = itemReq.getQuantity() != null && itemReq.getQuantity() > 0 ? itemReq.getQuantity() : 1;
@@ -85,8 +85,8 @@ public class OrderServiceImpl implements OrderService {
             OrderItem item = new OrderItem();
             item.setOrder(order);
             item.setVariant(variant);
-            item.setBookId(variant.getBook().getId());
-            item.setTitleSnapshot(variant.getBook() != null ? variant.getBook().getTitle() : variant.getSku());
+            item.setBook(book);
+            item.setTitleSnapshot(book.getTitle() != null ? book.getTitle() : variant.getSku());
             item.setSkuSnapshot(variant.getSku());
             item.setUnitPrice(unitPrice);
             item.setQuantity(qty);
@@ -101,46 +101,44 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public Order placeOrderFromCartByEmail(String email, CheckoutRequest request) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        // 🛒 lấy cart
-        List<CartItem> cartItems = cartItemRepository.findByUser_Id(user.getId());
-
+    public Order placeOrderFromCart(Long userId, CheckoutRequest request) {
+        List<CartItem> cartItems = cartItemRepository.findByUser_IdWithVariantAndBook(userId);
         if (cartItems.isEmpty()) {
-            throw new RuntimeException("Cart is empty");
+            throw new IllegalArgumentException("Cart is empty");
+        }
+        if (request.getCustomerId() == null || !request.getCustomerId().equals(userId)) {
+            throw new IllegalArgumentException("You must log in to checkout. Guests cannot buy without an account.");
         }
         if (request.getShippingAddress() == null || request.getShippingAddress().isBlank()) {
             throw new IllegalArgumentException("Shipping address is required");
         }
 
-        // 📦 convert cart -> order items
         List<OrderItemRequest> items = cartItems.stream()
-                .map(ci -> new OrderItemRequest(
-                        ci.getVariant().getId(),
-                        ci.getQuantity()
-                ))
+                .map(ci -> new OrderItemRequest(ci.getVariant().getId(), ci.getQuantity()))
                 .toList();
-
-        // 🧾 build order request (gắn userId từ server)
-        OrderRequest orderRequest = new OrderRequest(
-                items,
-                request.getEmail(),
-                request.getShippingAddress(),
-                request.getRecipientName(),
-                request.getPhone(),
-                request.getPaymentMethod(),
-                user.getId() // 👈 QUAN TRỌNG
-        );
-
-        // 🛍 tạo order
+        OrderRequest orderRequest = new OrderRequest(items, request.getEmail(), request.getShippingAddress(),
+                request.getRecipientName(), request.getPhone(), request.getPaymentMethod(), request.getCustomerId());
         Order order = placeOrder(orderRequest);
-
-        // 🧹 clear cart
-        cartItemRepository.deleteByUserId(user.getId());
-
+        cartItemRepository.deleteAll(cartItems);
         return order;
+    }
+
+    @Override
+    @Transactional
+    public Order placeOrderFromCartByEmail(String email, CheckoutRequest request) {
+        User user = userRepository.findByEmailAndDeletedAtIsNull(email)
+                .orElseThrow(() -> new RuntimeException("User not found: " + email));
+        if (request.getCustomerId() != null && !request.getCustomerId().equals(user.getId())) {
+            throw new IllegalArgumentException("Customer id does not match authenticated user");
+        }
+        request.setCustomerId(user.getId());
+        return placeOrderFromCart(user.getId(), request);
+    }
+
+    @Override
+    public String createPayment(Order order) {
+        throw new UnsupportedOperationException(
+                "PayOS (or other) payment URL creation is not wired in OrderServiceImpl yet.");
     }
 
     @Override
@@ -150,17 +148,19 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() -> new RuntimeException("Order not found: " + id));
     }
 
-    public void updatePaymentStatus(Long orderId, String status) {
+    @Override
+    @Transactional(readOnly = true)
+    public Order getOrderDetailByEmail(Long orderId, String email) {
+        User user = userRepository.findByEmailAndDeletedAtIsNull(email)
+                .orElseThrow(() -> new RuntimeException("User not found: " + email));
         Order order = getOrderById(orderId);
-
-        if ("success".equalsIgnoreCase(status)) {
-            order.setPaymentStatus("PAID");
-            order.setStatus("CONFIRMED");
-        } else {
-            order.setPaymentStatus("FAILED");
+        if (order.getDeletedAt() != null) {
+            throw new RuntimeException("Order not found: " + orderId);
         }
-
-        orderRepository.save(order);
+        if (!order.getUser().getId().equals(user.getId())) {
+            throw new RuntimeException("Forbidden");
+        }
+        return order;
     }
 
     @Override
@@ -170,55 +170,57 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public String createPayment(Order order) {
-        // Fake payment URL để test trước
-        return "http://localhost:5500/payment-result.html?status=success&orderId=" + order.getId();
+    @Transactional(readOnly = true)
+    public List<Order> getOrdersByEmail(String email, String status, String keyword, String fromDate, String toDate) {
+        User user = userRepository.findByEmailAndDeletedAtIsNull(email)
+                .orElseThrow(() -> new RuntimeException("User not found: " + email));
+        LocalDate from = parseDate(fromDate);
+        LocalDate to = parseDate(toDate);
+        String kw = keyword != null && !keyword.isBlank() ? keyword.trim().toLowerCase(Locale.ROOT) : null;
+        String st = status != null && !status.isBlank() ? status.trim().toUpperCase(Locale.ROOT) : null;
+
+        return orderRepository.findByUserIdAndDeletedAtIsNull(user.getId()).stream()
+                .filter(o -> st == null || st.equalsIgnoreCase(o.getStatus()))
+                .filter(o -> kw == null || (o.getOrderCode() != null && o.getOrderCode().toLowerCase(Locale.ROOT).contains(kw))
+                        || (o.getShipName() != null && o.getShipName().toLowerCase(Locale.ROOT).contains(kw)))
+                .filter(o -> from == null || !o.getPlacedAt().toLocalDate().isBefore(from))
+                .filter(o -> to == null || !o.getPlacedAt().toLocalDate().isAfter(to))
+                .sorted(Comparator.comparing(Order::getPlacedAt, Comparator.nullsLast(Comparator.naturalOrder())).reversed())
+                .collect(Collectors.toList());
     }
 
-    @Override
-    public List<Order> getOrdersByEmail(String email, String status, String keyword,
-                                        String fromDate, String toDate) {
-
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        return orderRepository.searchOrders(
-                user.getId(),
-                status,
-                keyword
-        );
-    }
-
-    @Override
-    public Order getOrderDetailByEmail(Long orderId, String email) {
-
-        Order order = orderRepository.findByIdWithItems(orderId)
-                .orElseThrow(() -> new RuntimeException("Order not found"));
-
-        if (!order.getUser().getEmail().equals(email)) {
-            throw new RuntimeException("Unauthorized");
+    private static LocalDate parseDate(String value) {
+        if (value == null || value.isBlank()) {
+            return null;
         }
-
-        return order;
+        try {
+            return LocalDate.parse(value.trim());
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     @Override
     @Transactional
     public void cancelOrder(Long orderId, String email) {
-
+        User user = userRepository.findByEmailAndDeletedAtIsNull(email)
+                .orElseThrow(() -> new RuntimeException("User not found: " + email));
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("Order not found"));
-
-        if (!order.getUser().getEmail().equals(email)) {
-            throw new RuntimeException("Unauthorized");
+                .orElseThrow(() -> new RuntimeException("Order not found: " + orderId));
+        if (order.getDeletedAt() != null) {
+            throw new RuntimeException("Order not found: " + orderId);
         }
-
-        // RULE: chỉ cho cancel khi CONFIRMED
-        if (!order.getStatus().equals("CONFIRMED")) {
-            throw new RuntimeException("Cannot cancel this order");
+        if (!order.getUser().getId().equals(user.getId())) {
+            throw new RuntimeException("Forbidden");
         }
-
+        if ("CANCELLED".equalsIgnoreCase(order.getStatus())) {
+            return;
+        }
+        if (!"NEW".equalsIgnoreCase(order.getStatus())) {
+            throw new IllegalStateException("Only new orders can be cancelled");
+        }
         order.setStatus("CANCELLED");
+        order.setCancelledAt(LocalDateTime.now());
         orderRepository.save(order);
     }
 }

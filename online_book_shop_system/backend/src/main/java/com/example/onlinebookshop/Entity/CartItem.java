@@ -1,5 +1,6 @@
 package com.example.onlinebookshop.Entity;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
@@ -40,4 +41,10 @@ public class CartItem {
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    /** Exposed for JSON even when nested variant is omitted by lazy-proxy serialization. */
+    @JsonGetter("variantId")
+    public Long getVariantIdForJson() {
+        return variant == null ? null : variant.getId();
+    }
 }

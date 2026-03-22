@@ -1,0 +1,6 @@
+# Maven / IDE (repo root — complements online_book_shop_system/.gitignore)
+**/target/
+**/target/**
+
+# Accidental file from mistyped git command, e.g. `tore --staged .`
+/tore *

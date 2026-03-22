@@ -30,40 +30,39 @@ public class CartServiceImpl implements CartService {
         this.userRepository = userRepository;
     }
 
-    private User getUserByEmail(String email) {
-        return userRepository.findByEmail(email)
+    private Long resolveUserIdByEmail(String email) {
+        return userRepository.findByEmailAndDeletedAtIsNull(email)
+                .map(User::getId)
                 .orElseThrow(() -> new RuntimeException("User not found: " + email));
     }
 
-    // ✅ GET CART
+    @Override
+    @Transactional(readOnly = true)
+    public List<CartItem> getCart(Long userId) {
+        return cartItemRepository.findByUser_IdWithVariantAndBook(userId);
+    }
+
     @Override
     @Transactional(readOnly = true)
     public List<CartItem> getCartByEmail(String email) {
-        User user = getUserByEmail(email);
-        return cartItemRepository.findByUser_IdOrderByAddedAtDesc(user.getId());
+        return getCart(resolveUserIdByEmail(email));
     }
 
-    // ✅ ADD ITEM
     @Override
     @Transactional
-    public CartItem addItemByEmail(String email, AddToCartRequest request) {
-        User user = getUserByEmail(email);
-
+    public CartItem addItem(Long userId, AddToCartRequest request) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found: " + userId));
         BookVariant variant = variantRepository.findById(request.getVariantId())
                 .orElseThrow(() -> new RuntimeException("Book not found: " + request.getVariantId()));
-
-        if (!variant.getIsActive() ||
-                (variant.getBook() != null && !"ACTIVE".equalsIgnoreCase(variant.getBook().getStatus()))) {
-            throw new IllegalArgumentException("Book is not available");
+        if (!variant.getIsActive() || (variant.getBook() != null && !"ACTIVE".equalsIgnoreCase(variant.getBook().getStatus()))) {
+            throw new IllegalArgumentException("Book is not available: " + (variant.getBook() != null ? variant.getBook().getTitle() : variant.getSku()));
         }
 
         int qty = request.getQuantity() != null && request.getQuantity() > 0 ? request.getQuantity() : 1;
         Long copyId = request.getCopyId();
 
-        Optional<CartItem> existing = copyId == null
-                ? cartItemRepository.findByUser_IdAndVariant_IdAndCopyIdIsNull(user.getId(), request.getVariantId())
-                : cartItemRepository.findByUser_IdAndVariant_IdAndCopyId(user.getId(), request.getVariantId(), copyId);
-
+        Optional<CartItem> existing = cartItemRepository.findByUser_IdAndVariant_IdAndCopyId(userId, request.getVariantId(), copyId);
         if (existing.isPresent()) {
             CartItem item = existing.get();
             item.setQuantity(item.getQuantity() + qty);
@@ -75,43 +74,49 @@ public class CartServiceImpl implements CartService {
             item.setVariant(variant);
             item.setCopyId(copyId);
             item.setQuantity(qty);
-            item.setAddedAt(LocalDateTime.now());
             return cartItemRepository.save(item);
         }
     }
 
-    // ✅ UPDATE ITEM
     @Override
     @Transactional
-    public CartItem updateItemByEmail(String email, Long variantId, UpdateCartItemRequest request) {
-        User user = getUserByEmail(email);
+    public CartItem addItemByEmail(String email, AddToCartRequest request) {
+        return addItem(resolveUserIdByEmail(email), request);
+    }
 
-        CartItem item = cartItemRepository
-                .findByUser_IdAndVariant_IdAndCopyIdIsNull(user.getId(), variantId)
-                .orElseThrow(() -> new RuntimeException("Cart item not found"));
+    @Override
+    @Transactional
+    public CartItem updateItem(Long userId, Long variantId, UpdateCartItemRequest request) {
+        CartItem item = cartItemRepository.findByUser_IdAndVariant_IdAndCopyId(userId, variantId, null)
+                .orElseThrow(() -> new RuntimeException("Cart item not found for variant: " + variantId));
 
         int qty = request.getQuantity() != null ? request.getQuantity() : item.getQuantity();
-
         if (qty <= 0) {
             cartItemRepository.delete(item);
             return null;
         }
-
         item.setQuantity(qty);
         item.setUpdatedAt(LocalDateTime.now());
         return cartItemRepository.save(item);
     }
 
-    // ✅ DELETE ITEM
+    @Override
+    @Transactional
+    public CartItem updateItemByEmail(String email, Long variantId, UpdateCartItemRequest request) {
+        return updateItem(resolveUserIdByEmail(email), variantId, request);
+    }
+
+    @Override
+    @Transactional
+    public void removeItem(Long userId, Long variantId) {
+        CartItem item = cartItemRepository.findByUser_IdAndVariant_IdAndCopyId(userId, variantId, null)
+                .orElseThrow(() -> new RuntimeException("Cart item not found for variant: " + variantId));
+        cartItemRepository.delete(item);
+    }
+
     @Override
     @Transactional
     public void removeItemByEmail(String email, Long variantId) {
-        User user = getUserByEmail(email);
-
-        CartItem item = cartItemRepository
-                .findByUser_IdAndVariant_IdAndCopyIdIsNull(user.getId(), variantId)
-                .orElseThrow(() -> new RuntimeException("Cart item not found"));
-
-        cartItemRepository.delete(item);
+        removeItem(resolveUserIdByEmail(email), variantId);
     }
 }

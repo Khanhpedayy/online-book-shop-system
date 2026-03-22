@@ -21,7 +21,6 @@ public class BookVariant {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @ToString.Exclude
     @JoinColumn(name = "book_id", nullable = false)
     private BookInfo book;
 
@@ -33,8 +32,6 @@ public class BookVariant {
 
     @Column(name = "sale_price", nullable = false, precision = 18, scale = 2)
     private BigDecimal salePrice = BigDecimal.ZERO;
-
-    private String format;
 
     @Column(name = "is_active", nullable = false)
     private Boolean isActive = true;

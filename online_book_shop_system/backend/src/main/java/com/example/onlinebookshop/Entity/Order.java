@@ -30,28 +30,16 @@ public class Order {
     private User user;
 
     @Column(name = "status", nullable = false, length = 20)
-    private String status = "PENDING";        // thay NEW
+    private String status = "NEW";
 
     @Column(name = "payment_status", nullable = false, length = 20)
-    private String paymentStatus = "UNPAID";  // thay PENDING
-
-    @Column(name = "payment_method", length = 20)
-    private String paymentMethod; // COD, PAYOS
+    private String paymentStatus = "PENDING";
 
     @Column(name = "total_amount", nullable = false, precision = 18, scale = 2)
     private BigDecimal totalAmount = BigDecimal.ZERO;
 
     @Column(name = "subtotal_amount", nullable = false, precision = 18, scale = 2)
     private BigDecimal subtotalAmount = BigDecimal.ZERO;
-
-    @Column(name = "shipping_fee", nullable = false, precision = 18, scale = 2)
-    private BigDecimal shippingFee = BigDecimal.ZERO;
-
-    @Column(name = "discount_amount", nullable = false, precision = 18, scale = 2)
-    private BigDecimal discountAmount = BigDecimal.ZERO;
-
-    @Column(name = "currency", nullable = false, length = 10)
-    private String currency = "VND";
 
     @Column(name = "ship_name", nullable = false, length = 150)
     private String shipName;
@@ -64,6 +52,36 @@ public class Order {
 
     @Column(name = "ship_line2", length = 255)
     private String shipLine2;
+
+    @Column(name = "staff_note")
+    private String staffNote;
+
+    @Column(name = "confirmed_at")
+    private LocalDateTime confirmedAt;
+
+    @Column(name = "packed_at")
+    private LocalDateTime packedAt;
+
+    @Column(name = "shipped_at")
+    private LocalDateTime shippedAt;
+
+    @Column(name = "delivered_at")
+    private LocalDateTime deliveredAt;
+
+    @Column(name = "completed_at")
+    private LocalDateTime completedAt;
+
+    @Column(name = "cancelled_at")
+    private LocalDateTime cancelledAt;
+
+    @Column(name = "carrier")
+    private String carrier;
+
+    @Column(name = "tracking_code")
+    private String trackingCode;
+
+    @Column(name = "cancel_reason")
+    private String cancelReason;
 
     @Column(name = "placed_at", nullable = false)
     private LocalDateTime placedAt = LocalDateTime.now();

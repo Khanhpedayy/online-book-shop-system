@@ -21,18 +21,31 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        User user = userRepository.findByEmailAndDeletedAtIsNull(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + email));
+        System.out.println(">>> loadUserByUsername called with email = [" + email + "]");
 
-        if (!"ACTIVE".equalsIgnoreCase(user.getStatus())) {
+        User user = userRepository.findByEmailAndDeletedAtIsNull(email)
+                .orElseThrow(() -> {
+                    System.out.println(">>> User not found in DB");
+                    return new UsernameNotFoundException("User not found: " + email);
+                });
+
+        System.out.println(">>> Found user: " + user.getEmail());
+        System.out.println(">>> Status: " + user.getStatus());
+        System.out.println(">>> DeletedAt: " + user.getDeletedAt());
+        System.out.println(">>> Password hash: " + user.getPasswordHash());
+
+        if (!"ACTIVE".equalsIgnoreCase(user.getStatus()) || user.getDeletedAt() != null) {
+            System.out.println(">>> User is not ACTIVE or already deleted");
             throw new UsernameNotFoundException("Account is disabled: " + email);
         }
 
         String roleCode = user.getRole() != null ? user.getRole().getCode() : "CUSTOMER";
+        System.out.println(">>> Role code: " + roleCode);
 
         return new org.springframework.security.core.userdetails.User(
                 user.getEmail(),
                 user.getPasswordHash() != null ? user.getPasswordHash() : "",
-                List.of(new SimpleGrantedAuthority("ROLE_" + roleCode)));
+                List.of(new SimpleGrantedAuthority("ROLE_" + roleCode))
+        );
     }
 }
