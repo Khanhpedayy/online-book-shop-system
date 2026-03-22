@@ -4,10 +4,14 @@ import com.example.onlinebookshop.Entity.BookInfo;
 import com.example.onlinebookshop.Entity.BookVariant;
 import com.example.onlinebookshop.Repository.BookInfoRepository;
 import com.example.onlinebookshop.Repository.BookVariantRepository;
+import com.example.onlinebookshop.dto.BookDetailDTO;
 import com.example.onlinebookshop.dto.BookVariantDTO;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -47,6 +51,80 @@ public class BookServiceImpl implements BookService {
         return variantRepository.findAllActiveWithBook().stream()
                 .map(this::toDTO)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<BookVariantDTO> findBooks(String keyword, String publisherName, Double minPrice, Double maxPrice) {
+        return variantRepository.findAllActiveWithBook().stream()
+                .filter(v -> matchesKeyword(v, keyword))
+                .filter(v -> matchesPublisher(v, publisherName))
+                .filter(v -> matchesPrice(v, minPrice, maxPrice))
+                .map(this::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    private boolean matchesKeyword(BookVariant v, String keyword) {
+        if (keyword == null || keyword.isBlank()) {
+            return true;
+        }
+        String k = keyword.toLowerCase(Locale.ROOT);
+        String title = v.getBook() != null && v.getBook().getTitle() != null
+                ? v.getBook().getTitle().toLowerCase(Locale.ROOT) : "";
+        String sku = v.getSku() != null ? v.getSku().toLowerCase(Locale.ROOT) : "";
+        return title.contains(k) || sku.contains(k);
+    }
+
+    private boolean matchesPublisher(BookVariant v, String publisherName) {
+        if (publisherName == null || publisherName.isBlank()) {
+            return true;
+        }
+        // books table has no publisher column; treat filter as loose match on title/description
+        String p = publisherName.toLowerCase(Locale.ROOT);
+        if (v.getBook() == null) {
+            return false;
+        }
+        String title = v.getBook().getTitle() != null ? v.getBook().getTitle().toLowerCase(Locale.ROOT) : "";
+        String desc = v.getBook().getShortDescription() != null
+                ? v.getBook().getShortDescription().toLowerCase(Locale.ROOT) : "";
+        return title.contains(p) || desc.contains(p);
+    }
+
+    private boolean matchesPrice(BookVariant v, Double minPrice, Double maxPrice) {
+        BigDecimal price = v.getSalePrice() != null ? v.getSalePrice() : BigDecimal.ZERO;
+        if (minPrice != null && price.compareTo(BigDecimal.valueOf(minPrice)) < 0) {
+            return false;
+        }
+        if (maxPrice != null && price.compareTo(BigDecimal.valueOf(maxPrice)) > 0) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public BookDetailDTO getBookDetail(Long variantId) {
+        BookVariant anchor = variantRepository.findById(variantId)
+                .orElseThrow(() -> new RuntimeException("Book not found"));
+        if (anchor.getDeletedAt() != null || !Boolean.TRUE.equals(anchor.getIsActive())) {
+            throw new RuntimeException("Book not found");
+        }
+        BookInfo book = anchor.getBook();
+        if (book == null || book.getDeletedAt() != null || !"ACTIVE".equalsIgnoreCase(book.getStatus())) {
+            throw new RuntimeException("Book not found");
+        }
+        List<BookVariantDTO> variants = variantRepository.findActiveByBookId(book.getId()).stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
+        return BookDetailDTO.builder()
+                .id(book.getId())
+                .title(book.getTitle())
+                .isbn13(book.getIsbn13())
+                .publisherName(null)
+                .publicationYear(null)
+                .description(book.getShortDescription())
+                .variants(variants)
+                .build();
     }
 
     @Override

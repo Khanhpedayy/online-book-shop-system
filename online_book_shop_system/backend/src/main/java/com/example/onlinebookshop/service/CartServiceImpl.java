@@ -102,6 +102,12 @@ public class CartServiceImpl implements CartService {
 
     @Override
     @Transactional
+    public CartItem updateItemByEmail(String email, Long variantId, UpdateCartItemRequest request) {
+        return updateItem(resolveUserIdByEmail(email), variantId, request);
+    }
+
+    @Override
+    @Transactional
     public void removeItem(Long userId, Long variantId) {
         CartItem item = cartItemRepository.findByUser_IdAndVariant_IdAndCopyId(userId, variantId, null)
                 .orElseThrow(() -> new RuntimeException("Cart item not found for variant: " + variantId));
