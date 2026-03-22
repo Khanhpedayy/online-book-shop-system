@@ -33,14 +33,14 @@ public class ManagerReturnsIntakeController {
 
     @PostMapping("/{id}/scan")
     @Operation(summary = "Scan returned copy", description = "Scan copyCode for returned items")
-    public ResponseEntity<Void> scan(@PathVariable Long id, @RequestBody ScanReturnCopyRequest req) {
+    public ResponseEntity<Void> scan(@PathVariable("id") Long id, @RequestBody ScanReturnCopyRequest req) {
         service.scanCopy(id, req);
         return ResponseEntity.ok().build();
     }
 
     @PutMapping("/{id}/items/{itemId}/condition")
     @Operation(summary = "Record condition", description = "Record the actual condition on return")
-    public ResponseEntity<Void> recordCondition(@PathVariable Long id, @PathVariable Long itemId,
+    public ResponseEntity<Void> recordCondition(@PathVariable("id") Long id, @PathVariable("itemId") Long itemId,
             @RequestBody RecordConditionRequest req) {
         try {
             service.recordCondition(itemId, req);
@@ -52,7 +52,7 @@ public class ManagerReturnsIntakeController {
 
     @PutMapping("/{id}/escalate")
     @Operation(summary = "Escalate to manager", description = "Hand off to manager for restock/reprice/damaged decision")
-    public ResponseEntity<Void> escalate(@PathVariable Long id) {
+    public ResponseEntity<Void> escalate(@PathVariable("id") Long id) {
         try {
             service.escalate(id);
             return ResponseEntity.ok().build();

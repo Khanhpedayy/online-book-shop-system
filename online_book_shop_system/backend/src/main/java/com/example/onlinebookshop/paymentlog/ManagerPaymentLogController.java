@@ -19,13 +19,13 @@ public class ManagerPaymentLogController {
 
     @GetMapping("/api/staff/orders/{orderId}/payments")
     @Operation(summary = "Payment logs by order", description = "View PayOS payment logs/status for an order")
-    public List<PaymentLogDTO> getByOrder(@PathVariable Long orderId) {
+    public List<PaymentLogDTO> getByOrder(@PathVariable("orderId") Long orderId) {
         return service.getByOrderId(orderId);
     }
 
     @PutMapping("/api/staff/payments/{id}/flag")
     @Operation(summary = "Flag mismatch", description = "Flag suspicious payment case")
-    public ResponseEntity<Void> flag(@PathVariable Long id, @RequestBody FlagPaymentRequest req) {
+    public ResponseEntity<Void> flag(@PathVariable("id") Long id, @RequestBody FlagPaymentRequest req) {
         try {
             service.flagPayment(id, req);
             return ResponseEntity.ok().build();
@@ -36,7 +36,7 @@ public class ManagerPaymentLogController {
 
     @PostMapping("/api/staff/payments/{id}/recheck")
     @Operation(summary = "Trigger recheck", description = "Trigger a payment status recheck")
-    public ResponseEntity<Map<String, String>> recheck(@PathVariable Long id) {
+    public ResponseEntity<Map<String, String>> recheck(@PathVariable("id") Long id) {
         try {
             return ResponseEntity.ok(service.recheck(id));
         } catch (RuntimeException e) {

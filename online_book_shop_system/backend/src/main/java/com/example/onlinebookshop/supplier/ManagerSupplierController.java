@@ -30,7 +30,7 @@ public class ManagerSupplierController {
 
     @GetMapping("/{id}")
     @Operation(summary = "Get supplier by ID")
-    public SupplierDTO getById(@PathVariable Long id) {
+    public SupplierDTO getById(@PathVariable("id") Long id) {
         return service.getById(id);
     }
 
@@ -42,13 +42,13 @@ public class ManagerSupplierController {
 
     @PutMapping("/{id}")
     @Operation(summary = "Update supplier")
-    public SupplierDTO update(@PathVariable Long id, @Valid @RequestBody UpdateSupplierRequest req) {
+    public SupplierDTO update(@PathVariable("id") Long id, @Valid @RequestBody UpdateSupplierRequest req) {
         return service.update(id, req);
     }
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Soft delete supplier")
-    public ResponseEntity<Map<String, String>> delete(@PathVariable Long id) {
+    public ResponseEntity<Map<String, String>> delete(@PathVariable("id") Long id) {
         service.delete(id);
         return ResponseEntity.ok(Map.of("message", "Supplier deleted successfully"));
     }

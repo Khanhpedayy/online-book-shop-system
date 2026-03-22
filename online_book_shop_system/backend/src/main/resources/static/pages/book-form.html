@@ -190,604 +190,604 @@
 </head>
 
 <body>
-    <div id="app-layout">
-        <div id="sidebar-slot"></div>
-        <div class="main-area">
-            <div id="header-slot"></div>
-            <main class="content-area p-4">
-                <!-- Page Header -->
-                <div class="d-flex align-items-center gap-3 mb-4">
-                    <a href="books.html" class="btn btn-light btn-sm d-flex align-items-center gap-1">
-                        <i class="bi bi-arrow-left"></i> Quay lại
-                    </a>
-                    <div>
-                        <h2 class="fw-bold mb-0" id="pageTitle">Tạo Sách Mới</h2>
-                        <p class="text-muted mb-0 small" id="pageSubtitle">Điền thông tin chi tiết để thêm sách mới vào
-                            danh mục</p>
-                    </div>
+<div id="app-layout">
+    <div id="sidebar-slot"></div>
+    <div class="main-area">
+        <div id="header-slot"></div>
+        <main class="content-area p-4">
+            <!-- Page Header -->
+            <div class="d-flex align-items-center gap-3 mb-4">
+                <a href="books.html" class="btn btn-light btn-sm d-flex align-items-center gap-1">
+                    <i class="bi bi-arrow-left"></i> Quay lại
+                </a>
+                <div>
+                    <h2 class="fw-bold mb-0" id="pageTitle">Tạo Sách Mới</h2>
+                    <p class="text-muted mb-0 small" id="pageSubtitle">Điền thông tin chi tiết để thêm sách mới vào
+                        danh mục</p>
                 </div>
+            </div>
 
-                <form id="bookForm" novalidate>
-                    <div class="row g-4">
-                        <!-- ========== LEFT COLUMN ========== -->
-                        <div class="col-lg-8">
-                            <!-- Basic Information -->
-                            <div class="card mb-4">
-                                <div class="card-body">
-                                    <div class="section-title">
-                                        <i class="bi bi-book"></i> Thông tin Cơ bản
-                                    </div>
-                                    <div class="row g-3">
-                                        <div class="col-12">
-                                            <label class="form-label">Tiêu đề sách <span
-                                                    class="required">*</span></label>
-                                            <input type="text" class="form-control" id="f_title" required
-                                                placeholder="Nhập tiêu đề sách">
-                                            <div class="invalid-feedback">Tiêu đề là bắt buộc</div>
-                                        </div>
-                                        <div class="col-12">
-                                            <label class="form-label">Phụ đề</label>
-                                            <input type="text" class="form-control" id="f_subtitle"
-                                                placeholder="Phụ đề tùy chọn">
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">Danh mục <span class="required">*</span></label>
-                                            <select class="form-select" id="f_categoryId" required>
-                                                <option value="">-- Chọn danh mục --</option>
-                                            </select>
-                                            <div class="invalid-feedback">Danh mục là bắt buộc</div>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <label class="form-label">Trạng thái</label>
-                                            <select class="form-select" id="f_status">
-                                                <option value="DRAFT">Bản nháp</option>
-                                                <option value="ACTIVE">Hoạt động (Đã XB)</option>
-                                                <option value="HIDDEN">Ẩn</option>
-                                            </select>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <label class="form-label">Chế độ bán</label>
-                                            <select class="form-select" id="f_sellMode">
-                                                <option value="PER_COPY">Theo bản sao</option>
-                                                <option value="PER_QUANTITY">Theo số lượng</option>
-                                            </select>
-                                        </div>
-                                    </div>
+            <form id="bookForm" novalidate>
+                <div class="row g-4">
+                    <!-- ========== LEFT COLUMN ========== -->
+                    <div class="col-lg-8">
+                        <!-- Basic Information -->
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <div class="section-title">
+                                    <i class="bi bi-book"></i> Thông tin Cơ bản
                                 </div>
-                            </div>
-
-                            <!-- Publishing Details -->
-                            <div class="card mb-4">
-                                <div class="card-body">
-                                    <div class="section-title">
-                                        <i class="bi bi-journal-text"></i> Chi tiết Xuất bản
+                                <div class="row g-3">
+                                    <div class="col-12">
+                                        <label class="form-label">Tiêu đề sách <span
+                                                class="required">*</span></label>
+                                        <input type="text" class="form-control" id="f_title" required
+                                               placeholder="Nhập tiêu đề sách">
+                                        <div class="invalid-feedback">Tiêu đề là bắt buộc</div>
                                     </div>
-                                    <div class="row g-3">
-                                        <div class="col-md-4">
-                                            <label class="form-label">ISBN-13</label>
-                                            <input type="text" class="form-control font-monospace" id="f_isbn13"
-                                                placeholder="978-xxx-xxx-xxx-x" maxlength="17">
-                                        </div>
-                                        <div class="col-md-4">
-                                            <label class="form-label">ISBN-10</label>
-                                            <input type="text" class="form-control font-monospace" id="f_isbn10"
-                                                placeholder="Tùy chọn" maxlength="13">
-                                        </div>
-                                        <div class="col-md-4">
-                                            <label class="form-label">Ngôn ngữ</label>
-                                            <select class="form-select" id="f_language">
-                                                <option value="vi">Tiếng Việt</option>
-                                                <option value="en">Tiếng Anh</option>
-                                                <option value="ja">Tiếng Nhật</option>
-                                                <option value="ko">Tiếng Hàn</option>
-                                                <option value="zh">Tiếng Trung</option>
-                                                <option value="fr">Tiếng Pháp</option>
-                                            </select>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">Nhà Xuất bản</label>
-                                            <input type="text" class="form-control" id="f_publisherName"
-                                                placeholder="Tên nhà xuất bản">
-                                        </div>
-                                        <div class="col-md-3">
-                                            <label class="form-label">Năm xuất bản</label>
-                                            <input type="number" class="form-control" id="f_publicationYear" min="1800"
-                                                max="2030" placeholder="2024">
-                                        </div>
+                                    <div class="col-12">
+                                        <label class="form-label">Phụ đề</label>
+                                        <input type="text" class="form-control" id="f_subtitle"
+                                               placeholder="Phụ đề tùy chọn">
                                     </div>
-                                </div>
-                            </div>
-
-                            <!-- Short Description -->
-                            <div class="card mb-4">
-                                <div class="card-body">
-                                    <div class="section-title">
-                                        <i class="bi bi-text-left"></i> Mô tả ngắn
+                                    <div class="col-md-6">
+                                        <label class="form-label">Danh mục <span class="required">*</span></label>
+                                        <select class="form-select" id="f_categoryId" required>
+                                            <option value="">-- Chọn danh mục --</option>
+                                        </select>
+                                        <div class="invalid-feedback">Danh mục là bắt buộc</div>
                                     </div>
-                                    <textarea class="form-control" id="f_shortDescription" rows="3" maxlength="500"
-                                        placeholder="Mô tả tóm tắt cho thẻ/danh sách (văn bản thuần)"
-                                        oninput="updateCharCount()"></textarea>
-                                    <div class="form-text text-end"><span id="charCount">0</span>/500</div>
-                                </div>
-                            </div>
-
-                            <!-- Full Description (Rich Text Editor) -->
-                            <div class="card mb-4">
-                                <div class="card-body">
-                                    <div class="section-title">
-                                        <i class="bi bi-file-richtext"></i> Mô tả chi tiết
+                                    <div class="col-md-3">
+                                        <label class="form-label">Trạng thái</label>
+                                        <select class="form-select" id="f_status">
+                                            <option value="DRAFT">Bản nháp</option>
+                                            <option value="ACTIVE">Hoạt động (Đã XB)</option>
+                                            <option value="HIDDEN">Ẩn</option>
+                                        </select>
                                     </div>
-                                    <p class="text-muted small mb-3">
-                                        Sử dụng thanh công cụ để định dạng văn bản: <strong>In đậm</strong>, <em>In
-                                            nghiêng</em>,
-                                        tiêu đề, danh sách, liên kết, v.v.
-                                    </p>
-                                    <div id="quillEditor"></div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Chế độ bán</label>
+                                        <select class="form-select" id="f_sellMode">
+                                            <option value="PER_COPY">Theo bản sao</option>
+                                            <option value="PER_QUANTITY">Theo số lượng</option>
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- ========== RIGHT COLUMN ========== -->
-                        <div class="col-lg-4">
-                            <!-- Images -->
-                            <div class="card mb-4">
-                                <div class="card-body">
-                                    <div class="section-title">
-                                        <i class="bi bi-images"></i> Hình ảnh Sách
+                        <!-- Publishing Details -->
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <div class="section-title">
+                                    <i class="bi bi-journal-text"></i> Chi tiết Xuất bản
+                                </div>
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <label class="form-label">ISBN-13</label>
+                                        <input type="text" class="form-control font-monospace" id="f_isbn13"
+                                               placeholder="978-xxx-xxx-xxx-x" maxlength="17">
                                     </div>
-                                    <p class="text-muted small mb-3">
-                                        Tải ảnh lên cho sách này. Bấm vào ảnh để xem trước.
-                                        Ảnh đầu tiên sẽ là ảnh bìa mặc định.
-                                    </p>
-
-                                    <!-- Upload Zone -->
-                                    <div class="upload-zone mb-3" id="uploadZone"
-                                        onclick="document.getElementById('fileInput').click()">
-                                        <i class="bi bi-cloud-arrow-up d-block mb-2"></i>
-                                        <div class="fw-semibold text-secondary">Kéo thả ảnh vào đây hoặc bấm để tải lên
-                                        </div>
-                                        <div class="text-muted small mt-1">JPG, PNG, WebP, GIF — Tối đa 5MB mỗi ảnh
-                                        </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">ISBN-10</label>
+                                        <input type="text" class="form-control font-monospace" id="f_isbn10"
+                                               placeholder="Tùy chọn" maxlength="13">
                                     </div>
-                                    <input type="file" id="fileInput" multiple accept="image/*" style="display:none"
-                                        onchange="handleFileSelect(event)">
+                                    <div class="col-md-4">
+                                        <label class="form-label">Ngôn ngữ</label>
+                                        <select class="form-select" id="f_language">
+                                            <option value="vi">Tiếng Việt</option>
+                                            <option value="en">Tiếng Anh</option>
+                                            <option value="ja">Tiếng Nhật</option>
+                                            <option value="ko">Tiếng Hàn</option>
+                                            <option value="zh">Tiếng Trung</option>
+                                            <option value="fr">Tiếng Pháp</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Nhà Xuất bản</label>
+                                        <input type="text" class="form-control" id="f_publisherName"
+                                               placeholder="Tên nhà xuất bản">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Năm xuất bản</label>
+                                        <input type="number" class="form-control" id="f_publicationYear" min="1800"
+                                               max="2030" placeholder="2024">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
-                                    <!-- Image Gallery -->
-                                    <div class="row g-2" id="imageGallery"></div>
+                        <!-- Short Description -->
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <div class="section-title">
+                                    <i class="bi bi-text-left"></i> Mô tả ngắn
+                                </div>
+                                <textarea class="form-control" id="f_shortDescription" rows="3" maxlength="500"
+                                          placeholder="Mô tả tóm tắt cho thẻ/danh sách (văn bản thuần)"
+                                          oninput="updateCharCount()"></textarea>
+                                <div class="form-text text-end"><span id="charCount">0</span>/500</div>
+                            </div>
+                        </div>
 
-                                    <div class="text-muted small mt-2" id="imageCount">Chưa có ảnh nào</div>
+                        <!-- Full Description (Rich Text Editor) -->
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <div class="section-title">
+                                    <i class="bi bi-file-richtext"></i> Mô tả chi tiết
+                                </div>
+                                <p class="text-muted small mb-3">
+                                    Sử dụng thanh công cụ để định dạng văn bản: <strong>In đậm</strong>, <em>In
+                                    nghiêng</em>,
+                                    tiêu đề, danh sách, liên kết, v.v.
+                                </p>
+                                <div id="quillEditor"></div>
+                            </div>
+                        </div>
+                    </div>
 
-                                    <!-- URL Input fallback -->
-                                    <hr class="my-3">
-                                    <label class="form-label">Hoặc thêm ảnh bằng URL</label>
-                                    <div class="input-group">
-                                        <input type="url" class="form-control form-control-sm" id="imageUrlInput"
-                                            placeholder="https://example.com/image.jpg">
-                                        <button type="button" class="btn btn-outline-secondary btn-sm"
+                    <!-- ========== RIGHT COLUMN ========== -->
+                    <div class="col-lg-4">
+                        <!-- Images -->
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <div class="section-title">
+                                    <i class="bi bi-images"></i> Hình ảnh Sách
+                                </div>
+                                <p class="text-muted small mb-3">
+                                    Tải ảnh lên cho sách này. Bấm vào ảnh để xem trước.
+                                    Ảnh đầu tiên sẽ là ảnh bìa mặc định.
+                                </p>
+
+                                <!-- Upload Zone -->
+                                <div class="upload-zone mb-3" id="uploadZone"
+                                     onclick="document.getElementById('fileInput').click()">
+                                    <i class="bi bi-cloud-arrow-up d-block mb-2"></i>
+                                    <div class="fw-semibold text-secondary">Kéo thả ảnh vào đây hoặc bấm để tải lên
+                                    </div>
+                                    <div class="text-muted small mt-1">JPG, PNG, WebP, GIF — Tối đa 5MB mỗi ảnh
+                                    </div>
+                                </div>
+                                <input type="file" id="fileInput" multiple accept="image/*" style="display:none"
+                                       onchange="handleFileSelect(event)">
+
+                                <!-- Image Gallery -->
+                                <div class="row g-2" id="imageGallery"></div>
+
+                                <div class="text-muted small mt-2" id="imageCount">Chưa có ảnh nào</div>
+
+                                <!-- URL Input fallback -->
+                                <hr class="my-3">
+                                <label class="form-label">Hoặc thêm ảnh bằng URL</label>
+                                <div class="input-group">
+                                    <input type="url" class="form-control form-control-sm" id="imageUrlInput"
+                                           placeholder="https://example.com/image.jpg">
+                                    <button type="button" class="btn btn-outline-secondary btn-sm"
                                             onclick="addImageByUrl()">
-                                            <i class="bi bi-plus-lg"></i> Thêm
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Tags -->
-                            <div class="card mb-4">
-                                <div class="card-body">
-                                    <div class="section-title">
-                                        <i class="bi bi-tags"></i> Thẻ (Tags)
-                                    </div>
-                                    <div id="tagsList" class="d-flex flex-wrap gap-2 mb-2"></div>
-                                    <div class="input-group">
-                                        <input type="text" class="form-control form-control-sm" id="tagInput"
-                                            placeholder="Nhập thẻ và nhấn Enter"
-                                            onkeydown="if(event.key==='Enter'){event.preventDefault();addTag()}">
-                                        <button type="button" class="btn btn-outline-secondary btn-sm"
-                                            onclick="addTag()">
-                                            <i class="bi bi-plus-lg"></i>
-                                        </button>
-                                    </div>
+                                        <i class="bi bi-plus-lg"></i> Thêm
+                                    </button>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Sticky Save Bar -->
-                    <div class="save-bar">
-                        <a href="books.html" class="btn btn-secondary d-flex align-items-center gap-2">
-                            <i class="bi bi-x-lg"></i> Hủy
-                        </a>
-                        <button type="button" class="btn btn-primary btn-lg d-flex align-items-center gap-2"
-                            onclick="saveBook()" id="btnSave">
-                            <i class="bi bi-floppy"></i> <span id="btnSaveText">Tạo Sách</span>
-                        </button>
-                    </div>
-                </form>
-            </main>
-        </div>
-    </div>
-
-    <!-- Lightbox -->
-    <div id="lightbox" class="lightbox" style="display:none" onclick="closeLightbox()">
-        <button class="close-btn" onclick="closeLightbox()"><i class="bi bi-x-lg"></i></button>
-        <img id="lightboxImg" src="" alt="Xem trước">
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
-    <script src="../js/api.js"></script>
-    <script src="../js/utils.js"></script>
-    <script src="../js/layout.js"></script>
-    <script>
-        /* ========== STATE ========== */
-        let editingId = null;
-        let categories = [];
-        let images = []; // { url, isCover, altText, sortOrder, uploading? }
-        let tags = [];
-        let quill = null;
-
-        /* ========== INIT ========== */
-        async function init() {
-            // Init Quill rich text editor
-            quill = new Quill('#quillEditor', {
-                theme: 'snow',
-                placeholder: 'Viết mô tả chi tiết của sách tại đây...',
-                modules: {
-                    toolbar: [
-                        [{ 'header': [1, 2, 3, false] }],
-                        ['bold', 'italic', 'underline', 'strike'],
-                        [{ 'color': [] }, { 'background': [] }],
-                        [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-                        ['blockquote', 'code-block'],
-                        ['link', 'image'],
-                        [{ 'align': [] }],
-                        ['clean']
-                    ]
-                }
-            });
-
-            // Load categories
-            try {
-                categories = await api.get('/management/books/lookup/categories');
-            } catch (e) { categories = []; }
-            populateCategories();
-
-            // Check if editing
-            const params = new URLSearchParams(window.location.search);
-            const id = params.get('id');
-            if (id) {
-                editingId = id;
-                document.getElementById('pageTitle').textContent = 'Chỉnh sửa Sách';
-                document.getElementById('pageSubtitle').textContent = 'Cập nhật thông tin chi tiết dưới đây';
-                document.getElementById('btnSaveText').textContent = 'Cập nhật Sách';
-                await loadBook(id);
-            }
-
-            // Setup drag & drop
-            setupDragDrop();
-        }
-
-        function populateCategories() {
-            const sel = document.getElementById('f_categoryId');
-            sel.innerHTML = '<option value="">-- Chọn danh mục --</option>';
-            (categories || []).forEach(c => {
-                sel.innerHTML += `<option value="${c.id}">${c.name}</option>`;
-            });
-        }
-
-        async function loadBook(id) {
-            try {
-                const book = await api.get(`/management/books/${id}`);
-                document.getElementById('f_title').value = book.title || '';
-                document.getElementById('f_subtitle').value = book.subtitle || '';
-                document.getElementById('f_isbn13').value = book.isbn13 || '';
-                document.getElementById('f_isbn10').value = book.isbn10 || '';
-                document.getElementById('f_categoryId').value = book.categoryId || '';
-                document.getElementById('f_publisherName').value = book.publisherName || '';
-                document.getElementById('f_publicationYear').value = book.publicationYear || '';
-                document.getElementById('f_language').value = book.language || 'vi';
-                document.getElementById('f_status').value = book.status || 'DRAFT';
-                document.getElementById('f_sellMode').value = book.sellMode || 'PER_COPY';
-                document.getElementById('f_shortDescription').value = book.shortDescription || '';
-                updateCharCount();
-
-                // Load description into Quill
-                if (book.descriptionHtml) {
-                    quill.root.innerHTML = book.descriptionHtml;
-                }
-
-                // Load images
-                if (book.images && book.images.length > 0) {
-                    images = book.images.map((img, idx) => ({
-                        url: img.url,
-                        isCover: img.isCover || false,
-                        altText: img.altText || '',
-                        sortOrder: img.sortOrder || idx
-                    }));
-                    // Ensure at least one cover
-                    if (!images.some(i => i.isCover) && images.length > 0) {
-                        images[0].isCover = true;
-                    }
-                    renderImageGallery();
-                }
-
-                // Load tags
-                try {
-                    const t = JSON.parse(book.tagsJson || '[]');
-                    if (Array.isArray(t)) { tags = t; renderTags(); }
-                } catch { }
-
-            } catch (e) {
-                showToast('Không tải được dữ liệu sách', 'danger');
-            }
-        }
-
-        /* ========== RICH TEXT ========== */
-        function getDescriptionHtml() {
-            if (!quill) return '';
-            const html = quill.root.innerHTML;
-            // Return empty if only whitespace/empty tags
-            return html === '<p><br></p>' ? '' : html;
-        }
-
-        /* ========== CHAR COUNT ========== */
-        function updateCharCount() {
-            document.getElementById('charCount').textContent =
-                document.getElementById('f_shortDescription').value.length;
-        }
-
-        /* ========== TAGS ========== */
-        function addTag() {
-            const input = document.getElementById('tagInput');
-            const tag = input.value.trim();
-            if (tag && !tags.includes(tag)) {
-                tags.push(tag);
-                renderTags();
-            }
-            input.value = '';
-        }
-
-        function removeTag(idx) {
-            tags.splice(idx, 1);
-            renderTags();
-        }
-
-        function renderTags() {
-            document.getElementById('tagsList').innerHTML = tags.map((t, i) =>
-                `<span class="badge bg-primary d-flex align-items-center gap-1">
-                    ${t}
-                    <i class="bi bi-x" style="cursor:pointer" onclick="removeTag(${i})"></i>
-                </span>`
-            ).join('');
-        }
-
-        /* ========== IMAGE UPLOAD ========== */
-        function setupDragDrop() {
-            const zone = document.getElementById('uploadZone');
-            ['dragenter', 'dragover'].forEach(evt => {
-                zone.addEventListener(evt, e => { e.preventDefault(); zone.classList.add('dragover'); });
-            });
-            ['dragleave', 'drop'].forEach(evt => {
-                zone.addEventListener(evt, e => { e.preventDefault(); zone.classList.remove('dragover'); });
-            });
-            zone.addEventListener('drop', e => {
-                const files = e.dataTransfer.files;
-                if (files.length) uploadFiles(files);
-            });
-        }
-
-        function handleFileSelect(e) {
-            const files = e.target.files;
-            if (files.length) uploadFiles(files);
-            e.target.value = ''; // reset so same file can be re-selected
-        }
-
-        async function uploadFiles(files) {
-            for (const file of files) {
-                if (file.size > 5 * 1024 * 1024) {
-                    showToast(`${file.name} vượt quá giới hạn 5MB`, 'warning');
-                    continue;
-                }
-                if (!file.type.startsWith('image/')) {
-                    showToast(`${file.name} không phải là hình ảnh`, 'warning');
-                    continue;
-                }
-
-                // Add placeholder with local preview
-                const localUrl = URL.createObjectURL(file);
-                const imgObj = {
-                    url: localUrl,
-                    isCover: images.length === 0,
-                    altText: file.name,
-                    sortOrder: images.length,
-                    uploading: true
-                };
-                images.push(imgObj);
-                renderImageGallery();
-
-                try {
-                    const formData = new FormData();
-                    formData.append('file', file);
-                    const resp = await fetch('/api/upload/image', {
-                        method: 'POST',
-                        body: formData,
-                        credentials: 'include'
-                    });
-                    if (!resp.ok) throw new Error('Upload failed');
-                    const data = await resp.json();
-                    imgObj.url = data.url;
-                    imgObj.uploading = false;
-                    URL.revokeObjectURL(localUrl);
-                    renderImageGallery();
-                } catch (e) {
-                    showToast(`Tải lên thất bại ${file.name}`, 'danger');
-                    images = images.filter(i => i !== imgObj);
-                    URL.revokeObjectURL(localUrl);
-                    renderImageGallery();
-                }
-            }
-        }
-
-        function addImageByUrl() {
-            const input = document.getElementById('imageUrlInput');
-            const url = input.value.trim();
-            if (!url) return;
-            if (url.startsWith('data:')) {
-                showToast('Định dạng Base64 (data URI) không được hỗ trợ', 'warning');
-                return;
-            }
-            images.push({
-                url: url,
-                isCover: images.length === 0,
-                altText: '',
-                sortOrder: images.length
-            });
-            renderImageGallery();
-            input.value = '';
-        }
-
-        function setCover(idx) {
-            images.forEach((img, i) => img.isCover = (i === idx));
-            renderImageGallery();
-        }
-
-        function removeImage(idx) {
-            const wasCover = images[idx].isCover;
-            images.splice(idx, 1);
-            if (wasCover && images.length > 0) images[0].isCover = true;
-            renderImageGallery();
-        }
-
-        function openLightbox(url) {
-            document.getElementById('lightboxImg').src = url;
-            document.getElementById('lightbox').style.display = 'flex';
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeLightbox() {
-            document.getElementById('lightbox').style.display = 'none';
-            document.body.style.overflow = '';
-        }
-
-        function renderImageGallery() {
-            const gallery = document.getElementById('imageGallery');
-            const countEl = document.getElementById('imageCount');
-
-            if (images.length === 0) {
-                gallery.innerHTML = '';
-                countEl.textContent = 'Chưa có ảnh nào';
-                return;
-            }
-
-            countEl.textContent = `${images.length} hình ảnh — bấm vào để xem trước, ảnh đầu là ảnh bìa`;
-
-            gallery.innerHTML = images.map((img, idx) => `
-                <div class="col-6 col-md-4">
-                    <div class="image-item ${img.isCover ? 'is-cover' : ''}">
-                        ${img.isCover ? '<div class="cover-badge"><i class="bi bi-star-fill me-1"></i>Ảnh bìa</div>' : ''}
-                        <img src="${img.url}" alt="${img.altText || ''}" loading="lazy"
-                             onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2280%22 height=%2280%22><rect fill=%22%23f1f5f9%22 width=%2280%22 height=%2280%22/><text x=%2240%22 y=%2244%22 text-anchor=%22middle%22 fill=%22%2394a3b8%22 font-size=%2212%22>Lỗi</text></svg>'">
-                        ${img.uploading ? '<div class="uploading-spinner"><div class="spinner-border spinner-border-sm text-primary"></div></div>' : ''}
-                        <div class="overlay">
-                            <button type="button" class="btn btn-sm btn-light" onclick="event.stopPropagation();openLightbox('${img.url}')" title="Xem trước">
-                                <i class="bi bi-eye"></i>
-                            </button>
-                            ${!img.isCover ? `<button type="button" class="btn btn-sm btn-primary" onclick="event.stopPropagation();setCover(${idx})" title="Đặt làm bìa">
-                                <i class="bi bi-star"></i>
-                            </button>` : ''}
-                            <button type="button" class="btn btn-sm btn-danger" onclick="event.stopPropagation();removeImage(${idx})" title="Gỡ bỏ">
-                                <i class="bi bi-trash"></i>
-                            </button>
+                        <!-- Tags -->
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <div class="section-title">
+                                    <i class="bi bi-tags"></i> Thẻ (Tags)
+                                </div>
+                                <div id="tagsList" class="d-flex flex-wrap gap-2 mb-2"></div>
+                                <div class="input-group">
+                                    <input type="text" class="form-control form-control-sm" id="tagInput"
+                                           placeholder="Nhập thẻ và nhấn Enter"
+                                           onkeydown="if(event.key==='Enter'){event.preventDefault();addTag()}">
+                                    <button type="button" class="btn btn-outline-secondary btn-sm"
+                                            onclick="addTag()">
+                                        <i class="bi bi-plus-lg"></i>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            `).join('');
-        }
 
-        /* ========== SAVE ========== */
-        async function saveBook() {
-            const form = document.getElementById('bookForm');
-            if (!form.checkValidity()) {
-                form.classList.add('was-validated');
-                showToast('Vui lòng kiểm tra các trường bắt buộc', 'warning');
-                // Scroll to first invalid field
-                const firstInvalid = form.querySelector(':invalid');
-                if (firstInvalid) firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                return;
-            }
+                <!-- Sticky Save Bar -->
+                <div class="save-bar">
+                    <a href="books.html" class="btn btn-secondary d-flex align-items-center gap-2">
+                        <i class="bi bi-x-lg"></i> Hủy
+                    </a>
+                    <button type="button" class="btn btn-primary btn-lg d-flex align-items-center gap-2"
+                            onclick="saveBook()" id="btnSave">
+                        <i class="bi bi-floppy"></i> <span id="btnSaveText">Tạo Sách</span>
+                    </button>
+                </div>
+            </form>
+        </main>
+    </div>
+</div>
 
-            // Check if any images still uploading
-            if (images.some(i => i.uploading)) {
-                showToast('Vui lòng đợi ảnh tải lên hoàn tất', 'warning');
-                return;
-            }
+<!-- Lightbox -->
+<div id="lightbox" class="lightbox" style="display:none" onclick="closeLightbox()">
+    <button class="close-btn" onclick="closeLightbox()"><i class="bi bi-x-lg"></i></button>
+    <img id="lightboxImg" src="" alt="Xem trước">
+</div>
 
-            const btn = document.getElementById('btnSave');
-            btn.disabled = true;
-            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Đang lưu...';
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
+<script src="../js/api.js"></script>
+<script src="../js/utils.js"></script>
+<script src="../js/layout.js"></script>
+<script>
+    /* ========== STATE ========== */
+    let editingId = null;
+    let categories = [];
+    let images = []; // { url, isCover, altText, sortOrder, uploading? }
+    let tags = [];
+    let quill = null;
 
-            // Build image list (filter out blob: URLs)
-            const imageList = images
-                .filter(i => !i.url.startsWith('blob:'))
-                .map((img, idx) => ({
-                    url: img.url,
-                    isCover: img.isCover,
-                    altText: img.altText || document.getElementById('f_title').value,
-                    sortOrder: idx
-                }));
-
-            const payload = {
-                title: document.getElementById('f_title').value.trim(),
-                subtitle: document.getElementById('f_subtitle').value.trim() || null,
-                isbn13: document.getElementById('f_isbn13').value.trim() || null,
-                isbn10: document.getElementById('f_isbn10').value.trim() || null,
-                categoryId: parseInt(document.getElementById('f_categoryId').value) || null,
-                publisherName: document.getElementById('f_publisherName').value.trim() || null,
-                publicationYear: parseInt(document.getElementById('f_publicationYear').value) || null,
-                language: document.getElementById('f_language').value,
-                status: document.getElementById('f_status').value,
-                sellMode: document.getElementById('f_sellMode').value,
-                shortDescription: document.getElementById('f_shortDescription').value.trim() || null,
-                descriptionHtml: getDescriptionHtml() || null,
-                tagsJson: tags.length > 0 ? JSON.stringify(tags) : null,
-                images: imageList.length > 0 ? imageList : undefined,
-            };
-
-            try {
-                if (editingId) {
-                    await api.put(`/management/books/${editingId}`, payload);
-                    showToast('Cập nhật sách thành công!', 'success');
-                } else {
-                    const result = await api.post('/management/books', payload);
-                    showToast('Tạo sách mới thành công!', 'success');
-                    editingId = result.id;
-                }
-                // Redirect to detail page after short delay
-                setTimeout(() => {
-                    window.location.href = editingId
-                        ? `book-detail.html?id=${editingId}`
-                        : 'books.html';
-                }, 800);
-            } catch (e) {
-                showToast('Lỗi: ' + (e.message || 'Lưu sách thất bại'), 'danger');
-                btn.disabled = false;
-                btn.innerHTML = `<i class="bi bi-floppy"></i> <span>${editingId ? 'Cập nhật' : 'Tạo'} Sách</span>`;
-            }
-        }
-
-        /* ========== KEYBOARD SHORTCUTS ========== */
-        document.addEventListener('keydown', e => {
-            // Escape closes lightbox
-            if (e.key === 'Escape') closeLightbox();
-            // Ctrl+S saves
-            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
-                e.preventDefault();
-                saveBook();
+    /* ========== INIT ========== */
+    async function init() {
+        // Init Quill rich text editor
+        quill = new Quill('#quillEditor', {
+            theme: 'snow',
+            placeholder: 'Viết mô tả chi tiết của sách tại đây...',
+            modules: {
+                toolbar: [
+                    [{ 'header': [1, 2, 3, false] }],
+                    ['bold', 'italic', 'underline', 'strike'],
+                    [{ 'color': [] }, { 'background': [] }],
+                    [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                    ['blockquote', 'code-block'],
+                    ['link', 'image'],
+                    [{ 'align': [] }],
+                    ['clean']
+                ]
             }
         });
 
-        document.addEventListener('DOMContentLoaded', init);
-    </script>
+        // Load categories
+        try {
+            categories = await api.get('/management/books/lookup/categories');
+        } catch (e) { categories = []; }
+        populateCategories();
+
+        // Check if editing
+        const params = new URLSearchParams(window.location.search);
+        const id = params.get('id');
+        if (id) {
+            editingId = id;
+            document.getElementById('pageTitle').textContent = 'Chỉnh sửa Sách';
+            document.getElementById('pageSubtitle').textContent = 'Cập nhật thông tin chi tiết dưới đây';
+            document.getElementById('btnSaveText').textContent = 'Cập nhật Sách';
+            await loadBook(id);
+        }
+
+        // Setup drag & drop
+        setupDragDrop();
+    }
+
+    function populateCategories() {
+        const sel = document.getElementById('f_categoryId');
+        sel.innerHTML = '<option value="">-- Chọn danh mục --</option>';
+        (categories || []).forEach(c => {
+            sel.innerHTML += `<option value="${c.id}">${c.name}</option>`;
+        });
+    }
+
+    async function loadBook(id) {
+        try {
+            const book = await api.get(`/management/books/${id}`);
+            document.getElementById('f_title').value = book.title || '';
+            document.getElementById('f_subtitle').value = book.subtitle || '';
+            document.getElementById('f_isbn13').value = book.isbn13 || '';
+            document.getElementById('f_isbn10').value = book.isbn10 || '';
+            document.getElementById('f_categoryId').value = book.categoryId || '';
+            document.getElementById('f_publisherName').value = book.publisherName || '';
+            document.getElementById('f_publicationYear').value = book.publicationYear || '';
+            document.getElementById('f_language').value = book.language || 'vi';
+            document.getElementById('f_status').value = book.status || 'DRAFT';
+            document.getElementById('f_sellMode').value = book.sellMode || 'PER_COPY';
+            document.getElementById('f_shortDescription').value = book.shortDescription || '';
+            updateCharCount();
+
+            // Load description into Quill
+            if (book.descriptionHtml) {
+                quill.root.innerHTML = book.descriptionHtml;
+            }
+
+            // Load images
+            if (book.images && book.images.length > 0) {
+                images = book.images.map((img, idx) => ({
+                    url: img.url,
+                    isCover: img.isCover || false,
+                    altText: img.altText || '',
+                    sortOrder: img.sortOrder || idx
+                }));
+                // Ensure at least one cover
+                if (!images.some(i => i.isCover) && images.length > 0) {
+                    images[0].isCover = true;
+                }
+                renderImageGallery();
+            }
+
+            // Load tags
+            try {
+                const t = JSON.parse(book.tagsJson || '[]');
+                if (Array.isArray(t)) { tags = t; renderTags(); }
+            } catch { }
+
+        } catch (e) {
+            showToast('Không tải được dữ liệu sách', 'danger');
+        }
+    }
+
+    /* ========== RICH TEXT ========== */
+    function getDescriptionHtml() {
+        if (!quill) return '';
+        const html = quill.root.innerHTML;
+        // Return empty if only whitespace/empty tags
+        return html === '<p><br></p>' ? '' : html;
+    }
+
+    /* ========== CHAR COUNT ========== */
+    function updateCharCount() {
+        document.getElementById('charCount').textContent =
+            document.getElementById('f_shortDescription').value.length;
+    }
+
+    /* ========== TAGS ========== */
+    function addTag() {
+        const input = document.getElementById('tagInput');
+        const tag = input.value.trim();
+        if (tag && !tags.includes(tag)) {
+            tags.push(tag);
+            renderTags();
+        }
+        input.value = '';
+    }
+
+    function removeTag(idx) {
+        tags.splice(idx, 1);
+        renderTags();
+    }
+
+    function renderTags() {
+        document.getElementById('tagsList').innerHTML = tags.map((t, i) =>
+            `<span class="badge bg-primary d-flex align-items-center gap-1">
+                ${t}
+                <i class="bi bi-x" style="cursor:pointer" onclick="removeTag(${i})"></i>
+            </span>`
+        ).join('');
+    }
+
+    /* ========== IMAGE UPLOAD ========== */
+    function setupDragDrop() {
+        const zone = document.getElementById('uploadZone');
+        ['dragenter', 'dragover'].forEach(evt => {
+            zone.addEventListener(evt, e => { e.preventDefault(); zone.classList.add('dragover'); });
+        });
+        ['dragleave', 'drop'].forEach(evt => {
+            zone.addEventListener(evt, e => { e.preventDefault(); zone.classList.remove('dragover'); });
+        });
+        zone.addEventListener('drop', e => {
+            const files = e.dataTransfer.files;
+            if (files.length) uploadFiles(files);
+        });
+    }
+
+    function handleFileSelect(e) {
+        const files = e.target.files;
+        if (files.length) uploadFiles(files);
+        e.target.value = ''; // reset so same file can be re-selected
+    }
+
+    async function uploadFiles(files) {
+        for (const file of files) {
+            if (file.size > 5 * 1024 * 1024) {
+                showToast(`${file.name} vượt quá giới hạn 5MB`, 'warning');
+                continue;
+            }
+            if (!file.type.startsWith('image/')) {
+                showToast(`${file.name} không phải là hình ảnh`, 'warning');
+                continue;
+            }
+
+            // Add placeholder with local preview
+            const localUrl = URL.createObjectURL(file);
+            const imgObj = {
+                url: localUrl,
+                isCover: images.length === 0,
+                altText: file.name,
+                sortOrder: images.length,
+                uploading: true
+            };
+            images.push(imgObj);
+            renderImageGallery();
+
+            try {
+                const formData = new FormData();
+                formData.append('file', file);
+                const resp = await fetch('/api/upload/image', {
+                    method: 'POST',
+                    body: formData,
+                    credentials: 'include'
+                });
+                if (!resp.ok) throw new Error('Upload failed');
+                const data = await resp.json();
+                imgObj.url = data.url;
+                imgObj.uploading = false;
+                URL.revokeObjectURL(localUrl);
+                renderImageGallery();
+            } catch (e) {
+                showToast(`Tải lên thất bại ${file.name}`, 'danger');
+                images = images.filter(i => i !== imgObj);
+                URL.revokeObjectURL(localUrl);
+                renderImageGallery();
+            }
+        }
+    }
+
+    function addImageByUrl() {
+        const input = document.getElementById('imageUrlInput');
+        const url = input.value.trim();
+        if (!url) return;
+        if (url.startsWith('data:')) {
+            showToast('Định dạng Base64 (data URI) không được hỗ trợ', 'warning');
+            return;
+        }
+        images.push({
+            url: url,
+            isCover: images.length === 0,
+            altText: '',
+            sortOrder: images.length
+        });
+        renderImageGallery();
+        input.value = '';
+    }
+
+    function setCover(idx) {
+        images.forEach((img, i) => img.isCover = (i === idx));
+        renderImageGallery();
+    }
+
+    function removeImage(idx) {
+        const wasCover = images[idx].isCover;
+        images.splice(idx, 1);
+        if (wasCover && images.length > 0) images[0].isCover = true;
+        renderImageGallery();
+    }
+
+    function openLightbox(url) {
+        document.getElementById('lightboxImg').src = url;
+        document.getElementById('lightbox').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeLightbox() {
+        document.getElementById('lightbox').style.display = 'none';
+        document.body.style.overflow = '';
+    }
+
+    function renderImageGallery() {
+        const gallery = document.getElementById('imageGallery');
+        const countEl = document.getElementById('imageCount');
+
+        if (images.length === 0) {
+            gallery.innerHTML = '';
+            countEl.textContent = 'Chưa có ảnh nào';
+            return;
+        }
+
+        countEl.textContent = `${images.length} hình ảnh — bấm vào để xem trước, ảnh đầu là ảnh bìa`;
+
+        gallery.innerHTML = images.map((img, idx) => `
+            <div class="col-6 col-md-4">
+                <div class="image-item ${img.isCover ? 'is-cover' : ''}">
+                    ${img.isCover ? '<div class="cover-badge"><i class="bi bi-star-fill me-1"></i>Ảnh bìa</div>' : ''}
+                    <img src="${img.url}" alt="${img.altText || ''}" loading="lazy"
+                         onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2280%22 height=%2280%22><rect fill=%22%23f1f5f9%22 width=%2280%22 height=%2280%22/><text x=%2240%22 y=%2244%22 text-anchor=%22middle%22 fill=%22%2394a3b8%22 font-size=%2212%22>Lỗi</text></svg>'">
+                    ${img.uploading ? '<div class="uploading-spinner"><div class="spinner-border spinner-border-sm text-primary"></div></div>' : ''}
+                    <div class="overlay">
+                        <button type="button" class="btn btn-sm btn-light" onclick="event.stopPropagation();openLightbox('${img.url}')" title="Xem trước">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                        ${!img.isCover ? `<button type="button" class="btn btn-sm btn-primary" onclick="event.stopPropagation();setCover(${idx})" title="Đặt làm bìa">
+                            <i class="bi bi-star"></i>
+                        </button>` : ''}
+                        <button type="button" class="btn btn-sm btn-danger" onclick="event.stopPropagation();removeImage(${idx})" title="Gỡ bỏ">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    /* ========== SAVE ========== */
+    async function saveBook() {
+        const form = document.getElementById('bookForm');
+        if (!form.checkValidity()) {
+            form.classList.add('was-validated');
+            showToast('Vui lòng kiểm tra các trường bắt buộc', 'warning');
+            // Scroll to first invalid field
+            const firstInvalid = form.querySelector(':invalid');
+            if (firstInvalid) firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return;
+        }
+
+        // Check if any images still uploading
+        if (images.some(i => i.uploading)) {
+            showToast('Vui lòng đợi ảnh tải lên hoàn tất', 'warning');
+            return;
+        }
+
+        const btn = document.getElementById('btnSave');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Đang lưu...';
+
+        // Build image list (filter out blob: URLs)
+        const imageList = images
+            .filter(i => !i.url.startsWith('blob:'))
+            .map((img, idx) => ({
+                url: img.url,
+                isCover: img.isCover,
+                altText: img.altText || document.getElementById('f_title').value,
+                sortOrder: idx
+            }));
+
+        const payload = {
+            title: document.getElementById('f_title').value.trim(),
+            subtitle: document.getElementById('f_subtitle').value.trim() || null,
+            isbn13: document.getElementById('f_isbn13').value.trim() || null,
+            isbn10: document.getElementById('f_isbn10').value.trim() || null,
+            categoryId: parseInt(document.getElementById('f_categoryId').value) || null,
+            publisherName: document.getElementById('f_publisherName').value.trim() || null,
+            publicationYear: parseInt(document.getElementById('f_publicationYear').value) || null,
+            language: document.getElementById('f_language').value,
+            status: document.getElementById('f_status').value,
+            sellMode: document.getElementById('f_sellMode').value,
+            shortDescription: document.getElementById('f_shortDescription').value.trim() || null,
+            descriptionHtml: getDescriptionHtml() || null,
+            tagsJson: tags.length > 0 ? JSON.stringify(tags) : null,
+            images: imageList.length > 0 ? imageList : undefined,
+        };
+
+        try {
+            if (editingId) {
+                await api.put(`/management/books/${editingId}`, payload);
+                showToast('Cập nhật sách thành công!', 'success');
+            } else {
+                const result = await api.post('/management/books', payload);
+                showToast('Tạo sách mới thành công!', 'success');
+                editingId = result.id;
+            }
+            // Redirect to detail page after short delay
+            setTimeout(() => {
+                window.location.href = editingId
+                    ? `book-detail.html?id=${editingId}`
+                    : 'books.html';
+            }, 800);
+        } catch (e) {
+            showToast('Lỗi: ' + (e.message || 'Lưu sách thất bại'), 'danger');
+            btn.disabled = false;
+            btn.innerHTML = `<i class="bi bi-floppy"></i> <span>${editingId ? 'Cập nhật' : 'Tạo'} Sách</span>`;
+        }
+    }
+
+    /* ========== KEYBOARD SHORTCUTS ========== */
+    document.addEventListener('keydown', e => {
+        // Escape closes lightbox
+        if (e.key === 'Escape') closeLightbox();
+        // Ctrl+S saves
+        if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+            e.preventDefault();
+            saveBook();
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', init);
+</script>
 </body>
 
 </html>

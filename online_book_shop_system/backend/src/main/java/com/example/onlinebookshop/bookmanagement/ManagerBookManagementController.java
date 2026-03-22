@@ -35,7 +35,7 @@ public class ManagerBookManagementController {
 
     @GetMapping("/{id}")
     @Operation(summary = "Get book detail", description = "Get full book detail with authors, variants, and images")
-    public BookDetailDTO getBookById(@PathVariable Long id) {
+    public BookDetailDTO getBookById(@PathVariable("id") Long id) {
         return service.getBookById(id);
     }
 
@@ -48,13 +48,13 @@ public class ManagerBookManagementController {
 
     @PutMapping("/{id}")
     @Operation(summary = "Update book", description = "Update book information, images, and publishing status")
-    public BookDetailDTO updateBook(@PathVariable Long id, @RequestBody UpdateBookRequest req) {
+    public BookDetailDTO updateBook(@PathVariable("id") Long id, @RequestBody UpdateBookRequest req) {
         return service.updateBook(id, req);
     }
 
     @PatchMapping("/{id}/status")
     @Operation(summary = "Hide/Unhide book", description = "Change book status: ACTIVE (publish) | HIDDEN (hide) | DRAFT")
-    public ResponseEntity<Map<String, String>> changeStatus(@PathVariable Long id,
+    public ResponseEntity<Map<String, String>> changeStatus(@PathVariable("id") Long id,
                                                             @RequestBody ChangeStatusRequest req) {
         service.changeStatus(id, req.getStatus());
         return ResponseEntity.ok(Map.of("message", "ManagerBook status changed to " + req.getStatus()));
@@ -62,7 +62,7 @@ public class ManagerBookManagementController {
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Soft delete book")
-    public ResponseEntity<Map<String, String>> deleteBook(@PathVariable Long id) {
+    public ResponseEntity<Map<String, String>> deleteBook(@PathVariable("id") Long id) {
         service.deleteBook(id);
         return ResponseEntity.ok(Map.of("message", "ManagerBook deleted successfully"));
     }
