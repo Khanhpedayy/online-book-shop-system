@@ -40,6 +40,7 @@ public class SecurityConfig {
                 .authenticationProvider(authenticationProvider())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/", "/index.html").permitAll()
+                        .requestMatchers("/error", "/error/**").permitAll()
                         .requestMatchers("/login", "/login.html", "/post-login", "/admin-entry").permitAll()
                         .requestMatchers("/perform-login").permitAll()
                         .requestMatchers("/css/**", "/js/**", "/images/**", "/uploads/**", "/favicon.ico").permitAll()

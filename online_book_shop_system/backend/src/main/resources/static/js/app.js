@@ -40,7 +40,6 @@ function updateAuthUI() {
     }
 }
 
-document.addEventListener("DOMContentLoaded", updateAuthUI);
 /* ===== API ===== */
 async function apiGet(path) {
     const headers = {};
@@ -49,19 +48,21 @@ async function apiGet(path) {
         headers["Authorization"] = "Bearer " + getToken();
     }
 
-    const resp = await fetch(API_BASE + path, { headers });
+    const resp = await fetch(API_BASE + path, { headers, credentials: 'include' });
 
     if (!resp.ok) throw new Error(await resp.text());
     return resp.json();
 }
 
 async function apiPost(path, body) {
+    const headers = { 'Content-Type': 'application/json' };
+    if (getToken()) {
+        headers['Authorization'] = 'Bearer ' + getToken();
+    }
     const resp = await fetch(API_BASE + path, {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            "Authorization": "Bearer " + getToken()
-        },
+        headers,
+        credentials: 'include',
         body: JSON.stringify(body)
     });
     if (!resp.ok) throw new Error(await resp.text());
@@ -195,7 +196,8 @@ function applyFilters() {
 }
 
 /* ===== CART ===== */
-function addToCart(id) {
+async function addToCart(id) {
+    await syncAuthFromServerSession(API_BASE);
     if (!isLoggedIn()) {
         alert("Please login first!");
         window.location = "login.html";
@@ -268,7 +270,9 @@ function nextSlide() {
 }
 
 /* ===== INIT ===== */
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
+    await syncAuthFromServerSession(API_BASE);
+    updateAuthUI();
 
     document.getElementById("searchBtn")?.addEventListener("click", applyFilters);
 

@@ -39,7 +39,7 @@ public class CartServiceImpl implements CartService {
     @Override
     @Transactional(readOnly = true)
     public List<CartItem> getCart(Long userId) {
-        return cartItemRepository.findByUser_IdOrderByAddedAtDesc(userId);
+        return cartItemRepository.findByUser_IdWithVariantAndBook(userId);
     }
 
     @Override

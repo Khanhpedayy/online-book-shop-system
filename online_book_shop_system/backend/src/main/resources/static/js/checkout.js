@@ -27,22 +27,25 @@ function getToken() {
     return localStorage.getItem("token");
 }
 async function apiGet(path) {
+    const headers = {};
+    const t = getToken();
+    if (t) headers['Authorization'] = 'Bearer ' + t;
     const res = await fetch(API_BASE + path, {
-        headers: {
-            "Authorization": "Bearer " + getToken()
-        }
+        headers,
+        credentials: 'include'
     });
     if (!res.ok) throw new Error(await res.text());
     return res.json();
 }
 
 async function apiPost(path, body){
+    const headers = { 'Content-Type': 'application/json' };
+    const t = getToken();
+    if (t) headers['Authorization'] = 'Bearer ' + t;
     const res = await fetch(API_BASE + path,{
         method:'POST',
-        headers:{
-            'Content-Type':'application/json',
-            "Authorization": "Bearer " + getToken()
-        },
+        headers,
+        credentials: 'include',
         body:JSON.stringify(body)
     });
     if(!res.ok) throw new Error(await res.text());
@@ -70,9 +73,6 @@ function updateAuthUI() {
         logoutLink.style.display = "none";
     }
 }
-
-document.addEventListener("DOMContentLoaded", updateAuthUI);
-
 
 // ===== UPDATE TOTALS =====
 function updateTotals() {
@@ -245,7 +245,9 @@ async function payAgain(orderId) {
 }
 
 // ===== INIT =====
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
+    await syncAuthFromServerSession(API_BASE);
+    updateAuthUI();
     loadCheckoutSummary();
     handlePaymentResult();
 });

@@ -10,9 +10,11 @@ import com.example.onlinebookshop.dto.LoginResponse;
 import com.example.onlinebookshop.dto.RegisterRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,6 +42,34 @@ public class AuthController {
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtils = jwtUtils;
+    }
+
+    /**
+     * Form login (session cookie) does not fill localStorage; static pages call this with credentials
+     * to obtain a JWT for Authorization headers on /api/**.
+     */
+    @GetMapping("/session-token")
+    public ResponseEntity<LoginResponse> sessionToken(Authentication authentication) {
+        if (authentication == null
+                || !authentication.isAuthenticated()
+                || authentication instanceof AnonymousAuthenticationToken) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        String email = authentication.getName();
+        User user = userRepository.findByEmailAndDeletedAtIsNull(email)
+                .orElse(null);
+        if (user == null || user.getDeletedAt() != null
+                || (user.getStatus() != null && !"ACTIVE".equalsIgnoreCase(user.getStatus()))) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        String roleCode = user.getRole() != null ? user.getRole().getCode() : "CUSTOMER";
+        String token = jwtUtils.generateToken(user.getEmail(), roleCode);
+        return ResponseEntity.ok(LoginResponse.builder()
+                .token(token)
+                .email(user.getEmail())
+                .fullName(user.getFullName())
+                .role(roleCode)
+                .build());
     }
 
     @PostMapping("/login")

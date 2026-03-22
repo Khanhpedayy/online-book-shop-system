@@ -9,21 +9,25 @@ function getQueryParam(name){
 }
 
 async function apiGet(path){
+    const headers = {};
+    const t = getToken();
+    if (t) headers['Authorization'] = 'Bearer ' + t;
     const res = await fetch(API_BASE + path,{
-        headers:{
-            "Authorization":"Bearer " + getToken()
-        }
+        headers,
+        credentials: 'include'
     });
     if(!res.ok) throw new Error(await res.text());
     return res.json();
 }
 
 async function apiPost(path){
+    const headers = {};
+    const t = getToken();
+    if (t) headers['Authorization'] = 'Bearer ' + t;
     const res = await fetch(API_BASE + path,{
         method:"POST",
-        headers:{
-            "Authorization":"Bearer " + getToken()
-        }
+        headers,
+        credentials: 'include'
     });
 
     if(!res.ok) throw new Error(await res.text());
@@ -160,7 +164,8 @@ function formatMoney(v){
 }
 
 /* ===== INIT ===== */
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
+    await syncAuthFromServerSession(API_BASE);
     if(!getToken()){
         alert("Login first!");
         window.location = "login.html";

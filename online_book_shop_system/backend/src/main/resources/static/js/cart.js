@@ -51,8 +51,6 @@ function updateAuthUI() {
     }
 }
 
-document.addEventListener("DOMContentLoaded", updateAuthUI);
-
 async function apiGet(path){
     const headers = {};
 
@@ -61,7 +59,7 @@ async function apiGet(path){
         headers["Authorization"] = "Bearer " + token;
     }
 
-    const resp = await fetch(`${API_BASE}${path}`, { headers });
+    const resp = await fetch(`${API_BASE}${path}`, { headers, credentials: 'include' });
 
     if(!resp.ok) throw new Error(await resp.text());
     return resp.json();
@@ -77,7 +75,8 @@ async function apiDelete(path) {
 
     const resp = await fetch(`${API_BASE}${path}`, {
         method: "DELETE",
-        headers
+        headers,
+        credentials: 'include'
     });
 
     if (!resp.ok && resp.status !== 204) {
@@ -119,6 +118,7 @@ async function loadCart() {
 
         items.forEach(ci => {
             const v = ci.variant;
+            const variantId = ci.variantId ?? v?.id;
             const title = v?.book?.title ?? v?.sku ?? '(unknown)';
             const price = v?.salePrice ?? 0;
             const lineTotal = price * ci.quantity;
@@ -128,7 +128,7 @@ async function loadCart() {
             div.className = 'cart-item';
             div.innerHTML = `
                 <span>${title.replace(/</g, '&lt;')} × ${ci.quantity} @ $${price.toFixed(2)} = $${lineTotal.toFixed(2)}</span>
-                <button type="button" class="btn btn-secondary" data-remove="${v?.id}">Remove</button>
+                <button type="button" class="btn btn-secondary" data-remove="${variantId != null ? variantId : ''}">Remove</button>
             `;
             cartContainer.appendChild(div);
         });
@@ -136,7 +136,12 @@ async function loadCart() {
         // remove item
         cartContainer.querySelectorAll('button[data-remove]').forEach(btn => {
             btn.addEventListener('click', async () => {
-                const variantId = Number(btn.getAttribute('data-remove'));
+                const raw = btn.getAttribute('data-remove');
+                const variantId = Number(raw);
+                if (!raw || !Number.isFinite(variantId) || variantId <= 0) {
+                    alert('Không xác định được sản phẩm trong giỏ (variantId). Hãy tải lại trang.');
+                    return;
+                }
                 try {
                     await apiDelete(`/api/cart/items/${variantId}`);
                     await loadCart();
@@ -177,7 +182,9 @@ function goToCheckout() {
     window.location.href = "checkout.html";
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
+    await syncAuthFromServerSession(API_BASE);
+    updateAuthUI();
     if (!isLoggedIn()) {
         alert("Please login first!");
         window.location = "login.html";
