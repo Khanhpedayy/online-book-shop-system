@@ -42,6 +42,7 @@ public class SecurityConfig {
                 .authenticationProvider(authenticationProvider())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/", "/index.html").permitAll()
+                        .requestMatchers("/payment-result.html", "/payment.html").permitAll()
                         .requestMatchers("/error", "/error/**").permitAll()
                         .requestMatchers("/login", "/login.html", "/post-login", "/admin-entry").permitAll()
                         .requestMatchers("/perform-login").permitAll()

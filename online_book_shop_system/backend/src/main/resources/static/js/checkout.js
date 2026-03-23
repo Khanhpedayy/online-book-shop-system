@@ -180,53 +180,6 @@ if (orderForm) {
     });
 }
 
-// ===== PAYMENT RESULT =====
-function getQueryParam(name) {
-    return new URLSearchParams(window.location.search).get(name);
-}
-
-function handlePaymentResult() {
-    const orderId = getQueryParam("orderId");
-    const status = getQueryParam("status");
-
-    const resultBox = document.getElementById("paymentResult");
-    if (!resultBox) return;
-
-    if (!orderId) {
-        resultBox.innerHTML = "Invalid payment result.";
-        return;
-    }
-
-    if (status === "success") {
-        resultBox.innerHTML = `✅ Payment successful for Order #${orderId}`;
-        return;
-    }
-
-    if (status === "failed" || status === "cancelled") {
-        resultBox.innerHTML = `
-            ❌ Payment ${status} for Order #${orderId}
-            <br><br>
-            <button onclick="payAgain(${orderId})">Pay Again</button>
-        `;
-    }
-}
-
-// ===== PAY AGAIN =====
-async function payAgain(orderId) {
-    try {
-        const res = await apiPost(`/api/orders/${orderId}/repay`, {});
-
-        if (res.paymentUrl) {
-            window.location.href = res.paymentUrl;
-        } else {
-            alert("Cannot retry payment");
-        }
-    } catch (e) {
-        console.error(e);
-        alert("Error retrying payment: " + e.message);
-    }
-}
-
 // ===== INIT =====
 document.addEventListener("DOMContentLoaded", async () => {
     await syncAuthFromServerSession(API_BASE);
@@ -234,5 +187,4 @@ document.addEventListener("DOMContentLoaded", async () => {
         updateShopHeaderAuth();
     }
     loadCheckoutSummary();
-    handlePaymentResult();
 });

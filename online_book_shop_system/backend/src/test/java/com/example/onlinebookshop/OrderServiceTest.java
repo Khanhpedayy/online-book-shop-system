@@ -3,6 +3,8 @@ package com.example.onlinebookshop;
 import com.example.onlinebookshop.Entity.*;
 import com.example.onlinebookshop.Repository.*;
 import com.example.onlinebookshop.Service.OrderServiceImpl;
+import com.example.onlinebookshop.paymentlog.ManagerPaymentLogRepository;
+import com.example.onlinebookshop.payos.PayOSClient;
 import com.example.onlinebookshop.dto.OrderItemRequest;
 import com.example.onlinebookshop.dto.OrderRequest;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,6 +39,12 @@ class OrderServiceTest {
     @Mock
     private CartItemRepository cartItemRepository;
 
+    @Mock
+    private PayOSClient payOSClient;
+
+    @Mock
+    private ManagerPaymentLogRepository paymentLogRepository;
+
     @InjectMocks
     private OrderServiceImpl orderService;
 
@@ -63,6 +71,8 @@ class OrderServiceTest {
                 "customer@example.com",
                 "123 Main St",
                 "John Doe",
+                "0900000000",
+                "COD",
                 1L
         );
     }
@@ -102,6 +112,8 @@ class OrderServiceTest {
                 "guest@test.com",
                 "123 Main St",
                 "John",
+                null,
+                "COD",
                 null
         );
 

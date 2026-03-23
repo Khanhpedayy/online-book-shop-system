@@ -34,6 +34,11 @@ public class ManagerGlobalExceptionHandler {
         return buildResponse(HttpStatus.BAD_REQUEST, "Dữ liệu không hợp lệ: " + errors.toString());
     }
 
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<Map<String, Object>> handleIllegalState(IllegalStateException ex) {
+        return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
     /* â”€â”€ 404: Not found (RuntimeException with "not found" convention) â”€â”€ */
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<Map<String, Object>> handleRuntimeException(RuntimeException ex) {

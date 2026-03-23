@@ -2,6 +2,8 @@ package com.example.onlinebookshop.paymentlog;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+
+import java.math.BigDecimal;
 import java.util.List;
 
 @Repository
@@ -10,6 +12,15 @@ public class ManagerPaymentLogRepository {
 
     public ManagerPaymentLogRepository(JdbcTemplate jdbc) {
         this.jdbc = jdbc;
+    }
+
+    public void insertPayOsLink(long orderId, String paymentLinkId, BigDecimal amount, int payosOrderCode) {
+        String tx = paymentLinkId != null && !paymentLinkId.isBlank() ? paymentLinkId : "UNKNOWN";
+        String raw = "{\"payosOrderCode\":" + payosOrderCode + ",\"orderId\":" + orderId + "}";
+        jdbc.update(
+                "INSERT INTO payment_logs (order_id, provider, transaction_id, amount, status, raw_data) VALUES (?,?,?,?,?,?)",
+                orderId, "PAYOS", tx, amount, "PENDING", raw
+        );
     }
 
     public List<PaymentLogDTO> findByOrderId(Long orderId) {

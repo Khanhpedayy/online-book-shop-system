@@ -1,4 +1,50 @@
-<h2>Payment Result</h2>
-<p id="status"></p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Payment result – Online Book Shop</title>
+    <link rel="stylesheet" href="css/shop.css">
+    <style>
+        .payment-banner { border-radius: 12px; padding: 24px; margin: 24px 0; max-width: 640px; }
+        .payment-banner h2 { margin: 0 0 12px; font-size: 1.35rem; }
+        .payment-banner--ok { background: #ecfdf5; border: 1px solid #6ee7b7; color: #065f46; }
+        .payment-banner--error { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; }
+        .payment-banner--pending { background: #fffbeb; border: 1px solid #fde68a; color: #92400e; }
+        .payment-detail { margin: 8px 0 0; }
+        #paymentActions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 20px; }
+        .shop-btn--secondary { background: #f3f4f6; color: #111827; }
+        .shop-btn--secondary:hover { background: #e5e7eb; }
+    </style>
+</head>
+<body class="shop-page">
 
-<button onclick="payAgain()">Pay Again</button>
+<header class="shop-header">
+    <div class="logo"><a href="index.html">Online Book Shop</a></div>
+    <div class="search-bar">
+        <input type="search" id="searchInput" placeholder="Search books..." aria-label="Search books">
+        <button type="button" id="searchBtn">Search</button>
+    </div>
+    <nav class="nav">
+        <a href="index.html">Home</a>
+        <a href="profile.html" id="profileLink" style="display:none;">Profile</a>
+        <a href="order-history.html" id="ordersLink" style="display:none;">Orders</a>
+        <a href="login.html" id="loginLink">Login</a>
+        <a href="#" id="logoutLink" style="display:none;">Logout</a>
+        <a href="cart.html" class="cart shop-cart-link">🛒 <span id="headerCartCount">$0.00 (0)</span></a>
+    </nav>
+</header>
+
+<main class="shop-main">
+    <h1 class="checkout-title">Payment</h1>
+    <div id="paymentResult" class="payment-banner">Loading…</div>
+    <div id="paymentActions"></div>
+</main>
+
+<footer class="shop-footer">© Online Book Shop</footer>
+
+<script src="js/auth-session.js"></script>
+<script src="js/shop-header.js"></script>
+<script src="js/payment-result.js"></script>
+</body>
+</html>
