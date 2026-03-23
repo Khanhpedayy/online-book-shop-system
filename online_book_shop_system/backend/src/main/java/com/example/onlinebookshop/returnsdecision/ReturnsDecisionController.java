@@ -10,7 +10,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/inventory/returns")
-@CrossOrigin(origins = "*")
 @Tag(name = "10. Returns Decision")
 public class ReturnsDecisionController {
 

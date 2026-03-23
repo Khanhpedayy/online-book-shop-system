@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@CrossOrigin(origins = "*")
 @Tag(name = "16. Payment Logs")
 public class PaymentLogController {
     private final PaymentLogService service;

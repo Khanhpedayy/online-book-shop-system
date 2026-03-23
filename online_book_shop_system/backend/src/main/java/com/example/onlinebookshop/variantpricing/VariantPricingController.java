@@ -11,7 +11,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/management/variants")
-@CrossOrigin(origins = "*")
 @Tag(name = "3. Variant & Pricing")
 public class VariantPricingController {
 

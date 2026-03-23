@@ -9,7 +9,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/staff/returns/intake")
-@CrossOrigin(origins = "*")
 @Tag(name = "17. Returns Intake")
 public class ReturnsIntakeController {
     private final ReturnsIntakeService service;

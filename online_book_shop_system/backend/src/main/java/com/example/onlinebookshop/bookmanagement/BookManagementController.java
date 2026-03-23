@@ -11,7 +11,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/management/books")
-@CrossOrigin(origins = "*")
 @Tag(name = "2. Book Management")
 public class BookManagementController {
 

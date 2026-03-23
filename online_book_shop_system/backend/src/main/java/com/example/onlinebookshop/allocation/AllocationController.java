@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/settings/allocation")
-@CrossOrigin(origins = "*")
 @Tag(name = "9. Allocation Settings")
 public class AllocationController {
 

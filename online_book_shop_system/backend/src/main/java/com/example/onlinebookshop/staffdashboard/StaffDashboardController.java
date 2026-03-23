@@ -7,7 +7,6 @@ import java.util.List;
 
 @RestController("staffDashboardApiController")
 @RequestMapping("/api/staff/dashboard")
-@CrossOrigin(origins = "*")
 @Tag(name = "12. Staff Dashboard")
 public class StaffDashboardController {
 

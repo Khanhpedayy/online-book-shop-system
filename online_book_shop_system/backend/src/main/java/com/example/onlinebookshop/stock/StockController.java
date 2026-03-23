@@ -9,7 +9,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/management/stock")
-@CrossOrigin(origins = "*")
 @Tag(name = "9. Stock Management")
 public class StockController {
 
