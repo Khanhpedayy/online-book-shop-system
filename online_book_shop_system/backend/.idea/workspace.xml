@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b0cef7af-9eae-4572-a7cc-fd78853d29dd" name="Changes" comment="fix backend logic and cleaning UI">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="b0cef7af-9eae-4572-a7cc-fd78853d29dd" name="Changes" comment="fix backend logic and cleaning UI" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -129,7 +127,7 @@
       <workItem from="1774171528593" duration="5427000" />
       <workItem from="1774177180329" duration="3837000" />
       <workItem from="1774228094254" duration="75000" />
-      <workItem from="1774228248970" duration="3521000" />
+      <workItem from="1774228248970" duration="3881000" />
     </task>
     <task id="LOCAL-00001" summary="fix merge">
       <option name="closed" value="true" />
