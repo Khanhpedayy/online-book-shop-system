@@ -6,14 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="b0cef7af-9eae-4572-a7cc-fd78853d29dd" name="Changes" comment="fix backend logic and cleaning UI">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/Config/WebConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/Config/WebConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/category/CategoryController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/category/CategoryController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/category/CategoryRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/category/CategoryRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/order/OrderController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/order/OrderController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/order/OrderRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/order/OrderRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/order/OrderService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/order/OrderService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/staffdashboard/StaffDashboardController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/staffdashboard/StaffDashboardController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -137,7 +129,7 @@
       <workItem from="1774171528593" duration="5427000" />
       <workItem from="1774177180329" duration="3837000" />
       <workItem from="1774228094254" duration="75000" />
-      <workItem from="1774228248970" duration="2304000" />
+      <workItem from="1774228248970" duration="3521000" />
     </task>
     <task id="LOCAL-00001" summary="fix merge">
       <option name="closed" value="true" />
