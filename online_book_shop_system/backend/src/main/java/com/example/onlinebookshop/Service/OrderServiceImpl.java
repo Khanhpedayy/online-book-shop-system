@@ -2,7 +2,7 @@ package com.example.onlinebookshop.Service;
 
 import com.example.onlinebookshop.Entity.*;
 import com.example.onlinebookshop.Repository.*;
-import com.example.onlinebookshop.paymentlog.ManagerPaymentLogRepository;
+import com.example.onlinebookshop.paymentlog.PaymentLogRepository;
 import com.example.onlinebookshop.payos.PayOSClient;
 import com.example.onlinebookshop.dto.CheckoutRequest;
 import com.example.onlinebookshop.dto.OrderItemRequest;
@@ -29,11 +29,11 @@ public class OrderServiceImpl implements OrderService {
     private final UserRepository userRepository;
     private final CartItemRepository cartItemRepository;
     private final PayOSClient payOSClient;
-    private final ManagerPaymentLogRepository paymentLogRepository;
+    private final PaymentLogRepository paymentLogRepository;
 
     public OrderServiceImpl(OrderRepository orderRepository, BookVariantRepository variantRepository,
                             UserRepository userRepository, CartItemRepository cartItemRepository,
-                            PayOSClient payOSClient, ManagerPaymentLogRepository paymentLogRepository) {
+                            PayOSClient payOSClient, PaymentLogRepository paymentLogRepository) {
         this.orderRepository = orderRepository;
         this.variantRepository = variantRepository;
         this.userRepository = userRepository;
