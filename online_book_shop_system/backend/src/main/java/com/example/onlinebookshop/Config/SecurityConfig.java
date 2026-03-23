@@ -29,7 +29,7 @@ public class SecurityConfig {
     private final CustomUserDetailsService customUserDetailsService;
 
     public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter,
-                          CustomUserDetailsService customUserDetailsService) {
+            CustomUserDetailsService customUserDetailsService) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
         this.customUserDetailsService = customUserDetailsService;
     }
@@ -56,13 +56,13 @@ public class SecurityConfig {
 
                         .requestMatchers("/staff/**").hasAnyRole("STAFF")
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/manager/**").hasAnyRole("MANAGER", "ADMIN")
+                        .requestMatchers("/api/inventory/**").hasAnyRole("MANAGER", "ADMIN")
 
-
-                        .anyRequest().authenticated()
-                )
-//                .authorizeHttpRequests(auth -> auth
-//                        .anyRequest().permitAll()
-//                );
+                        .anyRequest().authenticated())
+                // .authorizeHttpRequests(auth -> auth
+                // .anyRequest().permitAll()
+                // );
                 .formLogin(form -> form
                         .loginPage("/login")
                         .loginProcessingUrl("/perform-login")
@@ -70,15 +70,13 @@ public class SecurityConfig {
                         .passwordParameter("password")
                         .defaultSuccessUrl("/post-login", true)
                         .failureUrl("/login?error")
-                        .permitAll()
-                )
+                        .permitAll())
                 .logout(logout -> logout
                         .logoutRequestMatcher(new OrRequestMatcher(
                                 new AntPathRequestMatcher("/logout", "GET"),
                                 new AntPathRequestMatcher("/logout", "POST")))
                         .logoutSuccessUrl("/login?logout")
-                        .permitAll()
-                )
+                        .permitAll())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

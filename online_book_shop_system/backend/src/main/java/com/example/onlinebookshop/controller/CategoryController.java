@@ -10,7 +10,6 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/categories")
-@CrossOrigin
 public class CategoryController {
 
     private final CategoryRepository categoryRepository;
