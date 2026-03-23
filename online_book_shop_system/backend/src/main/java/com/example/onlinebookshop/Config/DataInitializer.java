@@ -8,8 +8,11 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 
 @Configuration
@@ -17,8 +20,10 @@ import java.time.LocalDateTime;
 public class DataInitializer {
 
     @Bean
-    CommandLineRunner initData(RoleRepository roleRepo, UserRepository userRepo, PasswordEncoder passwordEncoder) {
+    CommandLineRunner initData(RoleRepository roleRepo, UserRepository userRepo,
+                               PasswordEncoder passwordEncoder, JdbcTemplate jdbc) {
         return args -> {
+            // === Seed roles ===
             if (roleRepo.count() == 0) {
                 LocalDateTime now = LocalDateTime.now();
 
@@ -51,6 +56,7 @@ public class DataInitializer {
                 roleRepo.save(managerRole);
             }
 
+            // === Seed users ===
             if (userRepo.count() == 0) {
                 LocalDateTime now = LocalDateTime.now();
 
@@ -94,6 +100,26 @@ public class DataInitializer {
                 manager.setStatus("ACTIVE");
                 manager.setCreatedAt(now);
                 userRepo.save(manager);
+            }
+
+            // === Apply SQL migrations for Manager/Inventory tables ===
+            try {
+                ClassPathResource resource = new ClassPathResource("V1__add_staff_ops_tables.sql");
+                String sql = new String(resource.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+                String[] blocks = sql.split("(?=IF NOT EXISTS)");
+                for (String block : blocks) {
+                    block = block.trim();
+                    if (!block.isEmpty()) {
+                        try {
+                            jdbc.execute(block);
+                        } catch (Exception e) {
+                            System.out.println("[DataInitializer] Skipped: " + e.getMessage());
+                        }
+                    }
+                }
+                System.out.println("[DataInitializer] Migration V1 applied successfully.");
+            } catch (Exception e) {
+                System.err.println("[DataInitializer] Could not apply migration: " + e.getMessage());
             }
         };
     }
