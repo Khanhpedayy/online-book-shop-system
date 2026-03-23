@@ -5,7 +5,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-@Service
+@Service("orderMgmtService")
 public class OrderService {
 
     private final OrderRepository repo;

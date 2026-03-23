@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
-@RestController
+@RestController("mgmtCategoryController")
 @RequestMapping("/api/management/categories")
 @CrossOrigin(origins = "*")
 @Tag(name = "5. Category Management")

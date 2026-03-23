@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
-@RestController
+@RestController("staffDashboardApiController")
 @RequestMapping("/api/staff/dashboard")
 @CrossOrigin(origins = "*")
 @Tag(name = "12. Staff Dashboard")

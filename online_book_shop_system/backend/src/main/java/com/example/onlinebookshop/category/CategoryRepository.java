@@ -9,7 +9,7 @@ import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.List;
 
-@Repository
+@Repository("mgmtCategoryRepository")
 public class CategoryRepository {
 
     private final JdbcTemplate jdbc;
