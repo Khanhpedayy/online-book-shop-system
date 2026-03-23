@@ -660,5 +660,6 @@ INSERT INTO settings ([group], [key], value_json, description) VALUES
   ('INVENTORY',  'ALLOCATION',      '{"fifoBy":"LOT","reservationTtlMin":30,"conditionPriority":"NEWEST_FIRST","allowStaffOverride":false}', N'Rule xuất kho'),
   ('SYSTEM',     'RESERVATION_TTL', '{"minutes":30}',                                    N'Thời gian giữ hàng');
 
-
+  ALTER TABLE orders DROP CONSTRAINT CK_orders_status;
+ALTER TABLE orders ADD CONSTRAINT CK_orders_status CHECK (status IN ('NEW','CONFIRMED','PACKED','SHIPPED','DELIVERED','COMPLETED','CANCELLED','DELIVERY_FAILED'));
 /* ===================== END — 24 TABLES ===================== */
