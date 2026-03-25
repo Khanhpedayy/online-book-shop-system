@@ -4,6 +4,7 @@ import com.example.onlinebookshop.Service.BookService;
 import com.example.onlinebookshop.dto.BookVariantDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -17,7 +18,7 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(com.example.onlinebookshop.Controller.BookController.class)
+@WebMvcTest(com.example.onlinebookshop.controller.BookController.class)
 @AutoConfigureMockMvc(addFilters = false)
 class BookControllerTest {
 

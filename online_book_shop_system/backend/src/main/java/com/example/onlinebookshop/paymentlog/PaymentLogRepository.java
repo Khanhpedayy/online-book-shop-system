@@ -49,6 +49,47 @@ public class PaymentLogRepository {
         return jdbc.update("UPDATE payment_logs SET flagged=1, flag_reason=? WHERE id=?", reason, id);
     }
 
+    /**
+     * Sync payment result into:
+     * - payment_logs.status
+     * - orders.payment_status
+     *
+     * @param paymentLinkId PayOS paymentLinkId (we store it into payment_logs.transaction_id)
+     * @param status Target status: "PAID" or "UNPAID"
+     */
+    public void syncPaymentStatusByPaymentLinkId(String paymentLinkId, String status) {
+        if (paymentLinkId == null || paymentLinkId.isBlank()) {
+            throw new IllegalArgumentException("paymentLinkId is required");
+        }
+        if (status == null || status.isBlank()) {
+            throw new IllegalArgumentException("status is required");
+        }
+
+        String normalized = status.trim().toUpperCase();
+
+        // SQL Server can require SET QUOTED_IDENTIFIER for some update/from queries,
+        // otherwise it fails with:
+        // "UPDATE failed because the following SET options have incorrect settings: 'QUOTED_IDENTIFIER' ..."
+        jdbc.execute("SET QUOTED_IDENTIFIER ON");
+
+        int updatedLogs = jdbc.update(
+                "UPDATE payment_logs SET status=? WHERE provider='PAYOS' AND transaction_id=?",
+                normalized, paymentLinkId.trim()
+        );
+
+        // Update orders based on all logs that match paymentLinkId
+        int updatedOrders = jdbc.update(
+                "UPDATE o SET o.payment_status=? " +
+                        "FROM dbo.[orders] o " +
+                        "WHERE o.id IN (SELECT pl.order_id FROM dbo.payment_logs pl WHERE pl.provider='PAYOS' AND pl.transaction_id=?)",
+                normalized, paymentLinkId.trim()
+        );
+
+        if (updatedLogs == 0 && updatedOrders == 0) {
+            throw new RuntimeException("Payment not found for paymentLinkId: " + paymentLinkId);
+        }
+    }
+
     /* simulate recheck â€” in real implementation would call PayOS API */
     public String recheck(Long id) {
         List<String> statuses = jdbc.query("SELECT status FROM payment_logs WHERE id=?",

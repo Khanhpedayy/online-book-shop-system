@@ -4,20 +4,9 @@ const cartContainer = document.getElementById("cartContainer");
 const headerCartCount = document.getElementById('headerCartCount');
 
 const subtotalEl = document.getElementById('cartSubtotal');
-const discountEl = document.getElementById('cartDiscount');
 const shippingEl = document.getElementById('cartShipping');
 const totalEl = document.getElementById('cartTotal');
-const voucherInput = document.getElementById('voucherCode');
-const applyVoucherBtn = document.getElementById('applyVoucherBtn');
-
-let appliedVoucher = null;
 const shippingCost = 5;
-const vouchers = {
-    "SAVE10": 10,       // $10 off
-    "HALFPRICE": 0.5,   // 50% off
-};
-
-console.log("TOKEN:", localStorage.getItem("token"));
 
 function updateHeaderCart(total, count) {
     if (!headerCartCount) return;
@@ -72,16 +61,9 @@ async function apiDelete(path) {
 }
 
 function updateCartTotals(subtotal) {
-    let discount = 0;
-    if (appliedVoucher) {
-        const value = vouchers[appliedVoucher];
-        if (value < 1) discount = subtotal * value; // percentage
-        else discount = value;                      // fixed
-    }
-    const total = subtotal - discount + shippingCost;
+    const total = subtotal + shippingCost;
 
     subtotalEl.textContent = subtotal.toFixed(2);
-    discountEl.textContent = discount.toFixed(2);
     shippingEl.textContent = shippingCost.toFixed(2);
     totalEl.textContent = total.toFixed(2);
 }
@@ -100,6 +82,7 @@ async function loadCart() {
         }
 
         let subtotal = 0;
+        let quantityCount = 0;
         cartContainer.innerHTML = '';
 
         items.forEach(ci => {
@@ -109,6 +92,7 @@ async function loadCart() {
             const price = v?.salePrice ?? 0;
             const lineTotal = price * ci.quantity;
             subtotal += lineTotal;
+            quantityCount += ci.quantity || 0;
 
             const div = document.createElement('div');
             div.className = 'cart-item';
@@ -138,7 +122,7 @@ async function loadCart() {
             });
         });
 
-        updateHeaderCart(subtotal, items.length);
+        updateHeaderCart(subtotal, quantityCount);
         updateCartTotals(subtotal);
 
     } catch (e) {
@@ -146,23 +130,6 @@ async function loadCart() {
         cartContainer.innerHTML = 'Error loading cart: ' + e.message;
     }
 }
-
-applyVoucherBtn?.addEventListener('click', () => {
-    const code = voucherInput.value.trim().toUpperCase();
-    if (!code) {
-        alert("Enter a voucher code!");
-        return;
-    }
-    if (vouchers[code]) {
-        appliedVoucher = code;
-        alert("Voucher applied!");
-    } else {
-        appliedVoucher = null;
-        alert("Invalid voucher code");
-    }
-    const subtotal = parseFloat(subtotalEl.textContent) || 0;
-    updateCartTotals(subtotal);
-});
 
 function goToCheckout() {
     window.location.href = "checkout.html";

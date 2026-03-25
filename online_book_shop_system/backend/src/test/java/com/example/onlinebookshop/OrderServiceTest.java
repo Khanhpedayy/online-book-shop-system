@@ -3,7 +3,7 @@ package com.example.onlinebookshop;
 import com.example.onlinebookshop.Entity.*;
 import com.example.onlinebookshop.Repository.*;
 import com.example.onlinebookshop.Service.OrderServiceImpl;
-import com.example.onlinebookshop.paymentlog.ManagerPaymentLogRepository;
+import com.example.onlinebookshop.paymentlog.PaymentLogRepository;
 import com.example.onlinebookshop.payos.PayOSClient;
 import com.example.onlinebookshop.dto.OrderItemRequest;
 import com.example.onlinebookshop.dto.OrderRequest;
@@ -43,7 +43,7 @@ class OrderServiceTest {
     private PayOSClient payOSClient;
 
     @Mock
-    private ManagerPaymentLogRepository paymentLogRepository;
+    private PaymentLogRepository paymentLogRepository;
 
     @InjectMocks
     private OrderServiceImpl orderService;
