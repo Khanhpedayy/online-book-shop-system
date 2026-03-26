@@ -18,6 +18,6 @@ public class StaffDeliveryPageController {
     @GetMapping("/{orderId}/delivery")
     public String deliveryPage(@PathVariable long orderId, Model model) {
         model.addAttribute("o", staffOrderService.getDetail(orderId));
-        return "staff/delivery";
+        return "redirect:/staff/orders/" + orderId;
     }
 }

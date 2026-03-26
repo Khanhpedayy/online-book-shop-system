@@ -1,7 +1,6 @@
 package com.example.onlinebookshop.staff.controller;
 
 import com.example.onlinebookshop.staff.dto.OrderDetailView;
-import com.example.onlinebookshop.staff.dto.OrderFilter;
 import com.example.onlinebookshop.staff.service.StaffOrderService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,9 +18,8 @@ public class StaffOrderController {
     }
 
     @GetMapping
-    public String list(@ModelAttribute("filter") OrderFilter filter, Model model) {
-        model.addAttribute("orders", service.getAll(filter));
-        return "staff/order-list";
+    public String listRedirect() {
+        return "redirect:/staff/workspace/dashboard";
     }
 
     @GetMapping("/{id}")

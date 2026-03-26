@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{staff/workspace-fragments :: head('Staff Workspace - Confirmed Order')}"></head>
+<body>
+<div class="workspace">
+    <th:block th:replace="~{staff/workspace-fragments :: sidebar('confirmed')}"></th:block>
+    <main class="workspace-main">
+        <th:block th:replace="~{staff/workspace-fragments :: flash}"></th:block>
+        <th:block th:replace="~{staff/workspace-fragments :: filterBar('Confirmed Order','Chọn nhiều đơn NEW rồi confirm hàng loạt ngay trên cùng một màn hình.')}"></th:block>
+        <form method="post" th:action="@{/staff/workspace/confirmed/bulk-confirm}">
+            <div class="accordion" id="confirmedAccordion">
+                <div class="accordion-item mb-3" th:each="o : ${orders}">
+                    <div class="surface">
+                        <h2 class="accordion-header d-flex align-items-center">
+                            <div class="px-3"><input class="form-check-input" type="checkbox" name="orderIds" th:value="${o.id}"></div>
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" th:data-bs-target="${'#c-' + o.id}">
+                                <div class="w-100 pe-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
+                                    <div>
+                                        <div class="mono fw-bold" th:text="${o.orderCode}">ORD</div>
+                                        <div class="subtle"><span th:text="${o.shipName}"></span> · <span th:text="${o.shipPhone}"></span></div>
+                                    </div>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        <span class="chip" th:text="${o.paymentStatus}"></span>
+                                        <span class="chip" th:text="${o.itemCount + ' items'}"></span>
+                                        <span class="chip" th:text="${o.placedAt != null ? #temporals.format(o.placedAt, 'dd/MM/yyyy HH:mm') : '-'}"></span>
+                                    </div>
+                                </div>
+                            </button>
+                        </h2>
+                        <div class="accordion-collapse collapse" th:id="${'c-' + o.id}" data-bs-parent="#confirmedAccordion">
+                            <div class="accordion-body border-top">
+                                <div class="row g-3 align-items-center">
+                                    <div class="col-lg-8">
+                                        <div><b>Trạng thái:</b> <span th:text="${o.status}"></span></div>
+                                        <div><b>Tổng tiền:</b> <span th:text="${#numbers.formatDecimal(o.totalAmount, 0, 'COMMA', 0, 'POINT')} + ' VND'"></span></div>
+                                        <div><b>Tiến độ:</b> allocated <span th:text="${o.allocatedCount}"></span> / picked <span th:text="${o.pickedCount}"></span> / total <span th:text="${o.itemCount}"></span></div>
+                                    </div>
+                                    <div class="col-lg-4 text-lg-end"><a class="btn btn-outline-primary" th:href="@{/staff/orders/{id}(id=${o.id})}">Mở chi tiết</a></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div th:if="${orders == null or #lists.isEmpty(orders)}" class="surface p-5 text-center text-muted">Không có đơn NEW.</div>
+            </div>
+            <div class="bulk-bar mt-3">
+                <div class="surface p-3 d-flex justify-content-between align-items-center">
+                    <div>Đây là batch confirm. Staff chỉ xử lý state NEW ở màn này.</div>
+                    <button class="btn btn-primary">Confirm selected</button>
+                </div>
+            </div>
+        </form>
+    </main>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

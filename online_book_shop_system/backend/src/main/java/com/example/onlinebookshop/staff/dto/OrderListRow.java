@@ -2,24 +2,25 @@ package com.example.onlinebookshop.staff.dto;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
-/**
- * Row DTO cho màn Order List (STAFF).
- */
 public class OrderListRow {
 
     private Long id;
     private String orderCode;
     private String status;
     private String paymentStatus;
-
     private String shipName;
     private String shipPhone;
-
     private BigDecimal totalAmount;
     private LocalDateTime placedAt;
     private LocalDateTime shippedAt;
     private LocalDateTime deliveredAt;
+    private Integer itemCount;
+    private Integer allocatedCount;
+    private Integer pickedCount;
+    private List<AllocatePreviewRow> previewItems = new ArrayList<>();
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -50,4 +51,16 @@ public class OrderListRow {
 
     public LocalDateTime getDeliveredAt() { return deliveredAt; }
     public void setDeliveredAt(LocalDateTime deliveredAt) { this.deliveredAt = deliveredAt; }
+
+    public Integer getItemCount() { return itemCount; }
+    public void setItemCount(Integer itemCount) { this.itemCount = itemCount; }
+
+    public Integer getAllocatedCount() { return allocatedCount; }
+    public void setAllocatedCount(Integer allocatedCount) { this.allocatedCount = allocatedCount; }
+
+    public Integer getPickedCount() { return pickedCount; }
+    public void setPickedCount(Integer pickedCount) { this.pickedCount = pickedCount; }
+
+    public List<AllocatePreviewRow> getPreviewItems() { return previewItems; }
+    public void setPreviewItems(List<AllocatePreviewRow> previewItems) { this.previewItems = previewItems; }
 }
