@@ -1,454 +1,207 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Chi tiết đơn hàng | Staff</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <style>
-    .mono {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-    }
-    .workflow-step {
-      border: 1px solid #dee2e6;
-      border-radius: 12px;
-      padding: 14px;
-      background: #fff;
-      height: 100%;
-    }
-    .workflow-step.active {
-      border-color: #0d6efd;
-      box-shadow: 0 0 0 0.15rem rgba(13,110,253,.08);
-    }
-    .workflow-step.done {
-      border-color: #198754;
-      background: #f6fffa;
-    }
-    .workflow-step.locked {
-      background: #f8f9fa;
-      opacity: 0.88;
-    }
-    .step-no {
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 13px;
-      font-weight: 700;
-      color: #fff;
-      background: #6c757d;
-      margin-right: 8px;
-    }
-    .workflow-step.active .step-no {
-      background: #0d6efd;
-    }
-    .workflow-step.done .step-no {
-      background: #198754;
-    }
-    .section-title {
-      font-weight: 600;
-      margin-bottom: 10px;
-    }
-    .timeline-badge {
-      border: 1px solid #dee2e6;
-      background: #fff;
-      border-radius: 999px;
-      padding: 6px 12px;
-      font-size: 13px;
-      white-space: nowrap;
-    }
-  </style>
-</head>
+<head th:replace="~{staff/workspace-fragments :: head('Staff Workspace - Order Detail')}"></head>
+<body>
+<div class="workspace">
+  <th:block th:replace="~{staff/workspace-fragments :: sidebar('dashboard')}"></th:block>
 
-<body class="bg-light">
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-  <div class="container">
-    <a class="navbar-brand fw-semibold" th:href="@{/staff/dashboard}">Staff Panel</a>
-    <div class="ms-auto d-flex gap-2">
-      <a class="btn btn-outline-light btn-sm" th:href="@{/staff/orders}">Danh sách đơn</a>
-      <a class="btn btn-outline-light btn-sm" th:href="@{/logout}">Đăng xuất</a>
-    </div>
-  </div>
-</nav>
+  <main class="workspace-main">
+    <th:block th:replace="~{staff/workspace-fragments :: flash}"></th:block>
 
-<main class="container py-4" th:if="${order != null}">
-
-  <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
-    <div>
-      <h1 class="h4 mb-1">Chi tiết đơn hàng</h1>
-      <div class="text-muted">
-        <span class="mono" th:text="${order.orderCode}">ORD-0001</span>
-        <span class="mx-2">•</span>
-        <span th:text="${#temporals.format(order.placedAt, 'dd/MM/yyyy HH:mm')}">01/01/2026 10:00</span>
-      </div>
-    </div>
-
-    <div class="d-flex gap-2">
-      <span class="badge text-bg-secondary" th:text="${order.status}">NEW</span>
-      <span class="badge text-bg-info" th:text="${order.paymentStatus}">PENDING</span>
-    </div>
-  </div>
-
-  <div th:if="${successMsg}" class="alert alert-success" th:text="${successMsg}"></div>
-  <div th:if="${warnMsg}" class="alert alert-warning" th:text="${warnMsg}"></div>
-  <div th:if="${errorMsg}" class="alert alert-danger" th:text="${errorMsg}"></div>
-
-  <div class="card border-0 shadow-sm mb-3">
-    <div class="card-body">
-      <div class="section-title">Workflow bắt buộc của Staff</div>
-
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <span class="timeline-badge">1. Confirm</span>
-        <span class="timeline-badge">2. Allocate / Pick</span>
-        <span class="timeline-badge">3. Packing</span>
-        <span class="timeline-badge">4. Shipping</span>
-        <span class="timeline-badge">5. Delivery</span>
-      </div>
-
-      <div class="row g-3">
-
-        <!-- STEP 1 -->
-        <div class="col-12 col-md-6 col-xl-4">
-          <div class="workflow-step active">
-            <div class="mb-2">
-              <span class="step-no">1</span>
-              <span class="fw-semibold">Confirm Order</span>
-            </div>
-
-            <div class="small text-muted mb-2">
-              Kiểm tra thông tin đơn, địa chỉ, thanh toán. Staff phải xác nhận đơn trước khi xử lý kho.
-            </div>
-
-            <form th:action="@{|/staff/orders/${order.id}/status|}" method="post" class="row g-2">
-              <div class="col-12">
-                <select class="form-select form-select-sm" name="newStatus">
-                  <option value="NEW" th:selected="${order.status == 'NEW'}">NEW</option>
-                  <option value="CONFIRMED" th:selected="${order.status == 'CONFIRMED'}">CONFIRMED</option>
-                  <option value="PACKED" th:selected="${order.status == 'PACKED'}">PACKED</option>
-                  <option value="SHIPPED" th:selected="${order.status == 'SHIPPED'}">SHIPPED</option>
-                  <option value="DELIVERED" th:selected="${order.status == 'DELIVERED'}">DELIVERED</option>
-                  <option value="COMPLETED" th:selected="${order.status == 'COMPLETED'}">COMPLETED</option>
-                  <option value="CANCELLED" th:selected="${order.status == 'CANCELLED'}">CANCELLED</option>
-                </select>
-              </div>
-              <div class="col-12">
-                <button class="btn btn-sm btn-primary w-100">Cập nhật trạng thái</button>
-              </div>
-            </form>
-
-            <div class="small mt-2 text-muted">
-              Muốn qua bước 2, đơn nên ở trạng thái <span class="mono">CONFIRMED</span>.
-            </div>
+    <section class="surface p-4 mb-4">
+      <div class="d-flex flex-wrap justify-content-between align-items-start gap-3">
+        <div>
+          <div class="subtle mb-2">
+            <a th:href="@{/staff/workspace/dashboard}" class="text-decoration-none">Staff Workspace</a>
+            <span> / </span>
+            <span>Order Detail</span>
+          </div>
+          <h1 class="page-title mb-2">
+            <span class="mono" th:text="${order.orderCode}">ORD-001</span>
+          </h1>
+          <div class="d-flex flex-wrap gap-2">
+            <span class="chip" th:text="${order.status}">STATUS</span>
+            <span class="chip" th:text="${order.paymentStatus}">PAYMENT</span>
+            <span class="chip" th:text="${order.shipMethod != null ? order.shipMethod : 'NO_SHIP_METHOD'}">SHIP_METHOD</span>
           </div>
         </div>
 
-        <!-- STEP 2 -->
-        <div class="col-12 col-md-6 col-xl-4">
-          <div class="workflow-step"
-               th:classappend="${order.status == 'NEW' or order.status == 'CANCELLED' or order.status == 'COMPLETED'} ? ' locked' : ' active'">
-            <div class="mb-2">
-              <span class="step-no">2</span>
-              <span class="fw-semibold">Allocate / Pick</span>
-            </div>
-
-            <div class="small text-muted mb-2">
-              Gán copy sách cho từng order item. Có thể auto FIFO hoặc scan copyCode thủ công. Chỉ thực hiện sau khi đơn đã confirm.
-            </div>
-
-            <div class="d-grid gap-2">
-              <form th:action="@{|/staff/orders/${order.id}/allocate-auto|}" method="post" class="d-grid">
-                <button type="submit"
-                        class="btn btn-sm btn-outline-primary"
-                        th:disabled="${order.status == 'NEW' or order.status == 'CANCELLED' or order.status == 'COMPLETED'}">
-                  Auto allocate FIFO
-                </button>
-              </form>
-
-              <a class="btn btn-sm btn-outline-secondary"
-                 th:href="@{|/staff/orders/${order.id}/pick-list|}"
-                 th:classappend="${order.status == 'NEW' or order.status == 'CANCELLED' or order.status == 'COMPLETED'} ? ' disabled' : ''"
-                 th:attr="aria-disabled=${order.status == 'NEW' or order.status == 'CANCELLED' or order.status == 'COMPLETED'}">
-                Mở Pick List
-              </a>
-            </div>
-
-            <div class="small mt-2 text-muted">
-              Chỉ mở khi order không còn ở <span class="mono">NEW</span>.
-            </div>
-          </div>
-        </div>
-
-        <!-- STEP 3 -->
-        <div class="col-12 col-md-6 col-xl-4">
-          <div class="workflow-step"
-               th:classappend="${order.status == 'PACKED' or order.status == 'SHIPPED' or order.status == 'DELIVERED' or order.status == 'COMPLETED'} ? ' active' : ' locked'">
-            <div class="mb-2">
-              <span class="step-no">3</span>
-              <span class="fw-semibold">Packing</span>
-            </div>
-
-            <div class="small text-muted mb-2">
-              Chỉ đóng gói sau khi đã allocate đủ và scan pick đủ hàng từ kho.
-            </div>
-
-            <a class="btn btn-sm btn-outline-secondary w-100"
-               th:href="@{|/staff/orders/${order.id}/pack|}"
-               th:classappend="${order.status == 'NEW' or order.status == 'CONFIRMED' or order.status == 'CANCELLED' or order.status == 'COMPLETED'} ? ' disabled' : ''"
-               th:attr="aria-disabled=${order.status == 'NEW' or order.status == 'CONFIRMED' or order.status == 'CANCELLED' or order.status == 'COMPLETED'}">
-              Sang Packing
-            </a>
-
-            <div class="small mt-2 text-muted">
-              Staff không được bỏ qua bước đóng gói trước khi ship.
-            </div>
-          </div>
-        </div>
-
-        <!-- STEP 4 -->
-        <div class="col-12 col-md-6 col-xl-6">
-          <div class="workflow-step"
-               th:classappend="${order.status == 'SHIPPED' or order.status == 'DELIVERED' or order.status == 'COMPLETED'} ? ' active' : ' locked'">
-            <div class="mb-2">
-              <span class="step-no">4</span>
-              <span class="fw-semibold">Shipping</span>
-            </div>
-
-            <div class="small text-muted mb-2">
-              Bàn giao cho đơn vị vận chuyển, nhập carrier và tracking code. Chỉ thực hiện sau khi order đã PACKED.
-            </div>
-
-            <a class="btn btn-sm btn-outline-secondary w-100"
-               th:href="@{|/staff/orders/${order.id}/ship|}"
-               th:classappend="${order.status != 'PACKED' and order.status != 'SHIPPED' and order.status != 'DELIVERED' and order.status != 'COMPLETED'} ? ' disabled' : ''"
-               th:attr="aria-disabled=${order.status != 'PACKED' and order.status != 'SHIPPED' and order.status != 'DELIVERED' and order.status != 'COMPLETED'}">
-              Sang Shipping
-            </a>
-
-            <div class="small mt-2 text-muted">
-              Chỉ mở khi đơn đang hoặc đã đi qua trạng thái <span class="mono">PACKED</span>.
-            </div>
-          </div>
-        </div>
-
-        <!-- STEP 5 -->
-        <div class="col-12 col-md-6 col-xl-6">
-          <div class="workflow-step"
-               th:classappend="${order.status == 'DELIVERED' or order.status == 'COMPLETED'} ? ' active' : ' locked'">
-            <div class="mb-2">
-              <span class="step-no">5</span>
-              <span class="fw-semibold">Delivery / Return</span>
-            </div>
-
-            <div class="small text-muted mb-2">
-              Cập nhật kết quả giao hàng. Chỉ thực hiện sau khi đơn đã SHIPPED. Return Intake là luồng riêng khi khách trả hàng.
-            </div>
-
-            <div class="d-grid gap-2">
-              <a class="btn btn-sm btn-outline-secondary"
-                 th:href="@{|/staff/orders/${order.id}/delivery|}"
-                 th:classappend="${order.status != 'SHIPPED' and order.status != 'DELIVERED' and order.status != 'COMPLETED'} ? ' disabled' : ''"
-                 th:attr="aria-disabled=${order.status != 'SHIPPED' and order.status != 'DELIVERED' and order.status != 'COMPLETED'}">
-                Delivery Outcome
-              </a>
-
-              <a class="btn btn-sm btn-outline-warning"
-                 th:href="@{|/staff/returns/new?orderId=${order.id}|}">
-                Create Return Intake
-              </a>
-            </div>
-
-            <div class="small mt-2 text-muted">
-              Không được cập nhật delivery khi chưa qua bước shipping.
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </div>
-
-  <div class="row g-3">
-    <div class="col-12 col-lg-7">
-      <div class="card border-0 shadow-sm mb-3">
-        <div class="card-body">
-          <div class="section-title">Khách hàng & giao hàng</div>
-
-          <div class="row g-2">
-            <div class="col-12 col-md-6">
-              <div class="text-muted small">Tên nhận</div>
-              <div th:text="${order.shipName}">Nguyễn Văn A</div>
-            </div>
-            <div class="col-12 col-md-6">
-              <div class="text-muted small">SĐT</div>
-              <div class="mono" th:text="${order.shipPhone}">090...</div>
-            </div>
-
-            <div class="col-12">
-              <div class="text-muted small">Địa chỉ</div>
-              <div>
-                <span th:text="${order.shipLine1}"></span>
-                <span th:if="${order.shipLine2}">, <span th:text="${order.shipLine2}"></span></span>
-                <span th:if="${order.shipWard}">, <span th:text="${order.shipWard}"></span></span>
-                <span th:if="${order.shipDistrict}">, <span th:text="${order.shipDistrict}"></span></span>
-                <span th:if="${order.shipCity}">, <span th:text="${order.shipCity}"></span></span>
-                <span th:if="${order.shipProvince}">, <span th:text="${order.shipProvince}"></span></span>
-              </div>
-            </div>
-
-            <div class="col-12 col-md-6">
-              <div class="text-muted small">Carrier</div>
-              <div th:text="${order.carrier}">-</div>
-            </div>
-            <div class="col-12 col-md-6">
-              <div class="text-muted small">Tracking</div>
-              <div class="mono" th:text="${order.trackingCode}">-</div>
-            </div>
+        <div class="text-md-end">
+          <div class="subtle">Placed at</div>
+          <div class="fw-semibold"
+               th:text="${order.placedAt != null ? #temporals.format(order.placedAt, 'dd/MM/yyyy HH:mm') : '-'}">
+            01/01/2026 10:00
           </div>
         </div>
       </div>
+    </section>
 
-      <div class="card border-0 shadow-sm mb-3">
-        <div class="card-body">
-          <div class="section-title">Danh sách sản phẩm trong đơn</div>
+    <div class="row g-4">
+      <div class="col-lg-8">
+        <section class="surface p-4 mb-4">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="fs-4 mb-0">Danh sách sách trong đơn</h2>
+            <span class="chip" th:text="${#lists.size(order.items)} + ' items'">0 items</span>
+          </div>
 
           <div class="table-responsive">
-            <table class="table table-sm align-middle">
+            <table class="table align-middle mb-0">
               <thead>
-              <tr class="text-muted small">
-                <th>#</th>
+              <tr>
+                <th>Tên sách</th>
                 <th>SKU</th>
-                <th>Tên</th>
-                <th>Condition</th>
-                <th class="text-end">Đơn giá</th>
-                <th class="text-end">SL</th>
-                <th class="text-end">CopyId</th>
+                <th>Tình trạng</th>
+                <th>SL</th>
+                <th>Đơn giá</th>
+                <th>copyId</th>
               </tr>
               </thead>
               <tbody>
-              <tr th:each="it, idx : ${order.items}">
-                <td class="mono" th:text="${idx.index + 1}">1</td>
-                <td class="mono" th:text="${it.skuSnapshot}">SKU</td>
-                <td th:text="${it.titleSnapshot}">Title</td>
-                <td class="mono" th:text="${it.conditionSnapshot}">NEW</td>
-                <td class="text-end mono" th:text="${#numbers.formatDecimal(it.unitPrice, 0, 'COMMA', 0, 'POINT')}">0</td>
-                <td class="text-end mono" th:text="${it.quantity}">1</td>
-                <td class="text-end mono" th:text="${it.copyId}">-</td>
+              <tr th:each="item : ${order.items}">
+                <td>
+                  <div class="fw-semibold" th:text="${item.titleSnapshot}">Book title</div>
+                </td>
+                <td class="mono" th:text="${item.skuSnapshot}">SKU001</td>
+                <td th:text="${item.conditionSnapshot != null ? item.conditionSnapshot : '-'}">GOOD</td>
+                <td th:text="${item.quantity}">1</td>
+                <td th:text="${#numbers.formatDecimal(item.unitPrice, 0, 'COMMA', 0, 'POINT')} + ' VND'">100,000 VND</td>
+                <td class="mono" th:text="${item.copyId != null ? item.copyId : '-'}">12</td>
               </tr>
-
-              <tr th:if="${#lists.isEmpty(order.items)}">
-                <td colspan="7" class="text-center text-muted py-3">Chưa có item.</td>
+              <tr th:if="${order.items == null or #lists.isEmpty(order.items)}">
+                <td colspan="6" class="text-center text-muted py-4">Không có item trong đơn.</td>
               </tr>
               </tbody>
             </table>
           </div>
+        </section>
 
-          <div class="mt-3">
-            <div class="fw-semibold mb-2">Manual Allocate / Unpick</div>
-            <div class="small text-muted mb-3">
-              Chức năng này thuộc bước 2. Chỉ dùng khi cần gán tay hoặc bỏ gán copy sai.
+        <section class="surface p-4 mb-4">
+          <h2 class="fs-4 mb-3">Địa chỉ giao hàng</h2>
+
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="subtle">Người nhận</div>
+              <div class="fw-semibold" th:text="${order.shipName != null ? order.shipName : '-'}">Nguyễn Văn A</div>
             </div>
-
-            <div class="mt-3"
-                 th:if="${order.status != 'NEW' and order.status != 'CANCELLED' and order.status != 'COMPLETED'}"
-                 th:each="it : ${order.items}">
-              <div th:if="${it.copyId == null}">
-                <form class="row g-2 align-items-center" th:action="@{|/staff/orders/${order.id}/pick-scan|}" method="post">
-                  <input type="hidden" name="orderItemId" th:value="${it.id}"/>
-                  <div class="col-12 col-md-5">
-                    <div class="small text-muted">OrderItemId: <span class="mono" th:text="${it.id}">0</span></div>
-                    <div class="small">SKU: <span class="mono" th:text="${it.skuSnapshot}">SKU</span></div>
-                  </div>
-                  <div class="col-12 col-md-5">
-                    <input class="form-control form-control-sm" name="copyCode" placeholder="Scan / nhập copyCode" required/>
-                  </div>
-                  <div class="col-12 col-md-2">
-                    <button class="btn btn-sm btn-primary w-100" type="submit">Pick</button>
-                  </div>
-                </form>
-              </div>
-            </div>
-
-            <div class="mt-3"
-                 th:if="${order.status != 'NEW' and order.status != 'CANCELLED' and order.status != 'COMPLETED'}"
-                 th:each="it : ${order.items}">
-              <div th:if="${it.copyId != null}">
-                <form class="d-flex flex-wrap align-items-center gap-2" th:action="@{|/staff/orders/${order.id}/unpick|}" method="post">
-                  <input type="hidden" name="orderItemId" th:value="${it.id}"/>
-                  <span class="small">
-                    OrderItemId <span class="mono" th:text="${it.id}">0</span>
-                    đã gán copyId <span class="mono" th:text="${it.copyId}">0</span>
-                  </span>
-                  <button class="btn btn-sm btn-outline-danger" type="submit">Unpick</button>
-                </form>
-              </div>
-            </div>
-
-            <div class="alert alert-light border mt-3 mb-0"
-                 th:if="${order.status == 'NEW' or order.status == 'CANCELLED' or order.status == 'COMPLETED'}">
-              Chưa thể allocate/pick ở trạng thái hiện tại.
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-12 col-lg-5">
-      <div class="card border-0 shadow-sm mb-3">
-        <div class="card-body">
-          <div class="section-title">Thanh toán</div>
-
-          <div class="d-flex justify-content-between">
-            <div class="text-muted small">Subtotal</div>
-            <div class="mono" th:text="${#numbers.formatDecimal(order.subtotalAmount,0,'COMMA',0,'POINT')}">0</div>
-          </div>
-          <div class="d-flex justify-content-between">
-            <div class="text-muted small">Shipping</div>
-            <div class="mono" th:text="${#numbers.formatDecimal(order.shippingFee,0,'COMMA',0,'POINT')}">0</div>
-          </div>
-          <div class="d-flex justify-content-between">
-            <div class="text-muted small">Discount</div>
-            <div class="mono" th:text="${#numbers.formatDecimal(order.discountAmount,0,'COMMA',0,'POINT')}">0</div>
-          </div>
-          <hr/>
-          <div class="d-flex justify-content-between">
-            <div class="fw-semibold">Total</div>
-            <div class="fw-semibold mono" th:text="${#numbers.formatDecimal(order.totalAmount,0,'COMMA',0,'POINT')}">0</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="card border-0 shadow-sm mb-3">
-        <div class="card-body">
-          <div class="section-title">Ghi chú nội bộ</div>
-          <form th:action="@{|/staff/orders/${order.id}/note|}" method="post" class="row g-2">
-            <div class="col-12">
-              <textarea class="form-control form-control-sm" rows="5" name="staffNote"
-                        th:text="${order.staffNote}"></textarea>
+            <div class="col-md-6">
+              <div class="subtle">Số điện thoại</div>
+              <div class="fw-semibold" th:text="${order.shipPhone != null ? order.shipPhone : '-'}">0900000000</div>
             </div>
             <div class="col-12">
-              <button class="btn btn-sm btn-outline-primary">Lưu ghi chú</button>
+              <div class="subtle">Địa chỉ</div>
+              <div class="fw-semibold">
+                <span th:text="${order.shipLine1 != null ? order.shipLine1 : ''}"></span>
+                <span th:if="${order.shipLine2 != null and !#strings.isEmpty(order.shipLine2)}">, <span th:text="${order.shipLine2}"></span></span>
+                <span th:if="${order.shipWard != null and !#strings.isEmpty(order.shipWard)}">, <span th:text="${order.shipWard}"></span></span>
+                <span th:if="${order.shipDistrict != null and !#strings.isEmpty(order.shipDistrict)}">, <span th:text="${order.shipDistrict}"></span></span>
+                <span th:if="${order.shipCity != null and !#strings.isEmpty(order.shipCity)}">, <span th:text="${order.shipCity}"></span></span>
+                <span th:if="${order.shipProvince != null and !#strings.isEmpty(order.shipProvince)}">, <span th:text="${order.shipProvince}"></span></span>
+              </div>
             </div>
+          </div>
+        </section>
+
+        <section class="surface p-4">
+          <h2 class="fs-4 mb-3">Ghi chú</h2>
+
+          <div class="mb-4">
+            <div class="subtle mb-1">Customer note</div>
+            <div class="p-3 rounded border bg-light"
+                 th:text="${order.customerNote != null and !#strings.isEmpty(order.customerNote) ? order.customerNote : 'Không có ghi chú từ khách hàng.'}">
+              Không có ghi chú
+            </div>
+          </div>
+
+          <form method="post" th:action="@{/staff/orders/{id}/note(id=${order.id})}">
+            <label class="form-label fw-semibold">Staff note</label>
+            <textarea class="form-control mb-3"
+                      name="staffNote"
+                      rows="4"
+                      th:text="${order.staffNote}"></textarea>
+            <button type="submit" class="btn btn-primary">Lưu ghi chú nội bộ</button>
           </form>
-        </div>
+        </section>
       </div>
 
-      <div class="card border-0 shadow-sm">
-        <div class="card-body">
-          <div class="section-title">Quy tắc không được bỏ bước</div>
-          <ol class="small mb-0 ps-3">
-            <li>Phải confirm order trước khi xử lý kho.</li>
-            <li>Phải allocate và pick đủ trước khi pack.</li>
-            <li>Phải pack xong trước khi ship.</li>
-            <li>Phải ship xong mới được cập nhật delivery outcome.</li>
-          </ol>
-        </div>
+      <div class="col-lg-4">
+        <section class="surface p-4 mb-4">
+          <h2 class="fs-4 mb-3">Tổng tiền</h2>
+
+          <div class="d-flex justify-content-between mb-2">
+            <span class="subtle">Subtotal</span>
+            <span th:text="${#numbers.formatDecimal(order.subtotalAmount, 0, 'COMMA', 0, 'POINT')} + ' VND'">0 VND</span>
+          </div>
+
+          <div class="d-flex justify-content-between mb-2">
+            <span class="subtle">Shipping fee</span>
+            <span th:text="${#numbers.formatDecimal(order.shippingFee, 0, 'COMMA', 0, 'POINT')} + ' VND'">0 VND</span>
+          </div>
+
+          <div class="d-flex justify-content-between mb-3">
+            <span class="subtle">Discount</span>
+            <span th:text="${#numbers.formatDecimal(order.discountAmount, 0, 'COMMA', 0, 'POINT')} + ' VND'">0 VND</span>
+          </div>
+
+          <hr>
+
+          <div class="d-flex justify-content-between fw-bold fs-5">
+            <span>Total</span>
+            <span th:text="${#numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 0, 'POINT')} + ' VND'">0 VND</span>
+          </div>
+        </section>
+
+        <section class="surface p-4 mb-4">
+          <h2 class="fs-4 mb-3">Thông tin shipment</h2>
+
+          <div class="mb-3">
+            <div class="subtle">Carrier</div>
+            <div class="fw-semibold" th:text="${order.carrier != null and !#strings.isEmpty(order.carrier) ? order.carrier : '-'}">GHN</div>
+          </div>
+
+          <div class="mb-0">
+            <div class="subtle">Tracking code</div>
+            <div class="fw-semibold mono" th:text="${order.trackingCode != null and !#strings.isEmpty(order.trackingCode) ? order.trackingCode : '-'}">TRACK001</div>
+          </div>
+        </section>
+
+        <section class="surface p-4">
+          <h2 class="fs-4 mb-3">Timeline</h2>
+
+          <div class="d-flex flex-column gap-3">
+            <div>
+              <div class="subtle">Placed</div>
+              <div th:text="${order.placedAt != null ? #temporals.format(order.placedAt, 'dd/MM/yyyy HH:mm') : '-'}">-</div>
+            </div>
+            <div>
+              <div class="subtle">Confirmed</div>
+              <div th:text="${order.confirmedAt != null ? #temporals.format(order.confirmedAt, 'dd/MM/yyyy HH:mm') : '-'}">-</div>
+            </div>
+            <div>
+              <div class="subtle">Packed</div>
+              <div th:text="${order.packedAt != null ? #temporals.format(order.packedAt, 'dd/MM/yyyy HH:mm') : '-'}">-</div>
+            </div>
+            <div>
+              <div class="subtle">Shipped</div>
+              <div th:text="${order.shippedAt != null ? #temporals.format(order.shippedAt, 'dd/MM/yyyy HH:mm') : '-'}">-</div>
+            </div>
+            <div>
+              <div class="subtle">Delivered</div>
+              <div th:text="${order.deliveredAt != null ? #temporals.format(order.deliveredAt, 'dd/MM/yyyy HH:mm') : '-'}">-</div>
+            </div>
+            <div>
+              <div class="subtle">Completed</div>
+              <div th:text="${order.completedAt != null ? #temporals.format(order.completedAt, 'dd/MM/yyyy HH:mm') : '-'}">-</div>
+            </div>
+            <div>
+              <div class="subtle">Cancelled</div>
+              <div th:text="${order.cancelledAt != null ? #temporals.format(order.cancelledAt, 'dd/MM/yyyy HH:mm') : '-'}">-</div>
+            </div>
+          </div>
+        </section>
       </div>
     </div>
-  </div>
-
-</main>
+  </main>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>

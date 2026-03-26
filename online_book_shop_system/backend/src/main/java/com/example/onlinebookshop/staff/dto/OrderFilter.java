@@ -1,17 +1,13 @@
 package com.example.onlinebookshop.staff.dto;
 
-/**
- * Bộ lọc cho danh sách đơn hàng (STAFF).
- *
- * Lưu ý: dùng String để đơn giản (không cần enum), vì DB cũng đang lưu dạng VARCHAR.
- */
 public class OrderFilter {
 
-    private String status;         // NEW/CONFIRMED/PACKED/... (optional)
-    private String paymentStatus;  // PENDING/PAID/... (optional)
-    private String delivery;       // NOT_SHIPPED/IN_TRANSIT/DELIVERED/RETURNED (optional)
-    private String q;              // keyword: order_code / ship_name / ship_phone
-    private String sort;           // placedAtDesc / placedAtAsc / totalDesc / totalAsc
+    private String status;
+    private String paymentStatus;
+    private String delivery;
+    private String q;
+    private String sort;
+    private String stage;
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
@@ -27,4 +23,7 @@ public class OrderFilter {
 
     public String getSort() { return sort; }
     public void setSort(String sort) { this.sort = sort; }
+
+    public String getStage() { return stage; }
+    public void setStage(String stage) { this.stage = stage; }
 }
