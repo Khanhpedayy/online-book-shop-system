@@ -41,6 +41,6 @@ public class StaffDashboardController {
             model.addAttribute("dbError", ex.getMessage());
         }
 
-        return "staff/dashboard";
+        return "redirect:/staff/workspace/dashboard";
     }
 }
