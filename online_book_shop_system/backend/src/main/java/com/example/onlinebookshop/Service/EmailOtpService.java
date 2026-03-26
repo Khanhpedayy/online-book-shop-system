@@ -195,4 +195,33 @@ public class EmailOtpService {
             System.err.println("Lỗi gửi email xác nhận giao hàng: " + e.getMessage());
         }
     }
+    /**
+     * Gửi email thông báo mật khẩu mới do Admin reset
+     */
+    public void sendNewPassword(String to, String newPassword) {
+        try {
+            MimeMessage message = javaMailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            helper.setFrom(sender);
+            helper.setTo(to);
+            helper.setSubject("Mật khẩu mới của bạn - Online Book Shop");
+
+            String htmlMsg = "<div style='font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px;'>"
+                    + "<h2 style='color: #6c63ff; text-align: center;'>Online Book Shop</h2>"
+                    + "<p>Chào bạn,</p>"
+                    + "<p>Quản trị viên đã đặt lại mật khẩu cho tài khoản của bạn. Dưới đây là mật khẩu đăng nhập mới:</p>"
+                    + "<div style='text-align: center; margin: 20px 0;'>"
+                    + "<span style='font-size: 20px; font-weight: bold; background: #f4f4f4; padding: 10px 20px; border-radius: 5px; letter-spacing: 2px;'>"
+                    + newPassword + "</span>"
+                    + "</div>"
+                    + "<p>Vui lòng đăng nhập và đỗi mật khẩu ngay để đảm bảo an toàn.</p>"
+                    + "</div>";
+
+            helper.setText(htmlMsg, true);
+            javaMailSender.send(message);
+        } catch (Exception e) {
+            System.err.println("Lỗi gửi email cấp lại mật khẩu cho " + to + ": " + e.getMessage());
+        }
+    }
 }

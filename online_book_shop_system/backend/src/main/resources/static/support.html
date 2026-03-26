@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Hỗ trợ – Online Book Shop</title>
+    <link rel="stylesheet" href="css/shop.css">
+    <style>
+        .sp-title { font-size: 1.5rem; margin-bottom: 4px; }
+        .sp-subtitle { color: #64748b; font-size: 0.92rem; margin-bottom: 20px; }
+
+        /* Toolbar */
+        .sp-toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px; }
+        .btn-new {
+            padding: 9px 20px; border: none; border-radius: 8px;
+            background: #6366f1; color: #fff; cursor: pointer;
+            font-weight: 700; font-size: 0.9rem; transition: background .2s;
+        }
+        .btn-new:hover { background: #4f46e5; }
+
+        /* Ticket cards */
+        .ticket-card {
+            background: var(--shop-card-bg); border-radius: 12px; padding: 16px 20px;
+            margin-bottom: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            cursor: pointer; transition: box-shadow .2s;
+            border-left: 4px solid #e2e8f0;
+        }
+        .ticket-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.12); }
+        .ticket-card.status-OPEN { border-left-color: #6366f1; }
+        .ticket-card.status-IN_PROGRESS { border-left-color: #f59e0b; }
+        .ticket-card.status-RESOLVED { border-left-color: #22c55e; }
+        .ticket-card.status-CLOSED { border-left-color: #ef4444; }
+        .ticket-card.status-WAITING { border-left-color: #94a3b8; }
+
+        .tc-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 6px; }
+        .tc-code { font-size: 0.78rem; color: #94a3b8; font-weight: 600; }
+        .tc-category { font-size: 0.78rem; padding: 2px 8px; border-radius: 4px; background: #f1f5f9; color: #475569; font-weight: 600; }
+        .tc-status {
+            font-size: 0.78rem; padding: 2px 9px; border-radius: 6px; font-weight: 700; margin-left: auto;
+        }
+        .tc-status.OPEN { background: #ede9fe; color: #6366f1; }
+        .tc-status.IN_PROGRESS { background: #fef3c7; color: #d97706; }
+        .tc-status.RESOLVED { background: #dcfce7; color: #16a34a; }
+        .tc-status.CLOSED { background: #fee2e2; color: #dc2626; }
+        .tc-status.WAITING { background: #f1f5f9; color: #64748b; }
+        .tc-subject { font-weight: 700; font-size: 0.95rem; margin-bottom: 4px; }
+        .tc-date { font-size: 0.8rem; color: #94a3b8; }
+        .empty-state { color: #94a3b8; text-align: center; padding: 40px 0; }
+
+        /* Ticket Detail Modal */
+        .td-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.45); z-index: 2000;
+            align-items: center; justify-content: center;
+        }
+        .td-overlay.open { display: flex; }
+        .td-modal {
+            background: #fff; border-radius: 16px; padding: 28px 30px;
+            width: 96%; max-width: 600px; max-height: 88vh; overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .td-modal h3 { margin: 0 0 4px; font-size: 1.1rem; }
+        .td-meta { color: #64748b; font-size: 0.85rem; margin-bottom: 16px; }
+        .td-thread { border-top: 1px solid #e2e8f0; padding-top: 14px; margin-bottom: 14px; }
+        .msg-bubble {
+            max-width: 85%; padding: 10px 14px; border-radius: 10px;
+            margin-bottom: 10px; font-size: 0.9rem; line-height: 1.5;
+        }
+        .msg-bubble.customer { background: #ede9fe; margin-left: auto; text-align: right; }
+        .msg-bubble.admin { background: #f1f5f9; }
+        .msg-from { font-size: 0.75rem; font-weight: 700; margin-bottom: 2px; color: #64748b; }
+        .msg-time { font-size: 0.72rem; color: #94a3b8; margin-top: 4px; }
+        .td-close {
+            float: right; border: none; background: none; font-size: 1.3rem;
+            cursor: pointer; color: #94a3b8; line-height: 1;
+        }
+
+        /* Create Ticket Modal */
+        .ct-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.45); z-index: 2000;
+            align-items: center; justify-content: center;
+        }
+        .ct-overlay.open { display: flex; }
+        .ct-modal {
+            background: #fff; border-radius: 16px; padding: 28px 30px;
+            width: 96%; max-width: 520px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .ct-modal h3 { margin: 0 0 18px; font-size: 1.1rem; }
+        .form-group { margin-bottom: 14px; }
+        .form-group label { display: block; font-weight: 600; font-size: 0.88rem; margin-bottom: 5px; color: #374151; }
+        .form-group select, .form-group input, .form-group textarea {
+            width: 100%; padding: 10px 12px; border: 1.5px solid #e2e8f0;
+            border-radius: 8px; font: inherit; box-sizing: border-box;
+            transition: border .2s;
+        }
+        .form-group select:focus, .form-group input:focus, .form-group textarea:focus {
+            outline: none; border-color: #6366f1;
+        }
+        .form-group textarea { min-height: 110px; resize: vertical; }
+        .form-hint { color: #94a3b8; font-size: 0.78rem; margin-top: 4px; }
+        .ct-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 6px; }
+        .btn-cancel {
+            padding: 9px 18px; border: 1.5px solid #e2e8f0; background: #fff;
+            border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.9rem;
+        }
+        .btn-submit {
+            padding: 9px 22px; border: none; background: #6366f1; color: #fff;
+            border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 0.9rem;
+            transition: background .2s;
+        }
+        .btn-submit:hover { background: #4f46e5; }
+        .form-error { color: #dc2626; font-size: 0.85rem; margin-top: 10px; min-height: 1.2em; }
+    </style>
+</head>
+<body class="shop-page">
+
+<header class="shop-header">
+    <div class="logo"><a href="index.html">📚 Online Book Shop</a></div>
+    <div class="search-bar">
+        <input type="search" id="searchInput" placeholder="Search books..." aria-label="Search books">
+        <button type="button" id="searchBtn">Search</button>
+    </div>
+    <nav class="nav">
+        <a href="index.html">Home</a>
+        <a href="profile.html" id="profileLink" style="display:none;">Profile</a>
+        <a href="order-history.html" id="ordersLink" style="display:none;">Orders</a>
+        <a href="reviews.html" id="reviewsLink" style="display:none;">Reviews</a>
+        <a href="support.html" id="supportLink" style="display:none;">Support</a>
+        <a href="notifications.html" id="notifLink" style="display:none;">🔔 <span id="notifBadge" style="background:#6366f1;color:#fff;border-radius:10px;padding:1px 7px;font-size:0.75rem;font-weight:700;margin-left:2px;"></span></a>
+        <a href="login.html" id="loginLink">Login</a>
+        <a href="#" id="logoutLink" style="display:none;">Logout</a>
+        <a href="cart.html" class="cart shop-cart-link">🛒 <span id="headerCartCount">$0.00 (0)</span></a>
+    </nav>
+</header>
+
+<main class="shop-main shop-main--sm">
+    <h1 class="sp-title">🎧 Hỗ trợ khách hàng</h1>
+    <p class="sp-subtitle">Gửi yêu cầu hỗ trợ và theo dõi trạng thái phản hồi</p>
+
+    <div class="sp-toolbar">
+        <span id="ticketCount" style="color:#64748b;font-size:0.9rem;"></span>
+        <button class="btn-new" onclick="openCreateModal()">+ Tạo yêu cầu mới</button>
+    </div>
+
+    <div id="ticketList"><p class="empty-state">Đang tải...</p></div>
+</main>
+
+<!-- ── Create Ticket Modal ── -->
+<div class="ct-overlay" id="ctOverlay">
+    <div class="ct-modal">
+        <h3>📝 Tạo yêu cầu hỗ trợ</h3>
+
+        <div class="form-group">
+            <label for="ctCategory">Loại vấn đề *</label>
+            <select id="ctCategory">
+                <option value="">-- Chọn loại --</option>
+                <option value="SHIPPING">🚚 Vận chuyển (SHIPPING)</option>
+                <option value="PAYMENT">💳 Thanh toán (PAYMENT)</option>
+                <option value="RETURN">↩️ Đổi/trả hàng (RETURN)</option>
+                <option value="PRODUCT">📦 Sản phẩm (PRODUCT)</option>
+                <option value="OTHER">❓ Khác (OTHER)</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="ctSubject">Tiêu đề *</label>
+            <input type="text" id="ctSubject" placeholder="Mô tả ngắn gọn vấn đề của bạn" maxlength="200">
+        </div>
+
+        <div class="form-group">
+            <label for="ctMessage">Nội dung chi tiết *</label>
+            <textarea id="ctMessage" placeholder="Mô tả chi tiết vấn đề bạn gặp phải..." maxlength="2000"></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="ctOrderId">Mã đơn hàng (nếu có)</label>
+            <input type="number" id="ctOrderId" placeholder="Nhập Order ID nếu vấn đề liên quan đến đơn hàng">
+            <div class="form-hint">💡 Thêm Order ID sẽ giúp bộ phận hỗ trợ xử lý nhanh hơn</div>
+        </div>
+
+        <div class="form-error" id="ctError"></div>
+
+        <div class="ct-actions">
+            <button class="btn-cancel" onclick="closeCreateModal()">Huỷ</button>
+            <button class="btn-submit" id="btnSubmit" onclick="submitTicket()">📨 Gửi yêu cầu</button>
+        </div>
+    </div>
+</div>
+
+<!-- ── Detail Modal ── -->
+<div class="td-overlay" id="tdOverlay">
+    <div class="td-modal">
+        <button class="td-close" onclick="closeDetailModal()">✕</button>
+        <h3 id="tdTitle"></h3>
+        <div class="td-meta" id="tdMeta"></div>
+        <div class="td-thread" id="tdThread"></div>
+        <div style="color:#64748b;font-size:0.85rem;text-align:center;" id="tdClosed"></div>
+    </div>
+</div>
+
+<footer class="shop-footer">© Online Book Shop</footer>
+
+<script src="js/auth-session.js"></script>
+<script src="js/shop-header.js"></script>
+<script src="js/support.js"></script>
+</body>
+</html>

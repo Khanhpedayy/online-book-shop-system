@@ -12,6 +12,7 @@
         var profileLink = document.getElementById("profileLink");
         var ordersLink = document.getElementById("ordersLink");
         var reviewsLink = document.getElementById("reviewsLink");
+        var supportLink = document.getElementById("supportLink");
         var notifLink = document.getElementById("notifLink");
         if (!loginLink || !logoutLink) {
             return;
@@ -31,6 +32,9 @@
             if (notifLink) {
                 notifLink.style.display = "inline";
             }
+            if (supportLink) {
+                supportLink.style.display = "inline";
+            }
         } else {
             loginLink.style.display = "inline";
             logoutLink.style.display = "none";
@@ -45,6 +49,9 @@
             }
             if (notifLink) {
                 notifLink.style.display = "none";
+            }
+            if (supportLink) {
+                supportLink.style.display = "none";
             }
         }
     }

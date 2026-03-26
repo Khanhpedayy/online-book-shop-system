@@ -38,6 +38,31 @@
             --input-bg: rgba(255, 255, 255, 0.05);
         }
 
+        body.light-mode {
+            --bg: #f4f5f7;
+            --bg-sidebar: #ffffff;
+            --bg-card: #ffffff;
+            --bg-hover: rgba(0, 0, 0, 0.04);
+            --accent: #5a52d5;
+            --accent-hover: #4a42b5;
+            --accent-glow: rgba(90, 82, 213, 0.15);
+            --text: #111122;
+            --text2: #4b5563;
+            --text3: #6b7280;
+            --border: rgba(0, 0, 0, 0.08);
+            --input-bg: #f9fafb;
+        }
+
+        body.light-mode .sidebar-brand h2 {
+            background: none;
+            -webkit-text-fill-color: initial;
+            color: var(--accent);
+        }
+
+        body.light-mode .table-wrapper {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
         body {
             font-family: 'Inter', -apple-system, sans-serif;
             background: var(--bg);
@@ -789,6 +814,7 @@
                     <div class="role">Quản trị viên</div>
                 </div>
             </div>
+            <button class="btn-sm" onclick="toggleTheme()" style="width:100%;margin-bottom:10px;justify-content:center;display:flex;">🌓 Giao diện</button>
             <button class="btn-logout" onclick="logout()">🚪 Đăng xuất</button>
         </div>
     </aside>
@@ -995,7 +1021,8 @@
                     <div class="error-msg" id="err-mPassword"></div>
                 </div>
                 <div class="modal-actions">
-                    <button type="button" class="btn-ghost" onclick="closeModal()">Hủy</button>
+                    <button type="button" class="btn-ghost" onclick="closeModal()">Đóng</button>
+                    <button type="button" class="btn btn-accent" id="btnResetCustomerPassword" style="display:none;background:var(--yellow);color:#000;" onclick="resetCustomerPassword()">Gửi Email MK Mới</button>
                     <button type="submit" class="btn btn-accent" id="modalSubmitBtn">Tạo tài khoản</button>
                 </div>
             </form>
@@ -1026,6 +1053,22 @@
            }
            return headers;
         }
+        (function initTheme() {
+            const savedTheme = localStorage.getItem('adminTheme');
+            if (savedTheme === 'light') {
+                document.body.classList.add('light-mode');
+            }
+        })();
+
+        function toggleTheme() {
+            document.body.classList.toggle('light-mode');
+            if (document.body.classList.contains('light-mode')) {
+                localStorage.setItem('adminTheme', 'light');
+            } else {
+                localStorage.setItem('adminTheme', 'dark');
+            }
+        }
+
         (function checkAdmin() {
             const user = getUser();
             const token = getToken();
@@ -1256,6 +1299,17 @@
             document.getElementById('mRole').value = 'CUSTOMER';
             document.getElementById('mPassword').value = '';
             document.getElementById('passwordLabel').textContent = 'Mật khẩu * (≥ 8 ký tự, hoa, thường, số, đặc biệt)';
+            
+            document.getElementById('mFullName').disabled = false;
+            document.getElementById('mEmail').disabled = false;
+            document.getElementById('mPhone').disabled = false;
+            document.getElementById('mRole').disabled = false;
+            document.getElementById('mPassword').style.display = 'block';
+            document.getElementById('passwordLabel').style.display = 'block';
+            document.getElementById('modalSubmitBtn').style.display = 'inline-flex';
+            const rpBtn = document.getElementById('btnResetCustomerPassword');
+            if (rpBtn) rpBtn.style.display = 'none';
+
             document.getElementById('modalOverlay').classList.add('active');
         }
 
@@ -1264,7 +1318,7 @@
             if (!user) return;
             editingId = id;
             resetValidation();
-            document.getElementById('modalTitle').textContent = 'Chỉnh sửa tài khoản';
+            document.getElementById('modalTitle').textContent = 'Chi tiết tài khoản';
             document.getElementById('modalSubmitBtn').textContent = 'Cập nhật';
             document.getElementById('mFullName').value = user.fullName || '';
             document.getElementById('mEmail').value = user.email || '';
@@ -1273,12 +1327,58 @@
             document.getElementById('mPassword').value = '';
             document.getElementById('passwordLabel').textContent = 'Mật khẩu mới (bỏ trống nếu không đổi, nếu đổi phải ≥ 8 ký tự...)';
 
+            const isCustomer = user.roleCode === 'CUSTOMER';
+            document.getElementById('mFullName').disabled = isCustomer;
+            document.getElementById('mEmail').disabled = isCustomer;
+            document.getElementById('mPhone').disabled = isCustomer;
+            document.getElementById('mRole').disabled = isCustomer;
+            
+            const rpBtn = document.getElementById('btnResetCustomerPassword');
+            if (isCustomer) {
+                document.getElementById('modalSubmitBtn').style.display = 'none';
+                document.getElementById('mPassword').style.display = 'none';
+                document.getElementById('passwordLabel').style.display = 'none';
+                if (rpBtn) rpBtn.style.display = 'inline-flex';
+            } else {
+                document.getElementById('modalSubmitBtn').style.display = 'inline-flex';
+                document.getElementById('mPassword').style.display = 'block';
+                document.getElementById('passwordLabel').style.display = 'block';
+                if (rpBtn) rpBtn.style.display = 'none';
+            }
+
             // Mark existing valid fields as green
             validateField('mFullName');
             validateField('mEmail');
             if (user.phone) validateField('mPhone');
 
             document.getElementById('modalOverlay').classList.add('active');
+        }
+
+        async function resetCustomerPassword() {
+            if (!editingId) return;
+            const user = allUsers.find(u => u.id === editingId);
+            if (!user) return;
+            if (!confirm(`Bạn có chắc muốn cấp lại mật khẩu cho khách hàng "${user.fullName}"? Mật khẩu mới sẽ được gửi về email.`)) return;
+
+            const btn = document.getElementById('btnResetCustomerPassword');
+            const originalText = btn.textContent;
+            btn.disabled = true;
+            btn.textContent = 'Đang xử lý...';
+
+            try {
+                const res = await fetch(API + '/api/admin/users/' + editingId + '/reset-password-email', {
+                    method: 'POST', headers: authHeaders()
+                });
+                const data = await res.json();
+                if (!res.ok) { toast('error', data.error || 'Thao tác thất bại'); return; }
+                toast('success', 'Đã cấp lại mật khẩu và gửi email thành công');
+                closeModal();
+            } catch (err) {
+                toast('error', 'Không thể kết nối server');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = originalText;
+            }
         }
 
         function closeModal() {
@@ -1386,6 +1486,8 @@
             document.querySelectorAll('.page-section').forEach(s => s.style.display = 'none');
             const rrPage = document.getElementById('pageReviewReports');
             if (rrPage) rrPage.style.display = 'none';
+            const spPage = document.getElementById('pageSupport');
+            if (spPage) spPage.style.display = 'none';
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
 
             if (page === 'dashboard') {
@@ -1405,6 +1507,12 @@
                 if (p) p.style.display = '';
                 document.getElementById('navReviewReports').classList.add('active');
                 loadReviewReports();
+            } else if (page === 'support') {
+                const p = document.getElementById('pageSupport');
+                if (p) p.style.display = '';
+                const nav = document.getElementById('navSupport');
+                if (nav) nav.classList.add('active');
+                loadSupportTickets();
             }
         }
 
@@ -1622,7 +1730,7 @@
         /* inject page HTML once */
         (function buildReviewReportsPage() {
             const html = `
-            <div id="pageReviewReports" style="display:none;">
+            <div id="pageReviewReports" class="page-section" style="display:none;">
                 <div class="topbar">
                     <div>
                         <h1>🚩 Report &amp; Support</h1>
@@ -1685,7 +1793,7 @@
                 </div>
             </div>`;
 
-            document.body.insertAdjacentHTML('beforeend', html);
+            document.querySelector('.main').insertAdjacentHTML('beforeend', html);
         })();
 
         var _currentReportId = null;
@@ -1793,6 +1901,195 @@
                 }
             } catch(e) {
                 document.getElementById('rrModalMsg').textContent = '❌ ' + e.message;
+            }
+        }
+    </script>
+
+    <!-- ========== SUPPORT TICKETS PAGE ========== -->
+    <script>
+        (function buildSupportPage() {
+            const html = `
+            <div id="pageSupport" class="page-section" style="display:none;">
+                <div class="topbar">
+                    <div>
+                        <h1>🎧 Support Tickets</h1>
+                        <div class="breadcrumb">Admin / Support Tickets</div>
+                    </div>
+                </div>
+                <div class="content">
+                    <div class="toolbar" style="margin-bottom:16px;">
+                        <span style="font-size:13px;color:var(--text2);">Lọc:</span>
+                        <select id="spStatusFilter" class="filter-select" onchange="loadSupportTickets()">
+                            <option value="">Tất cả</option>
+                            <option value="OPEN" selected>OPEN</option>
+                            <option value="IN_PROGRESS">IN_PROGRESS</option>
+                            <option value="WAITING">WAITING</option>
+                            <option value="RESOLVED">RESOLVED</option>
+                            <option value="CLOSED">CLOSED</option>
+                        </select>
+                        <button class="btn btn-accent" onclick="loadSupportTickets()">🔄 Tải lại</button>
+                    </div>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead><tr>
+                                <th>Mã ticket</th><th>Khách hàng</th><th>Loại</th><th>Tiêu đề</th><th>Trạng thái</th><th>Ngày tạo</th><th>Hành động</th>
+                            </tr></thead>
+                            <tbody id="spTableBody"></tbody>
+                        </table>
+                        <div id="spEmpty" class="empty-state" style="display:none;"><div class="icon">🎧</div><p>Không có support ticket nào.</p></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Support detail + reply modal -->
+            <div id="spModal" class="modal-overlay">
+                <div class="modal" style="max-width:640px;">
+                    <h2 id="spModalTitle">Chi tiết ticket</h2>
+                    <div id="spModalMeta" style="font-size:12px;color:var(--text3);margin-bottom:12px;"></div>
+
+                    <!-- Thread -->
+                    <div id="spThread" style="background:rgba(255,255,255,0.03);border-radius:10px;padding:12px 14px;margin-bottom:16px;max-height:240px;overflow-y:auto;border:1px solid var(--border);"></div>
+
+                    <!-- Reply form -->
+                    <div style="margin-bottom:12px;">
+                        <label style="display:block;font-size:12px;color:var(--text2);margin-bottom:6px;">Phản hồi của admin *</label>
+                        <textarea id="spReplyMsg" placeholder="Nhập nội dung phản hồi..." style="width:100%;padding:10px 12px;background:var(--input-bg);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:inherit;font-size:13px;min-height:90px;resize:vertical;"></textarea>
+                    </div>
+                    <div style="margin-bottom:14px;">
+                        <label style="display:block;font-size:12px;color:var(--text2);margin-bottom:6px;">Cập nhật trạng thái</label>
+                        <select id="spResolution" style="width:100%;padding:10px 12px;background:var(--input-bg);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:inherit;font-size:13px;">
+                            <option value="IN_PROGRESS">Đang xử lý (IN_PROGRESS)</option>
+                            <option value="WAITING">Chờ phản hồi (WAITING)</option>
+                            <option value="RESOLVED">✅ Đã giải quyết (RESOLVED)</option>
+                            <option value="CLOSED">❌ Đóng/Từ chối (CLOSED)</option>
+                        </select>
+                    </div>
+
+                    <div id="spModalMsg" style="color:var(--red);font-size:12px;min-height:1.2em;margin-bottom:8px;"></div>
+
+                    <div class="modal-actions">
+                        <button class="btn-ghost" onclick="closeSpModal()">Đóng</button>
+                        <button class="btn btn-accent" onclick="sendSupportReply()">📨 Gửi phản hồi</button>
+                    </div>
+                </div>
+            </div>`;
+
+            document.querySelector('.main').insertAdjacentHTML('beforeend', html);
+        })();
+
+        // Add nav item for Support under Report & Support
+        (function addSupportNav() {
+            const rrNav = document.getElementById('navReviewReports');
+            if (!rrNav) return;
+            const newNav = document.createElement('a');
+            newNav.className = 'nav-item';
+            newNav.id = 'navSupport';
+            newNav.innerHTML = '<span class="emoji">🎧</span> Support Tickets';
+            newNav.setAttribute('onclick', "switchPage('support')");
+            rrNav.after(newNav);
+        })();
+
+        var _currentTicketId = null;
+
+        async function loadSupportTickets() {
+            const status = document.getElementById('spStatusFilter')?.value || '';
+            const token = localStorage.getItem('token');
+            try {
+                const url = '/api/admin/support-tickets' + (status ? '?status=' + status : '');
+                const res = await fetch(url, { headers: { Authorization: 'Bearer ' + token }, credentials: 'include' });
+                const data = await res.json();
+                renderSpTable(data);
+            } catch(e) { console.error(e); }
+        }
+
+        function renderSpTable(data) {
+            const tbody = document.getElementById('spTableBody');
+            const empty = document.getElementById('spEmpty');
+            if (!data || data.length === 0) {
+                tbody.innerHTML = '';
+                empty.style.display = 'block';
+                return;
+            }
+            empty.style.display = 'none';
+            const STATUS_COLORS = { OPEN: 'badge-role', IN_PROGRESS: 'badge-role', RESOLVED: 'badge-active', CLOSED: 'badge-inactive', WAITING: '' };
+            tbody.innerHTML = data.map(t => {
+                const badge = STATUS_COLORS[t.status] || '';
+                const date = t.createdAt ? new Date(t.createdAt).toLocaleDateString('vi-VN') : '';
+                return `<tr>
+                    <td style="font-family:monospace;font-size:12px;">${esc(t.ticketCode)}</td>
+                    <td>${esc(t.userName || '')}</td>
+                    <td><span class="badge badge-role" style="font-size:10px;">${esc(t.category)}</span></td>
+                    <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${esc(t.subject)}">${esc((t.subject||'').substring(0,50))}</td>
+                    <td><span class="badge ${badge}">${t.status}</span></td>
+                    <td class="date-text">${date}</td>
+                    <td class="actions"><button class="btn-sm" onclick="openSpModal(${t.id})">🔍 Xem & Trả lời</button></td>
+                </tr>`;
+            }).join('');
+        }
+
+        async function openSpModal(ticketId) {
+            _currentTicketId = ticketId;
+            const token = localStorage.getItem('token');
+            document.getElementById('spModal').classList.add('active');
+            document.getElementById('spModalTitle').textContent = 'Đang tải...';
+            document.getElementById('spThread').innerHTML = '';
+            document.getElementById('spReplyMsg').value = '';
+            document.getElementById('spModalMsg').textContent = '';
+            try {
+                const res = await fetch('/api/admin/support-tickets/' + ticketId, {
+                    headers: { Authorization: 'Bearer ' + token }, credentials: 'include'
+                });
+                const t = await res.json();
+                document.getElementById('spModalTitle').textContent = esc(t.subject);
+                document.getElementById('spModalMeta').textContent =
+                    t.ticketCode + ' · ' + t.category + ' · ' + t.status +
+                    (t.orderId ? ' · Order #' + t.orderId : '');
+
+                const thread = document.getElementById('spThread');
+                thread.innerHTML = (t.messages || []).map(m => {
+                    const isAdmin = m.from === 'admin';
+                    const label = isAdmin ? '🧑‍💼 Admin' : '👤 Khách hàng';
+                    const bg = isAdmin ? 'rgba(108,99,255,0.12)' : 'rgba(255,255,255,0.05)';
+                    const time = m.at ? new Date(m.at).toLocaleString('vi-VN') : '';
+                    return `<div style="background:${bg};border-radius:8px;padding:10px 12px;margin-bottom:8px;">
+                        <div style="font-size:11px;color:var(--text3);margin-bottom:4px;">${label} · ${time}</div>
+                        <div style="font-size:13px;">${esc(m.message)}</div>
+                    </div>`;
+                }).join('') || '<div style="color:var(--text3);font-size:12px;">Không có tin nhắn.</div>';
+
+                thread.scrollTop = thread.scrollHeight;
+            } catch(e) {
+                document.getElementById('spModalTitle').textContent = 'Lỗi tải dữ liệu';
+            }
+        }
+
+        function closeSpModal() {
+            document.getElementById('spModal').classList.remove('active');
+        }
+
+        async function sendSupportReply() {
+            const token = localStorage.getItem('token');
+            const message = (document.getElementById('spReplyMsg').value || '').trim();
+            const resolution = document.getElementById('spResolution').value;
+            const msgEl = document.getElementById('spModalMsg');
+            if (!message) { msgEl.textContent = '⚠️ Vui lòng nhập nội dung phản hồi.'; return; }
+            try {
+                const res = await fetch('/api/admin/support-tickets/' + _currentTicketId + '/reply', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+                    credentials: 'include',
+                    body: JSON.stringify({ message, resolution })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    closeSpModal();
+                    showToast(data.message || 'Đã gửi phản hồi!', 'success');
+                    loadSupportTickets();
+                } else {
+                    msgEl.textContent = '❌ ' + (data.message || 'Lỗi');
+                }
+            } catch(e) {
+                msgEl.textContent = '❌ ' + e.message;
             }
         }
     </script>

@@ -55,6 +55,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/me/reviews/**").authenticated()
                         .requestMatchers("/api/me/notifications/**").authenticated()
                         .requestMatchers("/api/me/review-reports").authenticated()
+                        .requestMatchers("/api/me/support-tickets/**").authenticated()
 
                         .requestMatchers("/staff/**").hasAnyRole("STAFF")
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")

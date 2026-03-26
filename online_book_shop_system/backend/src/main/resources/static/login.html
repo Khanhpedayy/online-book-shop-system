@@ -34,6 +34,33 @@
             --input-focus: rgba(108, 99, 255, 0.15);
         }
 
+        body.light-mode {
+            --bg-primary: #f4f5f7;
+            --bg-secondary: #e5e7eb;
+            --bg-card: rgba(255, 255, 255, 0.95);
+            --accent: #5a52d5;
+            --accent-hover: #4a42b5;
+            --accent-glow: rgba(90, 82, 213, 0.15);
+            --text-primary: #111122;
+            --text-secondary: #4b5563;
+            --text-muted: #6b7280;
+            --border: rgba(0, 0, 0, 0.08);
+            --input-bg: rgba(0, 0, 0, 0.03);
+            --input-focus: rgba(90, 82, 213, 0.1);
+        }
+
+        body.light-mode .card {
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06), 0 0 60px var(--accent-glow);
+        }
+
+        body.light-mode .tabs {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        body.light-mode .store-top {
+            background: #ffffff;
+        }
+
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background: var(--bg-primary);
@@ -448,9 +475,8 @@
             background: #1a1a2e;
             padding: 10px 20px;
             display: flex;
-            justify-content: center;
+            justify-content: space-between;
             align-items: center;
-            gap: 16px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.06);
         }
 
@@ -471,6 +497,7 @@
 
     <div class="store-top">
         <a href="index.html">← Online Book Shop</a>
+        <button onclick="toggleTheme()" style="background:none;border:none;color:var(--text-primary);cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px;">🌓 Giao diện</button>
     </div>
 
     <div class="bg-gradient"></div>
@@ -688,6 +715,22 @@
         })();
 
         const API_BASE = '';  // Same origin
+
+        (function initTheme() {
+            const savedTheme = localStorage.getItem('adminTheme');
+            if (savedTheme === 'light') {
+                document.body.classList.add('light-mode');
+            }
+        })();
+
+        function toggleTheme() {
+            document.body.classList.toggle('light-mode');
+            if (document.body.classList.contains('light-mode')) {
+                localStorage.setItem('adminTheme', 'light');
+            } else {
+                localStorage.setItem('adminTheme', 'dark');
+            }
+        }
 
         // === Tab switching ===
         function switchTab(tab) {

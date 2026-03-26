@@ -46,4 +46,14 @@ public class UserController {
     public ResponseEntity<UserDTO> toggleStatus(@PathVariable Long id) {
         return ResponseEntity.ok(userService.toggleUserStatus(id));
     }
+
+    @PostMapping("/{id}/reset-password-email")
+    public ResponseEntity<?> resetPasswordAndEmail(@PathVariable Long id) {
+        try {
+            userService.resetCustomerPassword(id);
+            return ResponseEntity.ok(java.util.Map.of("message", "Đã cấp lại mật khẩu và gửi email cho người dùng"));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(java.util.Map.of("error", e.getMessage()));
+        }
+    }
 }
