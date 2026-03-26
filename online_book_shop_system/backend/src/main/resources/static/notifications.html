@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Thông báo – Online Book Shop</title>
+    <link rel="stylesheet" href="css/shop.css">
+    <style>
+        .notif-title { font-size: 1.5rem; margin-bottom: 6px; }
+        .notif-subtitle { color: #64748b; font-size: 0.92rem; margin-bottom: 20px; }
+
+        .notif-toolbar { display: flex; justify-content: flex-end; margin-bottom: 14px; }
+        .btn-read-all {
+            padding: 8px 18px; border-radius: 8px; border: 1.5px solid #e2e8f0;
+            background: #fff; cursor: pointer; font-weight: 600; font-size: 0.88rem;
+            transition: background .2s;
+        }
+        .btn-read-all:hover { background: #f1f5f9; }
+
+        .notif-card {
+            display: flex; align-items: flex-start; gap: 14px;
+            background: var(--shop-card-bg); border-radius: 12px;
+            padding: 16px 18px; margin-bottom: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            cursor: pointer; transition: box-shadow .2s, background .2s;
+            border-left: 4px solid transparent;
+        }
+        .notif-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
+        .notif-card.unread { border-left-color: #6366f1; background: #f5f3ff; }
+        .notif-icon { font-size: 1.6rem; flex-shrink: 0; }
+        .notif-body { flex: 1; }
+        .notif-body h4 { margin: 0 0 4px; font-size: 0.95rem; }
+        .notif-body p { margin: 0; color: #374151; font-size: 0.88rem; line-height: 1.5; }
+        .notif-date { color: #94a3b8; font-size: 0.8rem; margin-top: 6px; }
+        .unread-dot {
+            width: 9px; height: 9px; border-radius: 50%;
+            background: #6366f1; flex-shrink: 0; margin-top: 6px;
+        }
+        .empty-state { color: #94a3b8; text-align: center; padding: 40px 0; font-size: 0.95rem; }
+    </style>
+</head>
+<body class="shop-page">
+
+<header class="shop-header">
+    <div class="logo"><a href="index.html">📚 Online Book Shop</a></div>
+    <div class="search-bar">
+        <input type="search" id="searchInput" placeholder="Search books..." aria-label="Search books">
+        <button type="button" id="searchBtn">Search</button>
+    </div>
+    <nav class="nav">
+        <a href="index.html">Home</a>
+        <a href="profile.html" id="profileLink" style="display:none;">Profile</a>
+        <a href="order-history.html" id="ordersLink" style="display:none;">Orders</a>
+        <a href="reviews.html" id="reviewsLink" style="display:none;">Reviews</a>
+        <a href="notifications.html" id="notifLink" style="display:none;">🔔 <span id="notifBadge" class="notif-badge"></span></a>
+        <a href="login.html" id="loginLink">Login</a>
+        <a href="#" id="logoutLink" style="display:none;">Logout</a>
+        <a href="cart.html" class="cart shop-cart-link">🛒 <span id="headerCartCount">$0.00 (0)</span></a>
+    </nav>
+</header>
+
+<main class="shop-main shop-main--sm">
+    <h1 class="notif-title">🔔 Thông báo</h1>
+    <p class="notif-subtitle">Các thông báo liên quan đến tài khoản và hoạt động của bạn</p>
+
+    <div class="notif-toolbar">
+        <button class="btn-read-all" onclick="markAllRead()">✓ Đánh dấu tất cả đã đọc</button>
+    </div>
+
+    <div id="notifList"><p class="empty-state">Đang tải...</p></div>
+</main>
+
+<footer class="shop-footer">© Online Book Shop</footer>
+
+<script src="js/auth-session.js"></script>
+<script src="js/shop-header.js"></script>
+<script src="js/notifications.js"></script>
+</body>
+</html>

@@ -86,12 +86,50 @@ public class EmailOtpService {
 
             javaMailSender.send(message);
         } catch (MessagingException e) {
-            // Log out the error if it happens but we don't necessarily crash because we
-            // fallback to printing OTP when testing locally
             System.err.println("Lỗi khi gửi email: " + e.getMessage());
         } catch (Exception e) {
             System.err.println("Cấu hình mail sai hoặc lỗi mạng, in OTP ra console để test: " + otp);
         }
+    }
+
+    // ============ Password Reset OTP ============
+
+    public String generateAndSendPasswordResetOtp(String email) {
+        Random random = new Random();
+        int otpValue = 100000 + random.nextInt(900000);
+        String otp = String.valueOf(otpValue);
+
+        otpCache.put(email, otp);
+        scheduler.schedule(() -> otpCache.remove(email, otp), 5, TimeUnit.MINUTES);
+
+        try {
+            MimeMessage message = javaMailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            helper.setFrom(sender);
+            helper.setTo(email);
+            helper.setSubject("Đặt lại mật khẩu - Online Book Shop");
+
+            String htmlMsg = "<div style='font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px;'>"
+                    + "<h2 style='color: #6c63ff; text-align: center;'>Online Book Shop</h2>"
+                    + "<p>Chào bạn,</p>"
+                    + "<p>Bạn vừa yêu cầu <strong>đặt lại mật khẩu</strong> tại hệ thống của chúng tôi. Dưới đây là mã xác thực OTP:</p>"
+                    + "<div style='text-align: center; margin: 20px 0;'>"
+                    + "<span style='font-size: 24px; font-weight: bold; background: #f4f4f4; padding: 10px 20px; border-radius: 5px; letter-spacing: 5px;'>"
+                    + otp + "</span>"
+                    + "</div>"
+                    + "<p>Mã này có hiệu lực trong <strong>5 phút</strong>. Vui lòng không chia sẻ mã này cho bất kỳ ai.</p>"
+                    + "<hr style='border: none; border-top: 1px solid #eee; margin: 20px 0;'/>"
+                    + "<p style='font-size: 12px; color: #888; text-align: center;'>Nếu bạn không yêu cầu đặt lại mật khẩu, vui lòng bỏ qua email này.</p>"
+                    + "</div>";
+
+            helper.setText(htmlMsg, true);
+            javaMailSender.send(message);
+        } catch (Exception e) {
+            System.err.println("Lỗi gửi email reset password, OTP: " + otp);
+        }
+
+        return otp;
     }
 
     // ============ Shipping Emails ============

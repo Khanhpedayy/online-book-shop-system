@@ -27,11 +27,8 @@ public class OrderItem {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "variant_id", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "book", "lots", "copies"})
     private BookVariant variant;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "book_id", nullable = false)
-    private BookInfo book;
 
     @Column(name = "title_snapshot", nullable = false, length = 255)
     private String titleSnapshot;

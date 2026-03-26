@@ -21,6 +21,8 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import com.example.onlinebookshop.Service.EmailOtpService;
 
 @RestController
@@ -33,6 +35,9 @@ public class AuthController {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtils jwtUtils;
     private final EmailOtpService emailOtpService;
+
+    // Cache: resetToken -> email (for password reset flow)
+    private final Map<String, String> resetTokenCache = new ConcurrentHashMap<>();
 
     public AuthController(AuthenticationManager authenticationManager,
             UserRepository userRepository,
@@ -177,5 +182,84 @@ public class AuthController {
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(Map.of("message", "Tạo tài khoản thành công"));
+    }
+
+    // ========== FORGOT PASSWORD ==========
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestBody Map<String, String> request) {
+        String email = request.get("email");
+        if (email == null || email.isBlank()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Email là bắt buộc"));
+        }
+
+        Optional<User> userOpt = userRepository.findByEmailAndDeletedAtIsNull(email.trim());
+        if (userOpt.isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Email không tồn tại trong hệ thống"));
+        }
+
+        User user = userOpt.get();
+        if (!"ACTIVE".equalsIgnoreCase(user.getStatus())) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Tài khoản đã bị vô hiệu hóa"));
+        }
+
+        String otp = emailOtpService.generateAndSendPasswordResetOtp(email.trim());
+        System.out.println("Password reset OTP for " + email + ": " + otp);
+
+        return ResponseEntity.ok(Map.of("message", "Đã gửi mã OTP đến email của bạn", "requireOtp", true));
+    }
+
+    @PostMapping("/verify-forgot-otp")
+    public ResponseEntity<?> verifyForgotOtp(@RequestBody Map<String, String> request) {
+        String email = request.get("email");
+        String otp = request.get("otp");
+
+        if (email == null || otp == null || otp.isBlank()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Email và mã OTP là bắt buộc"));
+        }
+
+        boolean isValid = emailOtpService.verifyOtp(email.trim(), otp.trim());
+        if (!isValid) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", "Mã xác thực không hợp lệ hoặc đã hết hạn"));
+        }
+
+        // Generate a one-time reset token
+        String resetToken = UUID.randomUUID().toString();
+        resetTokenCache.put(resetToken, email.trim());
+
+        return ResponseEntity.ok(Map.of("message", "Xác thực thành công", "resetToken", resetToken));
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> request) {
+        String resetToken = request.get("resetToken");
+        String newPassword = request.get("newPassword");
+
+        if (resetToken == null || newPassword == null) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Thiếu thông tin"));
+        }
+
+        String email = resetTokenCache.remove(resetToken);
+        if (email == null) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Phiên đặt lại mật khẩu đã hết hạn. Vui lòng thử lại"));
+        }
+
+        // Validate password strength
+        if (newPassword.length() < 8) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Mật khẩu phải có ít nhất 8 ký tự"));
+        }
+        if (!newPassword.matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^a-zA-Z\\d]).{8,}$")) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", "Mật khẩu chưa đủ mạnh. Cần chữ hoa, chữ thường, số và ký tự đặc biệt"));
+        }
+
+        User user = userRepository.findByEmailAndDeletedAtIsNull(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        user.setPasswordHash(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+
+        return ResponseEntity.ok(Map.of("message", "Đặt lại mật khẩu thành công!"));
     }
 }

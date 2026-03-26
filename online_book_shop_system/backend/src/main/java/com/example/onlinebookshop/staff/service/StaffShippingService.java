@@ -48,30 +48,16 @@ public class StaffShippingService {
     @Transactional
     public void confirmShipped(long orderId, String carrier, String trackingCode) {
 
-        String c = carrier == null ? null : carrier.trim();
-        String t = trackingCode == null ? null : trackingCode.trim();
-
-        if (c == null || c.isEmpty()) throw new IllegalArgumentException("carrier is required");
-        if (t == null || t.isEmpty()) throw new IllegalArgumentException("trackingCode is required");
-        if (t.length() < 6) throw new IllegalArgumentException("trackingCode quá ngắn (>=6 ký tự)");
+        String c = carrier == null || carrier.trim().isEmpty() ? "Nhân viên giao hàng" : carrier.trim();
+        String t = trackingCode == null || trackingCode.trim().isEmpty()
+                ? "SELF-" + orderId + "-" + System.currentTimeMillis() % 100000
+                : trackingCode.trim();
 
         var h = repo.getOrderHeader(orderId);
 
-        // Rule demo: chỉ ship khi PACKED (hoặc đã SHIPPED để idempotent)
+        // Rule: chỉ ship khi PACKED (hoặc đã SHIPPED để idempotent)
         if (!"PACKED".equalsIgnoreCase(h.status()) && !"SHIPPED".equalsIgnoreCase(h.status())) {
             throw new IllegalStateException("Order phải PACKED trước khi ship. status=" + h.status());
-        }
-
-        // đảm bảo đã pick + allocate đủ cho item per-copy (demo)
-        int total = repo.countPackableItems(orderId);
-        int allocated = repo.countAllocated(orderId);
-        int picked = repo.countPicked(orderId);
-
-        if (allocated < total) {
-            throw new IllegalStateException("Chưa allocate đủ copy. allocated=" + allocated + ", total=" + total);
-        }
-        if (picked < allocated) {
-            throw new IllegalStateException("Chưa picked đủ. picked=" + picked + ", allocated=" + allocated);
         }
 
         int r = repo.markShipped(orderId, c, t);

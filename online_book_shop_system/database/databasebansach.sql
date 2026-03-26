@@ -1,4 +1,4 @@
-﻿/* =========================================================
+/* =========================================================
    BOOKSTORE DATABASE — COMPACT SCHEMA (24 tables)
    SQL Server | Soft-delete + Audit columns
    Sections: 1)AUTH  2)CATALOG  3)INVENTORY
@@ -639,6 +639,48 @@ CREATE TABLE audit_logs (
 CREATE INDEX IX_audit_created ON audit_logs(created_at);
 CREATE INDEX IX_audit_entity  ON audit_logs(entity_table, entity_id);
 
+
+/* ===================== ENGAGEMENT (tiếp) ===================== */
+
+CREATE TABLE review_reports (
+  id           BIGINT IDENTITY(1,1) PRIMARY KEY,
+  review_id    BIGINT NOT NULL,
+  reporter_id  BIGINT NOT NULL,
+  reason       NVARCHAR(500) NOT NULL,
+  status       VARCHAR(20) NOT NULL DEFAULT 'PENDING',   -- PENDING | APPROVED | REJECTED
+  admin_note   NVARCHAR(500) NULL,
+  reviewed_by  BIGINT NULL,
+  reviewed_at  DATETIME2(0) NULL,
+  created_at   DATETIME2(0) NOT NULL DEFAULT SYSUTCDATETIME(),
+  updated_at   DATETIME2(0) NULL,
+  deleted_at   DATETIME2(0) NULL,
+  row_version  ROWVERSION,
+
+  CONSTRAINT FK_rr_review   FOREIGN KEY (review_id)   REFERENCES reviews(id),
+  CONSTRAINT FK_rr_reporter FOREIGN KEY (reporter_id)  REFERENCES users(id),
+  CONSTRAINT FK_rr_admin    FOREIGN KEY (reviewed_by)  REFERENCES users(id),
+  CONSTRAINT CK_rr_status   CHECK (status IN ('PENDING','APPROVED','REJECTED'))
+);
+CREATE INDEX IX_rr_review   ON review_reports(review_id);
+CREATE INDEX IX_rr_reporter ON review_reports(reporter_id);
+CREATE INDEX IX_rr_status   ON review_reports(status) WHERE deleted_at IS NULL;
+
+CREATE TABLE notifications (
+  id         BIGINT IDENTITY(1,1) PRIMARY KEY,
+  user_id    BIGINT NOT NULL,
+  title      NVARCHAR(200)  NOT NULL,
+  body       NVARCHAR(1000) NOT NULL,
+  type       VARCHAR(40)    NOT NULL DEFAULT 'GENERAL',
+  is_read    BIT NOT NULL DEFAULT 0,
+  ref_id     BIGINT NULL,
+  created_at DATETIME2(0) NOT NULL DEFAULT SYSUTCDATETIME(),
+  deleted_at DATETIME2(0) NULL,
+  row_version ROWVERSION,
+
+  CONSTRAINT FK_notif_user FOREIGN KEY (user_id) REFERENCES users(id)
+);
+CREATE INDEX IX_notif_user    ON notifications(user_id);
+CREATE INDEX IX_notif_unread  ON notifications(user_id, is_read) WHERE deleted_at IS NULL;
 
 /* ===================== SEED DATA ===================== */
 

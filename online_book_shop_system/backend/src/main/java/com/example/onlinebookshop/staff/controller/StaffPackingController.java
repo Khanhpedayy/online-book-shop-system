@@ -40,7 +40,7 @@ public class StaffPackingController {
         } catch (Exception e) {
             ra.addFlashAttribute("errorMsg", e.getMessage());
         }
-        return "redirect:/staff/orders/" + orderId + "/pack";
+        return "redirect:/staff/orders/" + orderId + "/ship";
     }
 
     @GetMapping("/{orderId}/packing-slip")

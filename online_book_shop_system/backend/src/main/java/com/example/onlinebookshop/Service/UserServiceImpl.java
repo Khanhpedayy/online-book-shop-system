@@ -149,7 +149,7 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng với ID: " + id));
 
         if ("ACTIVE".equals(user.getStatus())) {
-            user.setStatus("INACTIVE");
+            user.setStatus("DISABLED");
         } else {
             user.setStatus("ACTIVE");
         }

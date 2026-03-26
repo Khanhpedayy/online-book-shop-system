@@ -25,34 +25,31 @@
 <main class="container py-4">
     <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
         <div>
-            <h1 class="h4 mb-1">Shipping</h1>
+            <h1 class="h4 mb-1">Giao hàng</h1>
             <div class="text-muted">
                 Order: <span class="mono" th:text="${v.orderCode}">ORD</span>
                 <span class="mx-2">•</span>
                 Status: <span class="badge text-bg-secondary" th:text="${v.status}">PACKED</span>
-                <span class="mx-2">•</span>
-                Picked: <span class="mono" th:text="${v.pickedItems}">0</span>/<span class="mono" th:text="${v.allocatedItems}">0</span>
             </div>
         </div>
         <div class="d-flex gap-2">
             <a class="btn btn-sm btn-outline-secondary" th:href="@{|/staff/orders/${v.orderId}|}">Order Detail</a>
             <a class="btn btn-sm btn-outline-secondary" th:href="@{|/staff/orders/${v.orderId}/pack|}">Quay lại Packing</a>
-            <a class="btn btn-sm btn-outline-primary" th:href="@{|/staff/orders/${v.orderId}/packing-slip|}" target="_blank">Print Slip</a>
         </div>
     </div>
 
     <div class="card border-0 shadow-sm mb-3">
         <div class="card-body">
-            <div class="fw-semibold mb-2">Bạn đang ở bước 4: Bàn giao cho vận chuyển</div>
+            <div class="fw-semibold mb-2">Bạn đang ở bước 4: Giao hàng</div>
             <div class="d-flex flex-wrap gap-2">
                 <span class="step-chip">1. Confirm Order</span>
                 <span class="step-chip">2. Pick List</span>
                 <span class="step-chip">3. Packing</span>
-                <span class="step-chip text-primary fw-semibold">4. Shipping</span>
+                <span class="step-chip text-primary fw-semibold" style="border-color: #0d6efd;">4. Shipping</span>
                 <span class="step-chip">5. Delivery</span>
             </div>
             <div class="small text-muted mt-2">
-                Màn này dùng để nhập carrier, tracking code và xác nhận đơn đã được gửi đi.
+                Nhân viên tự giao hàng nội thành. Nhập tên người giao (không bắt buộc) và bấm xác nhận.
             </div>
         </div>
     </div>
@@ -64,11 +61,11 @@
         <div class="col-12 col-lg-6">
             <div class="card border-0 shadow-sm">
                 <div class="card-body">
-                    <div class="fw-semibold mb-2">Ship to</div>
-                    <div><span class="text-muted small">Name:</span> <span th:text="${v.shipName}">-</span></div>
-                    <div><span class="text-muted small">Phone:</span> <span class="mono" th:text="${v.shipPhone}">-</span></div>
+                    <div class="fw-semibold mb-2">Thông tin giao hàng</div>
+                    <div><span class="text-muted small">Người nhận:</span> <span th:text="${v.shipName}">-</span></div>
+                    <div><span class="text-muted small">Điện thoại:</span> <span class="mono" th:text="${v.shipPhone}">-</span></div>
                     <div class="mt-2">
-                        <div class="text-muted small">Address</div>
+                        <div class="text-muted small">Địa chỉ</div>
                         <div>
                             <span th:text="${v.shipLine1}"></span>
                             <span th:if="${v.shipLine2}">, <span th:text="${v.shipLine2}"></span></span>
@@ -81,7 +78,7 @@
 
                     <hr/>
                     <div class="text-muted small">
-                        Chỉ ship khi order đang <span class="mono">PACKED</span> và đã pick đủ.
+                        Đơn đang <span class="mono">PACKED</span> — sẵn sàng giao cho khách.
                     </div>
                 </div>
             </div>
@@ -90,28 +87,28 @@
         <div class="col-12 col-lg-6">
             <div class="card border-0 shadow-sm">
                 <div class="card-body">
-                    <div class="fw-semibold mb-2">Xác nhận SHIPPED</div>
+                    <div class="fw-semibold mb-2">Xác nhận đi giao</div>
 
                     <form class="row g-2" th:action="@{|/staff/orders/${v.orderId}/ship/confirm|}" method="post">
-                        <div class="col-12 col-md-6">
-                            <label class="form-label small text-muted">Carrier</label>
-                            <input class="form-control form-control-sm" name="carrier" placeholder="VD: GHN / GHTK / ViettelPost"
-                                   th:value="${v.carrier}" required>
-                        </div>
-
-                        <div class="col-12 col-md-6">
-                            <label class="form-label small text-muted">Tracking code</label>
-                            <input class="form-control form-control-sm mono" name="trackingCode" placeholder="Tracking"
-                                   th:value="${v.trackingCode}" required>
+                        <div class="col-12">
+                            <label class="form-label small text-muted">Người giao <span class="text-muted">(để trống = "Nhân viên giao hàng")</span></label>
+                            <input class="form-control form-control-sm" name="carrier" placeholder="VD: Nguyễn Văn A"
+                                   th:value="${v.carrier}">
                         </div>
 
                         <div class="col-12">
-                            <button class="btn btn-sm btn-primary">Mark SHIPPED</button>
+                            <label class="form-label small text-muted">Ghi chú giao hàng <span class="text-muted">(không bắt buộc)</span></label>
+                            <input class="form-control form-control-sm" name="trackingCode" placeholder="VD: Giao buổi chiều 2-5h"
+                                   th:value="${v.trackingCode}">
+                        </div>
+
+                        <div class="col-12 mt-2">
+                            <button class="btn btn-primary w-100">🚚 Xác nhận đi giao</button>
                         </div>
                     </form>
 
                     <div class="text-muted small mt-2">
-                        Sau khi ship xong, tiếp tục sang bước <span class="mono">Delivery Outcome</span>.
+                        Sau khi giao xong, quay lại cập nhật kết quả ở bước <span class="mono">Delivery</span>.
                     </div>
                 </div>
             </div>
@@ -120,16 +117,16 @@
 
     <div class="card border-0 shadow-sm mt-3">
         <div class="card-body">
-            <div class="fw-semibold mb-2">Items trong shipment</div>
+            <div class="fw-semibold mb-2">Sách cần giao</div>
             <div class="table-responsive">
                 <table class="table table-sm align-middle">
                     <thead>
                     <tr class="text-muted small">
                         <th>#</th>
-                        <th>Location</th>
-                        <th>Copy</th>
+                        <th>Vị trí kho</th>
+                        <th>Mã copy</th>
                         <th>SKU</th>
-                        <th>Title</th>
+                        <th>Tên sách</th>
                     </tr>
                     </thead>
                     <tbody>

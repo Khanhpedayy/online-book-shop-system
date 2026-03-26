@@ -89,6 +89,73 @@ async function loadBook() {
     document.getElementById("addCartBtn").onclick = addToCart;
 
     await loadRelated(book.id);
+    await loadReviews(book.id);
+}
+
+/* ── REVIEWS ── */
+async function loadReviews(bookId) {
+    const listEl    = document.getElementById("reviewsList");
+    const summaryEl = document.getElementById("reviewSummary");
+    if (!listEl) return;
+    try {
+        const reviews = await apiGet(API + "/books/" + bookId + "/reviews");
+
+        if (!reviews || reviews.length === 0) {
+            listEl.innerHTML = `<p class="rv-empty">Chưa có đánh giá nào cho cuốn sách này.</p>`;
+            return;
+        }
+
+        /* Summary: avg rating */
+        const avg = (reviews.reduce((s, r) => s + r.rating, 0) / reviews.length).toFixed(1);
+        const fullStars = Math.round(avg);
+        document.getElementById("avgScore").textContent = avg;
+        document.getElementById("avgStars").textContent = "★".repeat(fullStars) + "☆".repeat(5 - fullStars);
+        document.getElementById("avgCount").textContent = reviews.length + " đánh giá";
+        summaryEl.style.display = "flex";
+
+        /* Render cards */
+        listEl.innerHTML = reviews.map(r => {
+            const stars = "★".repeat(r.rating) + "☆".repeat(5 - r.rating);
+            const date  = r.createdAt ? new Date(r.createdAt).toLocaleDateString("vi-VN") : "";
+            const name  = esc(r.reviewerName || "Ẩn danh");
+            const title = r.title ? `<div class="rv-title">${esc(r.title)}</div>` : "";
+            const text  = esc(r.content || "");
+            return `
+                <div class="rv-card">
+                    <div class="rv-card-header">
+                        <span class="rv-stars">${stars}</span>
+                        <span class="rv-author">${name}</span>
+                        <span class="rv-date">${date}</span>
+                        <button class="rv-report-btn" onclick="openReportModal(${r.id})" title="Báo cáo đánh giá này">🚩 Báo cáo</button>
+                    </div>
+                    ${title}
+                    <div class="rv-content">${text}</div>
+                </div>`;
+        }).join("") +
+        `<!-- Report Modal -->
+        <div id="reportOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:2000;align-items:center;justify-content:center;">
+          <div style="background:#fff;border-radius:14px;padding:26px 28px;width:90%;max-width:460px;box-shadow:0 20px 60px rgba(0,0,0,0.25);">
+            <h3 style="margin:0 0 6px;font-size:1.1rem;">🚩 Báo cáo đánh giá</h3>
+            <p style="color:#64748b;font-size:0.88rem;margin-bottom:14px;">Nhập lý do để chúng tôi xem xét đánh giá này.</p>
+            <textarea id="reportReason" placeholder="Lý do báo cáo..." maxlength="500"
+              style="width:100%;min-height:100px;padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font:inherit;resize:vertical;box-sizing:border-box;margin-bottom:12px;"></textarea>
+            <div id="reportMsg" style="color:#dc2626;font-size:0.88rem;min-height:1.2em;margin-bottom:8px;"></div>
+            <div style="display:flex;gap:10px;justify-content:flex-end;">
+              <button onclick="closeReportModal()" style="padding:9px 18px;border:1.5px solid #e2e8f0;border-radius:8px;background:#fff;cursor:pointer;font-weight:600;">Huỷ</button>
+              <button id="btnReport" onclick="submitReport()" style="padding:9px 20px;border:none;border-radius:8px;background:#dc2626;color:#fff;cursor:pointer;font-weight:700;">Gửi báo cáo</button>
+            </div>
+          </div>
+        </div>`;
+
+    } catch(e) {
+        console.warn("Could not load reviews:", e);
+        listEl.innerHTML = `<p class="rv-empty">Không thể tải đánh giá.</p>`;
+    }
+}
+
+function esc(str) {
+    return String(str || "").replace(/[&<>"']/g,
+        c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 }
 
 async function addToCart() {
@@ -178,3 +245,53 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
     await loadCartCount();
 });
+
+/* ── REPORT MODAL ── */
+var _reportReviewId = null;
+
+function openReportModal(reviewId) {
+    _reportReviewId = reviewId;
+    var overlay = document.getElementById("reportOverlay");
+    if (!overlay) { alert("Không tìm thấy form báo cáo"); return; }
+    overlay.style.display = "flex";
+    document.getElementById("reportReason").value = "";
+    document.getElementById("reportMsg").textContent = "";
+    var btn = document.getElementById("btnReport");
+    if (btn) btn.disabled = false;
+}
+
+function closeReportModal() {
+    var overlay = document.getElementById("reportOverlay");
+    if (overlay) overlay.style.display = "none";
+}
+
+async function submitReport() {
+    const token = getToken();
+    if (!token) { alert("Vui lòng đăng nhập để báo cáo."); return; }
+    const reason = (document.getElementById("reportReason").value || "").trim();
+    const msgEl = document.getElementById("reportMsg");
+    if (!reason) { msgEl.textContent = "⚠️ Vui lòng nhập lý do."; return; }
+    const btn = document.getElementById("btnReport");
+    btn.disabled = true;
+    msgEl.textContent = "";
+    try {
+        const res = await fetch(API_BASE + "/api/me/review-reports", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
+            credentials: "include",
+            body: JSON.stringify({ reviewId: _reportReviewId, reason })
+        });
+        const data = await res.json();
+        if (res.ok) {
+            closeReportModal();
+            alert("✅ " + (data.message || "Đã gửi báo cáo!"));
+        } else {
+            msgEl.textContent = "❌ " + (data.message || "Lỗi gửi báo cáo");
+            btn.disabled = false;
+        }
+    } catch(e) {
+        msgEl.textContent = "❌ " + e.message;
+        btn.disabled = false;
+    }
+}
+

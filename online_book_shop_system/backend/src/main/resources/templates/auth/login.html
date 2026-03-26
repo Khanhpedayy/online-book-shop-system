@@ -511,6 +511,9 @@
                 <div class="login-note">
                     Staff / Manager / Admin đăng nhập để vào dashboard tương ứng
                 </div>
+                <div style="text-align:center; margin-top:14px;">
+                    <a href="#" onclick="switchTab('forgot'); return false;" style="color:var(--accent); font-size:13px; text-decoration:none;">🔑 Quên mật khẩu?</a>
+                </div>
             </form>
         </div>
 
@@ -559,6 +562,67 @@
             </form>
         </div>
 
+        <!-- FORGOT PASSWORD FORM -->
+        <div class="form-section" id="forgotForm">
+            <!-- Step 1: Enter email -->
+            <form id="forgotStep1" onsubmit="handleForgotPassword(event)">
+                <div class="form-group">
+                    <label for="forgotEmail">Nhập email tài khoản của bạn</label>
+                    <div class="input-wrapper">
+                        <input type="email" id="forgotEmail" placeholder="you@example.com" required autocomplete="email">
+                        <span class="icon">✉</span>
+                    </div>
+                </div>
+                <button type="submit" class="btn-primary" id="forgotBtn">
+                    <span class="btn-text">Gửi mã xác thực</span>
+                    <div class="spinner"></div>
+                </button>
+                <button type="button" onclick="switchTab('login')" style="margin-top:12px; width:100%; padding:10px; background:transparent; color:var(--text-muted); border:none; cursor:pointer; font-family:inherit; font-size:13px;">← Quay lại đăng nhập</button>
+            </form>
+
+            <!-- Step 2: Enter OTP -->
+            <form id="forgotStep2" onsubmit="handleForgotVerifyOtp(event)" style="display:none;">
+                <div class="form-group">
+                    <label for="forgotOtp">Mã xác thực (OTP) đã gửi về email</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="forgotOtp" placeholder="123456" required maxlength="6" style="letter-spacing:4px; font-weight:bold; text-align:center;">
+                        <span class="icon">🔑</span>
+                    </div>
+                </div>
+                <button type="submit" class="btn-primary" id="forgotVerifyBtn">
+                    <span class="btn-text">Xác nhận OTP</span>
+                    <div class="spinner"></div>
+                </button>
+                <button type="button" onclick="forgotBackToStep1()" style="margin-top:12px; width:100%; padding:10px; background:transparent; color:var(--text-muted); border:none; cursor:pointer; font-family:inherit; font-size:13px;">← Quay lại nhập email</button>
+            </form>
+
+            <!-- Step 3: New password -->
+            <form id="forgotStep3" onsubmit="handleResetPassword(event)" style="display:none;">
+                <div class="form-group">
+                    <label for="newPassword">Mật khẩu mới * (≥ 8 ký tự, hoa, thường, số, đặc biệt)</label>
+                    <div class="input-wrapper">
+                        <input type="password" id="newPassword" placeholder="••••••••" required minlength="8" autocomplete="new-password" oninput="validateResetPwUI()">
+                        <span class="icon">🔒</span>
+                        <button type="button" class="toggle-password" onclick="togglePassword('newPassword', this)">👁</button>
+                    </div>
+                    <div id="resetPwStrength" style="display:none; color:var(--error); font-size:13px; margin-top:8px; line-height:1.5;">
+                        Mật khẩu yếu. Yêu cầu:<br>• Tối thiểu 8 ký tự<br>• Gồm chữ in HOA, in thường<br>• Gồm số và ký tự đặc biệt
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="confirmPassword">Xác nhận mật khẩu mới</label>
+                    <div class="input-wrapper">
+                        <input type="password" id="confirmPassword" placeholder="••••••••" required minlength="8" autocomplete="new-password">
+                        <span class="icon">🔒</span>
+                    </div>
+                </div>
+                <button type="submit" class="btn-primary" id="resetPwBtn">
+                    <span class="btn-text">Đặt lại mật khẩu</span>
+                    <div class="spinner"></div>
+                </button>
+            </form>
+        </div>
+
         <div class="seed-info">
             <strong>Tài khoản mẫu:</strong><br>
             Customer: <code>customer@example.com</code> / <code>123456</code><br>
@@ -595,10 +659,14 @@
         hideMessage();
         document.getElementById('loginForm').classList.toggle('active', tab === 'login');
         document.getElementById('registerForm').classList.toggle('active', tab === 'register');
-        document.getElementById('tabLogin').classList.toggle('active', tab === 'login');
+        document.getElementById('forgotForm').classList.toggle('active', tab === 'forgot');
+        document.getElementById('tabLogin').classList.toggle('active', tab === 'login' || tab === 'forgot');
         document.getElementById('tabRegister').classList.toggle('active', tab === 'register');
         document.getElementById('subtitle').textContent =
-            tab === 'login' ? 'Đăng nhập để tiếp tục' : 'Tạo tài khoản mới';
+            tab === 'login' ? 'Đăng nhập để tiếp tục' :
+            tab === 'forgot' ? 'Đặt lại mật khẩu' :
+            'Tạo tài khoản mới';
+        if (tab === 'forgot') forgotResetSteps();
     }
 
     function showMessage(type, text) {
@@ -696,6 +764,92 @@
             }, false);
         });
     })();
+
+    // === Forgot Password ===
+    let forgotEmail = '';
+    let resetToken = '';
+
+    function forgotResetSteps() {
+        document.getElementById('forgotStep1').style.display = 'block';
+        document.getElementById('forgotStep2').style.display = 'none';
+        document.getElementById('forgotStep3').style.display = 'none';
+        document.getElementById('forgotEmail').value = '';
+        document.getElementById('forgotOtp').value = '';
+        forgotEmail = ''; resetToken = '';
+    }
+
+    function forgotBackToStep1() {
+        hideMessage();
+        document.getElementById('forgotStep1').style.display = 'block';
+        document.getElementById('forgotStep2').style.display = 'none';
+    }
+
+    async function handleForgotPassword(e) {
+        e.preventDefault(); hideMessage();
+        setLoading('forgotBtn', true);
+        forgotEmail = document.getElementById('forgotEmail').value.trim();
+        try {
+            const res = await fetch(API_BASE + '/api/auth/forgot-password', {
+                method: 'POST', headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({ email: forgotEmail })
+            });
+            const data = await res.json();
+            if (!res.ok) { showMessage('error', data.error || 'Thất bại'); return; }
+            showMessage('success', data.message);
+            document.getElementById('forgotStep1').style.display = 'none';
+            document.getElementById('forgotStep2').style.display = 'block';
+        } catch (err) { showMessage('error', 'Không thể kết nối đến server.'); }
+        finally { setLoading('forgotBtn', false); }
+    }
+
+    async function handleForgotVerifyOtp(e) {
+        e.preventDefault(); hideMessage();
+        setLoading('forgotVerifyBtn', true);
+        const otp = document.getElementById('forgotOtp').value.trim();
+        try {
+            const res = await fetch(API_BASE + '/api/auth/verify-forgot-otp', {
+                method: 'POST', headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({ email: forgotEmail, otp })
+            });
+            const data = await res.json();
+            if (!res.ok) { showMessage('error', data.error || 'Mã OTP không đúng'); document.getElementById('forgotOtp').style.borderColor = 'var(--error)'; return; }
+            resetToken = data.resetToken;
+            showMessage('success', 'Xác thực thành công! Nhập mật khẩu mới.');
+            document.getElementById('forgotStep2').style.display = 'none';
+            document.getElementById('forgotStep3').style.display = 'block';
+        } catch (err) { showMessage('error', 'Không thể kết nối đến server.'); }
+        finally { setLoading('forgotVerifyBtn', false); }
+    }
+
+    function validateResetPwUI() {
+        const pw = document.getElementById('newPassword').value;
+        const box = document.getElementById('resetPwStrength');
+        if (pw.length === 0) { box.style.display='none'; document.getElementById('newPassword').style.borderColor='var(--border)'; return; }
+        const strong = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z\d]).{8,}$/;
+        if (!strong.test(pw)) { box.style.display='block'; document.getElementById('newPassword').style.borderColor='var(--error)'; }
+        else { box.style.display='none'; document.getElementById('newPassword').style.borderColor='var(--success)'; }
+    }
+
+    async function handleResetPassword(e) {
+        e.preventDefault(); hideMessage();
+        const newPassword = document.getElementById('newPassword').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+        if (newPassword !== confirmPassword) { showMessage('error', 'Mật khẩu xác nhận không khớp'); document.getElementById('confirmPassword').style.borderColor='var(--error)'; return; }
+        const strong = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z\d]).{8,}$/;
+        if (!strong.test(newPassword)) { showMessage('error', 'Mật khẩu chưa đủ mạnh'); return; }
+        setLoading('resetPwBtn', true);
+        try {
+            const res = await fetch(API_BASE + '/api/auth/reset-password', {
+                method: 'POST', headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({ resetToken, newPassword })
+            });
+            const data = await res.json();
+            if (!res.ok) { showMessage('error', data.error || 'Thất bại'); return; }
+            showMessage('success', 'Đặt lại mật khẩu thành công! Đang chuyển về đăng nhập...');
+            setTimeout(() => { switchTab('login'); document.getElementById('email').value = forgotEmail; hideMessage(); }, 2000);
+        } catch (err) { showMessage('error', 'Không thể kết nối đến server.'); }
+        finally { setLoading('resetPwBtn', false); }
+    }
 </script>
 
 </body>

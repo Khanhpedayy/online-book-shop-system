@@ -5,6 +5,7 @@ import com.example.onlinebookshop.Repository.*;
 import com.example.onlinebookshop.dto.CheckoutRequest;
 import com.example.onlinebookshop.dto.OrderItemRequest;
 import com.example.onlinebookshop.dto.OrderRequest;
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -85,7 +86,6 @@ public class OrderServiceImpl implements OrderService {
             OrderItem item = new OrderItem();
             item.setOrder(order);
             item.setVariant(variant);
-            item.setBook(book);
             item.setTitleSnapshot(book.getTitle() != null ? book.getTitle() : variant.getSku());
             item.setSkuSnapshot(variant.getSku());
             item.setUnitPrice(unitPrice);
@@ -160,6 +160,11 @@ public class OrderServiceImpl implements OrderService {
         if (!order.getUser().getId().equals(user.getId())) {
             throw new RuntimeException("Forbidden");
         }
+        // Force-load items while Hibernate session is still open
+        Hibernate.initialize(order.getItems());
+        order.getItems().forEach(item -> {
+            try { Hibernate.initialize(item.getVariant()); } catch (Exception ignored) {}
+        });
         return order;
     }
 
