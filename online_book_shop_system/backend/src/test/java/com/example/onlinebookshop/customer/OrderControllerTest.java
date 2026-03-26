@@ -1,4 +1,4 @@
-package com.example.onlinebookshop;
+package com.example.onlinebookshop.customer;
 
 import com.example.onlinebookshop.controller.OrderController;
 import com.example.onlinebookshop.Entity.Order;
