@@ -63,8 +63,30 @@ class OrderServiceTest {
         user.setFullName("Test Customer");
         user.setStatus("ACTIVE");
 
-        bookInfo = new BookInfo(1L, null, null, null, "Clean Code", null, "slug", null, null, "ACTIVE",null, null, null, null, null);
-        variant = new BookVariant(1L, bookInfo, "SKU-001", BigDecimal.valueOf(39.99), BigDecimal.valueOf(39.99),null, true, null, null);
+        bookInfo = new BookInfo(
+                1L,          // id
+                null,        // categoryId
+                null,        // isbn13
+                null,        // isbn10
+                "Clean Code",// title
+                null,        // subtitle
+                "slug",      // slug
+                null,        // shortDescription
+                null,        // descriptionHtml
+                "ACTIVE",    // status
+                null,        // createdAt
+                null         // deletedAt
+        );
+        variant = new BookVariant(
+                1L,
+                bookInfo,
+                "SKU-001",
+                BigDecimal.valueOf(39.99), // listPrice
+                BigDecimal.valueOf(39.99), // salePrice
+                true,                       // isActive
+                null,
+                null
+        );
 
         validRequest = new OrderRequest(
                 List.of(new OrderItemRequest(1L, 2)),
@@ -98,7 +120,15 @@ class OrderServiceTest {
 
     @Test
     void placeOrder_emptyItems_shouldThrowException() {
-        OrderRequest request = new OrderRequest(Collections.emptyList(), "customer@test.com", "123 St", "John", 1L);
+        OrderRequest request = new OrderRequest(
+                Collections.emptyList(),
+                "customer@test.com",
+                "123 St",
+                "John",
+                "0900000000",
+                "COD",
+                1L
+        );
 
         assertThatThrownBy(() -> orderService.placeOrder(request))
                 .isInstanceOf(IllegalArgumentException.class)

@@ -4,20 +4,20 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b0cef7af-9eae-4572-a7cc-fd78853d29dd" name="Changes" comment="fix profile and payos">
-      <change beforePath="$PROJECT_DIR$/../.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/../.gitignore" afterDir="false" />
+    <list default="true" id="b0cef7af-9eae-4572-a7cc-fd78853d29dd" name="Changes" comment="fix order">
+      <change afterPath="$PROJECT_DIR$/src/main/resources/V5__patch_order_items_columns.sql" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/Config/DataInitializer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/Config/DataInitializer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/Config/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/Config/SecurityConfig.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/paymentlog/PaymentLogRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/paymentlog/PaymentLogRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/cart.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/cart.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/js/cart.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/js/cart.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/js/checkout.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/js/checkout.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/js/profile.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/js/profile.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/example/onlinebookshop/BookControllerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/example/onlinebookshop/BookControllerTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/static/js/payment-result.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/js/payment-result.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/example/onlinebookshop/BookControllerIntegrationTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/example/onlinebookshop/BookControllerIntegrationTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/example/onlinebookshop/BookServiceTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/example/onlinebookshop/BookServiceTest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/test/java/com/example/onlinebookshop/OrderControllerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/example/onlinebookshop/OrderControllerTest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/test/java/com/example/onlinebookshop/OrderServiceTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/example/onlinebookshop/OrderServiceTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/example/onlinebookshop/adjustment/AdjustmentControllerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/example/onlinebookshop/adjustment/AdjustmentControllerTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/application-test.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/application-test.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/test-data-cleanup.sql" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/test-data-cleanup.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/test-data-seed.sql" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/test-data-seed.sql" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -63,6 +63,7 @@
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
     &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
+    &quot;JUnit.CustomerFlowIntegrationTest.executor&quot;: &quot;Run&quot;,
     &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
     &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
     &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
@@ -88,7 +89,22 @@
       <recent name="D:\SWP391_GRP6\online-book-shop-system\online_book_shop_system\online-book-shop-system\online_book_shop_system\backend\src\main\resources\static\js" />
     </key>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Spring Boot.OnlineBookShopApplication">
+    <configuration name="CustomerFlowIntegrationTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="online-book-shop" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.example.onlinebookshop.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.example.onlinebookshop" />
+      <option name="MAIN_CLASS_NAME" value="com.example.onlinebookshop.CustomerFlowIntegrationTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="OnlineBookShopApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
       <option name="ALTERNATIVE_JRE_PATH" value="17" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
@@ -98,6 +114,11 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="JUnit.CustomerFlowIntegrationTest" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
@@ -134,6 +155,9 @@
       <workItem from="1774250502214" duration="1861000" />
       <workItem from="1774254172897" duration="3563000" />
       <workItem from="1774345406943" duration="1358000" />
+      <workItem from="1774447580111" duration="3280000" />
+      <workItem from="1774500422480" duration="719000" />
+      <workItem from="1774505527017" duration="304000" />
     </task>
     <task id="LOCAL-00001" summary="fix merge">
       <option name="closed" value="true" />
@@ -255,7 +279,15 @@
       <option name="project" value="LOCAL" />
       <updated>1774251227603</updated>
     </task>
-    <option name="localTasksCounter" value="16" />
+    <task id="LOCAL-00016" summary="fix profile and payos">
+      <option name="closed" value="true" />
+      <created>1774447893351</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1774447893351</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -292,6 +324,7 @@
     <MESSAGE value="payos" />
     <MESSAGE value="update" />
     <MESSAGE value="fix profile and payos" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix profile and payos" />
+    <MESSAGE value="fix order" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix order" />
   </component>
 </project>

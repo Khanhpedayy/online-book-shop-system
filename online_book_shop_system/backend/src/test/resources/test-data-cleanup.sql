@@ -2,7 +2,8 @@
 -- TEST DATA CLEANUP — removes seed data after integration tests
 -- Only deletes rows with test IDs (90000+)
 -- ============================================================
-DELETE FROM inventory_transactions WHERE id BETWEEN 90001 AND 99999;
+-- inventory_transactions table is not created by Hibernate in test profile
+-- DELETE FROM inventory_transactions WHERE id BETWEEN 90001 AND 99999;
 DELETE FROM return_items WHERE id BETWEEN 90001 AND 99999;
 DELETE FROM returns WHERE id BETWEEN 90001 AND 99999;
 DELETE FROM order_items WHERE id BETWEEN 90001 AND 99999;

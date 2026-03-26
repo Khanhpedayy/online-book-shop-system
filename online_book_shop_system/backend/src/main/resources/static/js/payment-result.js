@@ -29,31 +29,33 @@
 
     function parseOutcome(params) {
         var orderId = params.get("orderId");
+        var paymentLinkId = params.get("id");
         var payosCancel = params.get("payosCancel") === "1";
         var code = params.get("code");
         var cancel = params.get("cancel") === "true";
         var status = (params.get("status") || "").toUpperCase();
 
         if (!orderId) {
-            return { kind: "invalid", orderId: null, message: "Missing order reference." };
+            return { kind: "invalid", orderId: null, paymentLinkId: null, message: "Missing order reference." };
         }
 
         if (payosCancel || cancel || status === "CANCELLED") {
-            return { kind: "cancelled", orderId: orderId, message: "Payment was cancelled." };
+            return { kind: "cancelled", orderId: orderId, paymentLinkId: paymentLinkId, message: "Payment was cancelled." };
         }
 
         if (code && code !== "00") {
-            return { kind: "failed", orderId: orderId, message: "Payment failed (code " + code + ")." };
+            return { kind: "failed", orderId: orderId, paymentLinkId: paymentLinkId, message: "Payment failed (code " + code + ")." };
         }
 
         if (status === "PAID") {
-            return { kind: "success", orderId: orderId, message: "Payment completed successfully." };
+            return { kind: "success", orderId: orderId, paymentLinkId: paymentLinkId, message: "Payment completed successfully." };
         }
 
         if (status === "PENDING" || status === "PROCESSING") {
             return {
                 kind: "pending",
                 orderId: orderId,
+                paymentLinkId: paymentLinkId,
                 message: "Payment is still pending or processing. Refresh your order later or try again."
             };
         }
@@ -62,17 +64,18 @@
             return {
                 kind: "unknown",
                 orderId: orderId,
+                paymentLinkId: paymentLinkId,
                 message: "No payment status in the URL. Open your order from Orders if you finished paying."
             };
         }
 
-        return { kind: "failed", orderId: orderId, message: "Payment was not completed." };
+        return { kind: "failed", orderId: orderId, paymentLinkId: paymentLinkId, message: "Payment was not completed." };
     }
 
     function render() {
         var box = document.getElementById("paymentResult");
         if (!box) {
-            return;
+            return { kind: "invalid", orderId: null, paymentLinkId: null, message: "paymentResult element not found." };
         }
 
         var params = new URLSearchParams(window.location.search);
@@ -86,7 +89,7 @@
         if (out.kind === "invalid") {
             box.className = "payment-banner payment-banner--error";
             box.textContent = out.message;
-            return;
+            return out;
         }
 
         var title =
@@ -114,7 +117,7 @@
                     encodeURIComponent(out.orderId) +
                     '">View order</a> <a class="shop-btn" href="order-history.html">Order history</a>';
             }
-            return;
+            return out;
         }
 
         box.className =
@@ -137,6 +140,28 @@
             od.href = "order-detail.html?id=" + encodeURIComponent(out.orderId);
             od.textContent = "View order";
             actions.appendChild(od);
+        }
+
+        return out;
+    }
+
+    async function trySyncPayosPayment(out) {
+        // Only do the fallback sync when we see PAID on return URL.
+        // Webhook is the source of truth; this is only to avoid "paid UI but PENDING DB" in local/dev.
+        if (!out || out.kind !== "success") return;
+        if (!out.paymentLinkId) return;
+        if (!getToken()) return; // require authenticated customer
+
+        var payload = {
+            paymentLinkId: out.paymentLinkId,
+            targetStatus: "PAID"
+        };
+
+        try {
+            await apiPost("/api/payos/orders/" + encodeURIComponent(out.orderId) + "/sync-return", payload);
+        } catch (e) {
+            // Don't break the page; just log. User can always refresh order detail later.
+            console.warn("PayOS fallback sync failed:", e);
         }
     }
 
@@ -168,6 +193,7 @@
         if (typeof updateShopHeaderCart === "function") {
             updateShopHeaderCart();
         }
-        render();
+        var out = render();
+        await trySyncPayosPayment(out);
     });
 })();

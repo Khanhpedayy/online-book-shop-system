@@ -14,6 +14,22 @@ public class PaymentLogRepository {
         this.jdbc = jdbc;
     }
 
+    public boolean existsPayosPaymentLogForOrder(Long orderId, String paymentLinkId) {
+        if (orderId == null) {
+            return false;
+        }
+        if (paymentLinkId == null || paymentLinkId.isBlank()) {
+            return false;
+        }
+        Integer count = jdbc.queryForObject(
+                "SELECT COUNT(1) FROM payment_logs WHERE order_id=? AND provider='PAYOS' AND transaction_id=?",
+                Integer.class,
+                orderId,
+                paymentLinkId.trim()
+        );
+        return count != null && count > 0;
+    }
+
     public void insertPayOsLink(long orderId, String paymentLinkId, BigDecimal amount, int payosOrderCode) {
         String tx = paymentLinkId != null && !paymentLinkId.isBlank() ? paymentLinkId : "UNKNOWN";
         String raw = "{\"payosOrderCode\":" + payosOrderCode + ",\"orderId\":" + orderId + "}";

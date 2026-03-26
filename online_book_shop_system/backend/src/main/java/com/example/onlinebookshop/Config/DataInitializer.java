@@ -108,6 +108,7 @@ public class DataInitializer {
             applySqlMigration(jdbc, "V2__user_addresses.sql");
             applySqlMigration(jdbc, "V3__order_payment_method.sql");
             applySqlMigration(jdbc, "V4__patch_user_addresses_columns.sql");
+            applySqlMigration(jdbc, "V5__patch_order_items_columns.sql");
         };
     }
 

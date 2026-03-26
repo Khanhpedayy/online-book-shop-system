@@ -1,5 +1,6 @@
 package com.example.onlinebookshop;
 
+import com.example.onlinebookshop.dto.BookVariantDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,13 +67,16 @@ class BookControllerIntegrationTest extends BaseIntegrationTest {
     @Test
     @DisplayName("IT_BK_04 | POST /api/books (valid) → 200 Created")
     void createBook_success() throws Exception {
-        Book book = new Book();
-        book.setTitle("IT Test Book");
-        book.setIsbn("9789999999999");
+        BookVariantDTO dto = new BookVariantDTO();
+        dto.setTitle("IT Test Book");
+        dto.setIsbn("9789999999999");
+        dto.setSku("IT-SKU-001");
+        dto.setSalePrice(new java.math.BigDecimal("100000"));
+        dto.setListPrice(new java.math.BigDecimal("120000"));
 
         mockMvc.perform(post("/api/books")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(book)))
+                .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.title").value("IT Test Book"))
                 .andExpect(jsonPath("$.id").exists());
@@ -82,12 +86,12 @@ class BookControllerIntegrationTest extends BaseIntegrationTest {
     @Test
     @DisplayName("IT_BK_05 | PUT /api/books/90001 (update title) → 200 OK")
     void updateBook_success() throws Exception {
-        Book book = new Book();
-        book.setTitle("Updated via IT");
+        BookVariantDTO dto = new BookVariantDTO();
+        dto.setTitle("Updated via IT");
 
         mockMvc.perform(put("/api/books/90001")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(book)))
+                .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.title").value("Updated via IT"));
     }

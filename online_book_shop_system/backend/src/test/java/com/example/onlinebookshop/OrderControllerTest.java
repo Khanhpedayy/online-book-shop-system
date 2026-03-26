@@ -45,6 +45,8 @@ class OrderControllerTest {
                 "customer@example.com",
                 "123 Main St",
                 "John Doe",
+                "0900000000",
+                "COD",
                 1L);
         Order order = new Order();
         order.setId(1L);
