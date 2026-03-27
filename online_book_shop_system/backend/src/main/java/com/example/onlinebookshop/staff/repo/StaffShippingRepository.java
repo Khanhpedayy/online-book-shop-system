@@ -86,7 +86,11 @@ public class StaffShippingRepository {
         return c == null ? 0 : c;
     }
 
-    /** Items để in packing slip / shipping confirm: ưu tiên per-copy (copy_id) */
+    /**
+     * Ưu tiên dữ liệu fulfillment thực tế:
+     * - có copy_id
+     * - có copy_code / location
+     */
     public List<ShippingItemRow> getItemsForSlip(long orderId) {
         String sql = """
             SELECT
@@ -118,7 +122,44 @@ public class StaffShippingRepository {
         });
     }
 
-    /** Mark shipped + set carrier/tracking + shipped_at (idempotent nhẹ nếu đã SHIPPED) */
+    /**
+     * Fallback khi chưa allocate/pick thật:
+     * lấy từ order_items để packing slip không bị trắng.
+     */
+    public List<ShippingItemRow> getFallbackItemsForSlip(long orderId) {
+        String sql = """
+            SELECT
+                oi.id AS order_item_id,
+                oi.sku_snapshot,
+                oi.title_snapshot,
+                oi.quantity
+            FROM dbo.order_items oi
+            WHERE oi.deleted_at IS NULL
+              AND oi.order_id = :oid
+            ORDER BY oi.id ASC
+            """;
+
+        return jdbc.query(sql, new MapSqlParameterSource("oid", orderId), (rs, n) -> {
+            ShippingItemRow r = new ShippingItemRow();
+            r.setOrderItemId(rs.getLong("order_item_id"));
+            r.setSkuSnapshot(rs.getString("sku_snapshot"));
+            r.setTitleSnapshot(rs.getString("title_snapshot"));
+
+            // chưa có copy thật thì để placeholder
+            r.setCopyId(null);
+
+            Integer qty = rs.getObject("quantity", Integer.class);
+            if (qty != null && qty > 1) {
+                r.setCopyCode("x" + qty);
+            } else {
+                r.setCopyCode("-");
+            }
+
+            r.setLocation("-");
+            return r;
+        });
+    }
+
     public int markShipped(long orderId, String carrier, String trackingCode) {
         String sql = """
             UPDATE dbo.orders

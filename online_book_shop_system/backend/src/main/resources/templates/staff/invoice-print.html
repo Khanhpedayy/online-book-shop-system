@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Invoice</title>
+  <style>
+    body {
+        font-family: Arial, sans-serif;
+        color: #222;
+        margin: 24px;
+    }
+    .header, .section {
+        margin-bottom: 20px;
+    }
+    .title {
+        font-size: 24px;
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+    .grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 12px;
+    }
+    th, td {
+        border: 1px solid #dcdcdc;
+        padding: 8px;
+        font-size: 14px;
+        text-align: left;
+        vertical-align: top;
+    }
+    .money {
+        text-align: right;
+        white-space: nowrap;
+    }
+    .totals {
+        width: 360px;
+        margin-left: auto;
+        border-collapse: collapse;
+    }
+    .totals td {
+        border: 1px solid #dcdcdc;
+        padding: 8px;
+    }
+    .totals td:last-child {
+        text-align: right;
+        white-space: nowrap;
+    }
+    @media print {
+        body {
+            margin: 12px;
+        }
+    }
+  </style>
+</head>
+<body onload="window.print()">
+<div class="header">
+  <div class="title">ORDER INVOICE</div>
+  <div><b>Order:</b> <span th:text="${v.orderCode}"></span></div>
+  <div>
+    <b>Placed at:</b>
+    <span th:text="${v.placedAt != null ? #temporals.format(v.placedAt, 'dd/MM/yyyy HH:mm') : '-'}"></span>
+  </div>
+  <div><b>Status:</b> <span th:text="${v.status}"></span></div>
+  <div><b>Payment status:</b> <span th:text="${v.paymentStatus}"></span></div>
+</div>
+
+<div class="section grid">
+  <div>
+    <div><b>Recipient:</b> <span th:text="${v.shipName}"></span></div>
+    <div><b>Phone:</b> <span th:text="${v.shipPhone}"></span></div>
+    <div><b>Address:</b></div>
+    <div th:text="${v.shipLine1}"></div>
+    <div th:if="${v.shipLine2 != null and !#strings.isEmpty(v.shipLine2)}" th:text="${v.shipLine2}"></div>
+    <div>
+      <span th:text="${v.shipWard}"></span>
+      <span th:if="${v.shipWard != null and v.shipDistrict != null}">, </span>
+      <span th:text="${v.shipDistrict}"></span>
+    </div>
+    <div>
+      <span th:text="${v.shipCity}"></span>
+      <span th:if="${v.shipCity != null and v.shipProvince != null}">, </span>
+      <span th:text="${v.shipProvince}"></span>
+    </div>
+  </div>
+
+  <div>
+    <div><b>Ship method:</b> <span th:text="${#strings.isEmpty(v.shipMethod) ? '-' : v.shipMethod}"></span></div>
+    <div><b>Carrier:</b> <span th:text="${#strings.isEmpty(v.carrier) ? '-' : v.carrier}"></span></div>
+    <div><b>Tracking:</b> <span th:text="${#strings.isEmpty(v.trackingCode) ? '-' : v.trackingCode}"></span></div>
+  </div>
+</div>
+
+<div class="section">
+  <table>
+    <thead>
+    <tr>
+      <th style="width: 45px;">#</th>
+      <th>Title</th>
+      <th>SKU</th>
+      <th>Condition</th>
+      <th style="width: 80px;">Qty</th>
+      <th style="width: 140px;">Unit price</th>
+      <th style="width: 160px;">Line total</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:if="${v.items == null or #lists.isEmpty(v.items)}">
+      <td colspan="7" style="text-align:center;">No items</td>
+    </tr>
+    <tr th:each="it, st : ${v.items}">
+      <td th:text="${st.index + 1}"></td>
+      <td th:text="${it.titleSnapshot}"></td>
+      <td th:text="${it.skuSnapshot}"></td>
+      <td th:text="${it.conditionSnapshot}"></td>
+      <td th:text="${it.quantity}"></td>
+      <td class="money"
+          th:text="${#numbers.formatDecimal(it.unitPrice, 0, 'COMMA', 0, 'POINT')} + ' VND'"></td>
+      <td class="money"
+          th:text="${#numbers.formatDecimal(it.unitPrice * it.quantity, 0, 'COMMA', 0, 'POINT')} + ' VND'"></td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+
+<table class="totals">
+  <tr>
+    <td>Subtotal</td>
+    <td th:text="${#numbers.formatDecimal(v.subtotalAmount, 0, 'COMMA', 0, 'POINT')} + ' VND'"></td>
+  </tr>
+  <tr>
+    <td>Shipping fee</td>
+    <td th:text="${#numbers.formatDecimal(v.shippingFee, 0, 'COMMA', 0, 'POINT')} + ' VND'"></td>
+  </tr>
+  <tr>
+    <td>Discount</td>
+    <td th:text="${#numbers.formatDecimal(v.discountAmount, 0, 'COMMA', 0, 'POINT')} + ' VND'"></td>
+  </tr>
+  <tr>
+    <td><b>Total</b></td>
+    <td><b th:text="${#numbers.formatDecimal(v.totalAmount, 0, 'COMMA', 0, 'POINT')} + ' VND'"></b></td>
+  </tr>
+</table>
+</body>
+</html>
