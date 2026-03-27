@@ -1,27 +1,36 @@
 package com.example.onlinebookshop.staff.controller;
 
+import com.example.onlinebookshop.staff.dto.OrderDetailView;
 import com.example.onlinebookshop.staff.dto.OrderFilter;
 import com.example.onlinebookshop.staff.service.StaffOrderService;
+import com.example.onlinebookshop.staff.service.StaffPackingService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.springframework.web.bind.annotation.PathVariable;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/staff/workspace")
 public class StaffWorkspaceController {
 
     private final StaffOrderService service;
+    private final StaffPackingService packingService;
 
-    public StaffWorkspaceController(StaffOrderService service) {
+    public StaffWorkspaceController(StaffOrderService service,
+                                    StaffPackingService packingService) {
         this.service = service;
+        this.packingService = packingService;
     }
 
     @GetMapping({"", "/"})
@@ -81,9 +90,28 @@ public class StaffWorkspaceController {
 
     @PostMapping("/packing/bulk-pack")
     public String bulkPack(@RequestParam(name = "orderIds", required = false) List<Long> orderIds,
+                           HttpServletRequest request,
                            RedirectAttributes ra) {
         try {
-            service.bulkPack(orderIds);
+            Map<Long, Integer> boxCounts = new LinkedHashMap<>();
+            Map<Long, String> packingNotes = new LinkedHashMap<>();
+
+            if (orderIds != null) {
+                for (Long orderId : orderIds) {
+                    String boxRaw = request.getParameter("boxCount_" + orderId);
+                    String noteRaw = request.getParameter("packingNote_" + orderId);
+
+                    int boxCount = 1;
+                    if (boxRaw != null && !boxRaw.trim().isEmpty()) {
+                        boxCount = Integer.parseInt(boxRaw.trim());
+                    }
+
+                    boxCounts.put(orderId, boxCount);
+                    packingNotes.put(orderId, noteRaw);
+                }
+            }
+
+            service.bulkPack(orderIds, boxCounts, packingNotes);
             ra.addFlashAttribute("successMsg", "Đã chuyển các đơn đã chọn sang PACKED.");
         } catch (Exception e) {
             ra.addFlashAttribute("errorMsg", e.getMessage());
@@ -142,6 +170,56 @@ public class StaffWorkspaceController {
             ra.addFlashAttribute("errorMsg", e.getMessage());
         }
         return "redirect:/staff/workspace/delivery-return";
+    }
+
+    @GetMapping("/packing-slip/bulk")
+    public String bulkPackingSlip(@RequestParam("orderIds") List<Long> orderIds,
+                                  Model model,
+                                  RedirectAttributes ra) {
+        try {
+            model.addAttribute("views", packingService.getPackingViews(orderIds));
+            return "staff/packing-slip-bulk";
+        } catch (Exception e) {
+            ra.addFlashAttribute("errorMsg", e.getMessage());
+            return "redirect:/staff/workspace/packing";
+        }
+    }
+
+    @GetMapping("/invoice/{orderId}")
+    public String invoice(@PathVariable Long orderId,
+                          Model model,
+                          RedirectAttributes ra) {
+        try {
+            OrderDetailView v = service.getDetail(orderId);
+
+            if (v == null) {
+                ra.addFlashAttribute("errorMsg", "Không tìm thấy dữ liệu invoice cho đơn " + orderId);
+                return "redirect:/staff/workspace/packing";
+            }
+
+            model.addAttribute("v", v);
+            return "staff/invoice-print";
+        } catch (Exception e) {
+            ra.addFlashAttribute("errorMsg", e.getMessage());
+            return "redirect:/staff/workspace/packing";
+        }
+    }
+
+    @GetMapping("/invoice/bulk")
+    public String bulkInvoice(@RequestParam("orderIds") List<Long> orderIds,
+                              Model model,
+                              RedirectAttributes ra) {
+        try {
+            List<OrderDetailView> views = new ArrayList<>();
+            for (Long orderId : orderIds) {
+                views.add(service.getDetail(orderId));
+            }
+            model.addAttribute("views", views);
+            return "staff/invoice-print-bulk";
+        } catch (Exception e) {
+            ra.addFlashAttribute("errorMsg", e.getMessage());
+            return "redirect:/staff/workspace/packing";
+        }
     }
 
     private void prepareStage(OrderFilter filter, String stage, Model model) {

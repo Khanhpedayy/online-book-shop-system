@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Packing Slip</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            color: #222;
+            margin: 24px;
+        }
+        .header, .section {
+            margin-bottom: 20px;
+        }
+        .title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        .muted {
+            color: #666;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+        }
+        th, td {
+            border: 1px solid #dcdcdc;
+            padding: 8px;
+            font-size: 14px;
+            text-align: left;
+            vertical-align: top;
+        }
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border: 1px solid #bbb;
+            border-radius: 999px;
+            font-size: 12px;
+            margin-right: 8px;
+        }
+        @media print {
+            body {
+                margin: 12px;
+            }
+        }
+    </style>
+</head>
+<body onload="window.print()">
+<div class="header">
+    <div class="title">PACKING SLIP</div>
+    <div><b>Order:</b> <span th:text="${v.orderCode}"></span></div>
+    <div class="muted">
+        <span class="badge" th:text="${v.status}"></span>
+        <span class="badge" th:text="${v.paymentStatus}"></span>
+    </div>
+</div>
+
+<div class="section grid">
+    <div>
+        <div><b>Recipient:</b> <span th:text="${v.shipName}"></span></div>
+        <div><b>Phone:</b> <span th:text="${v.shipPhone}"></span></div>
+        <div><b>Address:</b></div>
+        <div th:text="${v.shipLine1}"></div>
+        <div th:if="${v.shipLine2 != null and !#strings.isEmpty(v.shipLine2)}" th:text="${v.shipLine2}"></div>
+        <div>
+            <span th:text="${v.shipWard}"></span>
+            <span th:if="${v.shipWard != null and v.shipDistrict != null}">, </span>
+            <span th:text="${v.shipDistrict}"></span>
+        </div>
+        <div>
+            <span th:text="${v.shipCity}"></span>
+            <span th:if="${v.shipCity != null and v.shipProvince != null}">, </span>
+            <span th:text="${v.shipProvince}"></span>
+        </div>
+    </div>
+
+    <div>
+        <div><b>Boxes:</b> <span th:text="${v.boxCount}"></span></div>
+        <div><b>Packaging info:</b> <span th:text="${#strings.isEmpty(v.packingNote) ? '-' : v.packingNote}"></span></div>
+        <div><b>Picked items:</b> <span th:text="${v.pickedItems}"></span> / <span th:text="${v.packableItems}"></span></div>
+        <div><b>Carrier:</b> <span th:text="${#strings.isEmpty(v.carrier) ? '-' : v.carrier}"></span></div>
+        <div><b>Tracking:</b> <span th:text="${#strings.isEmpty(v.trackingCode) ? '-' : v.trackingCode}"></span></div>
+    </div>
+</div>
+
+<div class="section">
+    <table>
+        <thead>
+        <tr>
+            <th style="width: 45px;">#</th>
+            <th>Title</th>
+            <th>SKU</th>
+            <th>Copy code</th>
+            <th>Location</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="it, st : ${v.items}">
+            <td th:text="${st.index + 1}"></td>
+            <td th:text="${it.titleSnapshot}"></td>
+            <td th:text="${it.skuSnapshot}"></td>
+            <td th:text="${it.copyCode}"></td>
+            <td th:text="${it.location}"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

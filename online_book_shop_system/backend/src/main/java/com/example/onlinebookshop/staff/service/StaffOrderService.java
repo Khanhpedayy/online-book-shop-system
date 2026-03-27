@@ -1,24 +1,26 @@
 package com.example.onlinebookshop.staff.service;
 
 import com.example.onlinebookshop.Entity.Order;
+import com.example.onlinebookshop.staff.dto.AllocatePreviewRow;
 import com.example.onlinebookshop.staff.dto.OrderDetailView;
 import com.example.onlinebookshop.staff.dto.OrderFilter;
 import com.example.onlinebookshop.staff.dto.OrderListRow;
+import com.example.onlinebookshop.staff.dto.ReturnScanMatchRow;
 import com.example.onlinebookshop.staff.dto.StaffAlert;
 import com.example.onlinebookshop.staff.repo.StaffAlertRepository;
 import com.example.onlinebookshop.staff.repo.StaffOrderQueryRepository;
 import com.example.onlinebookshop.staff.repo.StaffOrderRepository;
+import com.example.onlinebookshop.staff.repo.StaffPackingRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Objects;
-import com.example.onlinebookshop.staff.dto.AllocatePreviewRow;
-import com.example.onlinebookshop.staff.dto.ReturnScanMatchRow;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 @Service
@@ -27,13 +29,16 @@ public class StaffOrderService {
     private final StaffOrderRepository staffOrderRepository;
     private final StaffOrderQueryRepository queryRepository;
     private final StaffAlertRepository alertRepository;
+    private final StaffPackingRepository packingRepository;
 
     public StaffOrderService(StaffOrderRepository staffOrderRepository,
                              StaffOrderQueryRepository queryRepository,
-                             StaffAlertRepository alertRepository) {
+                             StaffAlertRepository alertRepository,
+                             StaffPackingRepository packingRepository) {
         this.staffOrderRepository = staffOrderRepository;
         this.queryRepository = queryRepository;
         this.alertRepository = alertRepository;
+        this.packingRepository = packingRepository;
     }
 
     public List<OrderListRow> getAll(OrderFilter filter) {
@@ -103,8 +108,48 @@ public class StaffOrderService {
     }
 
     @Transactional
-    public void bulkPack(List<Long> orderIds) {
-        mutateInBulk(orderIds, "CONFIRMED", "PACKED");
+    public void bulkPack(List<Long> orderIds,
+                         Map<Long, Integer> boxCounts,
+                         Map<Long, String> packingNotes) {
+        for (Long orderId : validateIds(orderIds)) {
+            Order order = getById(orderId);
+            String current = normalized(order.getStatus());
+
+            if (!"CONFIRMED".equals(current)) {
+                throw new RuntimeException("Chỉ pack được đơn CONFIRMED. Đơn lỗi: " + order.getOrderCode());
+            }
+
+            int packable = packingRepository.countPackableItems(orderId);
+            int picked = packingRepository.countPicked(orderId);
+
+            if (packable <= 0) {
+                throw new RuntimeException("Đơn không có item hợp lệ để pack. Đơn lỗi: " + order.getOrderCode());
+            }
+
+            if (picked < packable) {
+                throw new RuntimeException("Đơn chưa được pick đủ nên chưa pack được. Đơn lỗi: " + order.getOrderCode());
+            }
+
+            Integer boxCount = boxCounts == null ? null : boxCounts.get(orderId);
+            String packingNote = packingNotes == null ? null : packingNotes.get(orderId);
+
+            int resolvedBoxCount = (boxCount == null ? 1 : boxCount);
+            if (resolvedBoxCount <= 0) {
+                throw new RuntimeException("Số box phải > 0. Đơn lỗi: " + order.getOrderCode());
+            }
+
+            String appended = buildPackNoteLine(resolvedBoxCount, packingNote);
+            String oldNote = order.getStaffNote();
+
+            if (oldNote == null || oldNote.trim().isEmpty()) {
+                order.setStaffNote(appended);
+            } else {
+                order.setStaffNote(oldNote.trim() + "\n" + appended);
+            }
+
+            applyStatus(order, "PACKED");
+            staffOrderRepository.save(order);
+        }
     }
 
     @Transactional
@@ -160,7 +205,7 @@ public class StaffOrderService {
 
         int updated = queryRepository.confirmAutoAllocateAndPick(orderId);
         if (updated == 0) {
-            throw new RuntimeException("Không có item nào được pick. Có thể đơn đã allocate/pick rồi hoặc không đủ tồn kho.");
+            throw new RuntimeException("Không có item nào được allocate/pick.");
         }
     }
 
@@ -294,6 +339,11 @@ public class StaffOrderService {
 
     private String normalized(String value) {
         return value == null ? "" : value.trim().toUpperCase();
+    }
+
+    private String buildPackNoteLine(int boxCount, String packingNote) {
+        String safeNote = packingNote == null ? "" : packingNote.trim();
+        return "[PACK] boxes=" + boxCount + " | " + safeNote + " | at=" + LocalDateTime.now();
     }
 
     private void applyStatus(Order order, String ns) {
