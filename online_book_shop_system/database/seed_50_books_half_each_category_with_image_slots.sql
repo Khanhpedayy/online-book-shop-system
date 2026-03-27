@@ -64,12 +64,6 @@ INSERT INTO books (id, category_id, title, slug, publisher_name, publication_yea
 (4,  1, N'Dế mèn phiêu lưu ký',                     'de-men-phieu-luu-ky',                     N'NXB Kim Đồng', 2015, 'vi', N'Cuộc phiêu lưu của chú Dế Mèn', 'ACTIVE'),
 (5,  1, N'Chí Phèo',                                'chi-pheo',                                N'NXB Văn Học', 2016, 'vi', N'Bi kịch người nông dân bị tha hóa', 'ACTIVE'),
 (6,  1, N'Cánh đồng bất tận',                       'canh-dong-bat-tan',                       N'NXB Trẻ', 2017, 'vi', N'Những mảnh đời trên cánh đồng miền Tây', 'ACTIVE'),
-(7,  1, N'Số đỏ',                                   'so-do',                                   N'NXB Văn Học', 2018, 'vi', N'Tiểu thuyết trào phúng của Vũ Trọng Phụng', 'ACTIVE'),
-(8,  1, N'Tướng về hưu',                             'tuong-ve-huu',                             N'NXB Văn Học', 2019, 'vi', N'Truyện ngắn đương đại Việt Nam', 'ACTIVE'),
-(9,  1, N'Những ngôi sao xa xôi',                   'nhung-ngoi-sao-xa-xoi',                   N'NXB Văn Học', 2017, 'vi', N'Truyện ngắn thời chiến', 'ACTIVE'),
-(10, 1, N'Ngồi khóc trên cây',                      'ngoi-khoc-tren-cay',                      N'NXB Trẻ', 2021, 'vi', N'Tiểu thuyết Nguyễn Nhật Ánh', 'ACTIVE'),
-(11, 1, N'Đi qua hoa cúc',                          'di-qua-hoa-cuc',                          N'NXB Trẻ', 2020, 'vi', N'Thơ Nguyễn Phong Việt', 'ACTIVE'),
-(12, 1, N'Lão Hạc',                                 'lao-hac',                                 N'NXB Văn Học', 2016, 'vi', N'Truyện ngắn kinh điển Nam Cao', 'ACTIVE'),
 
 -- Văn học nước ngoài (13-24)
 (13, 2, N'Rừng Na Uy',                              'rung-na-uy',                              N'NXB Hội Nhà Văn', 2020, 'vi', N'Tiểu thuyết nổi tiếng của Murakami', 'ACTIVE'),
@@ -78,12 +72,6 @@ INSERT INTO books (id, category_id, title, slug, publisher_name, publication_yea
 (16, 2, N'Hoàng tử bé',                             'hoang-tu-be',                             N'NXB Kim Đồng', 2019, 'vi', N'Tác phẩm kinh điển về tình bạn', 'ACTIVE'),
 (17, 2, N'1984',                                    'mot-chin-tam-tu',                          N'NXB Hội Nhà Văn', 2021, 'vi', N'Tiểu thuyết dystopia kinh điển', 'ACTIVE'),
 (18, 2, N'Trại súc vật',                            'trai-suc-vat',                            N'NXB Hội Nhà Văn', 2020, 'vi', N'Ngụ ngôn chính trị sắc sảo', 'ACTIVE'),
-(19, 2, N'Bắt trẻ đồng xanh',                      'bat-tre-dong-xanh',                       N'NXB Văn Học', 2019, 'vi', N'Tiểu thuyết tuổi trẻ nổi loạn', 'ACTIVE'),
-(20, 2, N'Người đua diều',                          'nguoi-dua-dieu',                          N'NXB Hội Nhà Văn', 2018, 'vi', N'Tình bạn và sự cứu chuộc', 'ACTIVE'),
-(21, 2, N'Đi tìm lẽ sống',                          'di-tim-le-song',                          N'NXB Trẻ', 2020, 'vi', N'Hồi ký từ trại tập trung', 'ACTIVE'),
-(22, 2, N'Cuộc sống không giới hạn',                'cuoc-song-khong-gioi-han',                N'NXB Trẻ', 2021, 'vi', N'Câu chuyện truyền cảm hứng', 'ACTIVE'),
-(23, 2, N'Sapiens - Lược sử loài người',            'sapiens-luoc-su-loai-nguoi',              N'NXB Thế Giới', 2022, 'vi', N'Lịch sử loài người từ thời cổ đại', 'ACTIVE'),
-(24, 2, N'Homo Deus - Lược sử tương lai',           'homo-deus-luoc-su-tuong-lai',             N'NXB Thế Giới', 2022, 'vi', N'Tương lai của loài người', 'ACTIVE'),
 
 -- Kinh tế - Kinh doanh (25-36)
 (25, 3, N'Cha giàu cha nghèo',                     'cha-giau-cha-ngheo',                     N'NXB Trẻ', 2019, 'vi', N'Bài học tài chính từ hai người cha', 'ACTIVE'),
@@ -92,12 +80,6 @@ INSERT INTO books (id, category_id, title, slug, publisher_name, publication_yea
 (28, 3, N'Từ tốt đến vĩ đại',                      'tu-tot-den-vi-dai',                      N'NXB Trẻ', 2019, 'vi', N'Good to Great - Jim Collins', 'ACTIVE'),
 (29, 3, N'Khởi nghiệp tinh gọn',                   'khoi-nghiep-tinh-gon',                   N'NXB Trẻ', 2020, 'vi', N'Lean Startup methodology', 'ACTIVE'),
 (30, 3, N'Tuần làm việc 4 giờ',                     'tuan-lam-viec-4-gio',                     N'NXB Lao Động', 2019, 'vi', N'Tối ưu hóa thời gian và hiệu suất', 'ACTIVE'),
-(31, 3, N'Zero to One',                             'zero-to-one',                             N'NXB Trẻ', 2021, 'vi', N'Bí quyết khởi nghiệp của Peter Thiel', 'ACTIVE'),
-(32, 3, N'Quản trị Marketing',                      'quan-tri-marketing',                      N'NXB Đại Học Kinh Tế', 2020, 'vi', N'Giáo trình marketing Philip Kotler', 'ACTIVE'),
-(33, 3, N'Chiến lược đại dương xanh',               'chien-luoc-dai-duong-xanh',               N'NXB Trẻ', 2019, 'vi', N'Blue Ocean Strategy', 'ACTIVE'),
-(34, 3, N'Binh pháp Tôn Tử trong kinh doanh',      'binh-phap-ton-tu-kinh-doanh',            N'NXB Thế Giới', 2020, 'vi', N'Áp dụng binh pháp vào business', 'ACTIVE'),
-(35, 3, N'Tư duy nhanh và chậm',                    'tu-duy-nhanh-va-cham',                    N'NXB Thế Giới', 2021, 'vi', N'Thinking Fast and Slow', 'ACTIVE'),
-(36, 3, N'Quốc gia khởi nghiệp',                   'quoc-gia-khoi-nghiep',                   N'NXB Thế Giới', 2020, 'vi', N'Câu chuyện về nền kinh tế Israel', 'ACTIVE'),
 
 -- Kỹ năng sống (37-46)
 (37, 4, N'Đắc nhân tâm',                           'dac-nhan-tam',                           N'NXB Tổng Hợp', 2020, 'vi', N'Nghệ thuật thu phục lòng người', 'ACTIVE'),
@@ -105,24 +87,13 @@ INSERT INTO books (id, category_id, title, slug, publisher_name, publication_yea
 (39, 4, N'Nghệ thuật tinh tế của việc đếch quan tâm', 'nghe-thuat-dech-quan-tam',             N'NXB Trẻ', 2021, 'vi', N'The Subtle Art of Not Giving a F*ck', 'ACTIVE'),
 (40, 4, N'Bí mật tư duy triệu phú',                'bi-mat-tu-duy-trieu-phu',                N'NXB Trẻ', 2019, 'vi', N'Secrets of the Millionaire Mind', 'ACTIVE'),
 (41, 4, N'7 thói quen hiệu quả',                   '7-thoi-quen-hieu-qua',                   N'NXB Trẻ', 2020, 'vi', N'7 Habits of Highly Effective People', 'ACTIVE'),
-(42, 4, N'Sức mạnh của thói quen',                 'suc-manh-cua-thoi-quen',                 N'NXB Lao Động', 2021, 'vi', N'The Power of Habit', 'ACTIVE'),
-(43, 4, N'Atomic Habits - Thay đổi tí hon',         'atomic-habits-thay-doi-ti-hon',           N'NXB Thế Giới', 2022, 'vi', N'Xây dựng thói quen tốt', 'ACTIVE'),
-(44, 4, N'Đọc vị bất kỳ ai',                       'doc-vi-bat-ky-ai',                       N'NXB Lao Động', 2020, 'vi', N'Kỹ năng đọc ngôn ngữ cơ thể', 'ACTIVE'),
-(45, 4, N'Think Again - Dám nghĩ lại',              'think-again-dam-nghi-lai',                N'NXB Trẻ', 2022, 'vi', N'Sức mạnh của việc thay đổi tư duy', 'ACTIVE'),
-(46, 4, N'Không phàn nàn',                          'khong-phan-nan',                          N'NXB Tổng Hợp', 2019, 'vi', N'21 ngày thay đổi cuộc sống', 'ACTIVE'),
 
 -- Khoa học - Công nghệ (47-56)
 (47, 5, N'Lược sử thời gian',                      'luoc-su-thoi-gian',                      N'NXB Trẻ', 2020, 'vi', N'A Brief History of Time', 'ACTIVE'),
 (48, 5, N'Vũ trụ trong vỏ hạt dẻ',                 'vu-tru-trong-vo-hat-de',                 N'NXB Trẻ', 2019, 'vi', N'The Universe in a Nutshell', 'ACTIVE'),
 (49, 5, N'Clean Code',                              'clean-code',                              N'NXB Bách Khoa', 2021, 'en', N'Hướng dẫn viết code sạch', 'ACTIVE'),
 (50, 5, N'The Pragmatic Programmer',                'the-pragmatic-programmer',                N'NXB Bách Khoa', 2022, 'en', N'Lập trình viên thực dụng', 'ACTIVE'),
-(51, 5, N'Giải thuật và lập trình',                 'giai-thuat-va-lap-trinh',                N'NXB Đại Học Quốc Gia', 2020, 'vi', N'Cấu trúc dữ liệu và giải thuật', 'ACTIVE'),
-(52, 5, N'Trí tuệ nhân tạo',                       'tri-tue-nhan-tao',                       N'NXB Bách Khoa', 2022, 'vi', N'AI và Machine Learning cơ bản', 'ACTIVE'),
-(53, 5, N'Blockchain và tiền mã hóa',              'blockchain-va-tien-ma-hoa',              N'NXB Thế Giới', 2021, 'vi', N'Tìm hiểu về blockchain', 'ACTIVE'),
-(54, 5, N'Python cho người mới bắt đầu',            'python-cho-nguoi-moi',                    N'NXB Bách Khoa', 2022, 'vi', N'Học Python từ zero', 'ACTIVE'),
-(55, 5, N'Cosmos - Vũ trụ',                         'cosmos-vu-tru',                           N'NXB Trẻ', 2020, 'vi', N'Carl Sagan - Khám phá vũ trụ', 'ACTIVE'),
-(56, 5, N'Hóa học vui',                             'hoa-hoc-vui',                             N'NXB Kim Đồng', 2019, 'vi', N'Khoa học thú vị cho mọi lứa tuổi', 'ACTIVE');
-
+(51, 5, N'Giải thuật và lập trình',                 'giai-thuat-va-lap-trinh',                N'NXB Đại Học Quốc Gia', 2020, 'vi', N'Cấu trúc dữ liệu và giải thuật', 'ACTIVE')
 SET IDENTITY_INSERT books OFF;
 
 GO
@@ -194,35 +165,28 @@ GO
 
 INSERT INTO book_authors (book_id, author_id, role, sort_order) VALUES
 -- Văn học VN
-(1,1,'AUTHOR',0),(2,1,'AUTHOR',0),(3,1,'AUTHOR',0),(10,1,'AUTHOR',0),(61,1,'AUTHOR',0),
+(1,1,'AUTHOR',0),(2,1,'AUTHOR',0),(3,1,'AUTHOR',0),(61,1,'AUTHOR',0),
 (4,2,'AUTHOR',0),(57,2,'AUTHOR',0),
-(5,3,'AUTHOR',0),(12,3,'AUTHOR',0),
+(5,3,'AUTHOR',0),
 (6,13,'AUTHOR',0),
-(8,22,'AUTHOR',0),(9,23,'AUTHOR',0),(11,19,'AUTHOR',0),
 -- Văn học nước ngoài
 (13,4,'AUTHOR',0),(14,4,'AUTHOR',0),
 (15,5,'AUTHOR',0),
 (16,12,'AUTHOR',0),
 (17,11,'AUTHOR',0),(18,11,'AUTHOR',0),
-(23,8,'AUTHOR',0),(24,8,'AUTHOR',0),
 -- Kinh tế
 (25,7,'AUTHOR',0),(27,7,'AUTHOR',0),
 (26,25,'AUTHOR',0),
-(34,24,'AUTHOR',0),
-(35,15,'AUTHOR',0),
 -- Kỹ năng sống
 (37,6,'AUTHOR',0),(38,6,'AUTHOR',0),
 (39,14,'AUTHOR',0),
-(45,20,'AUTHOR',0),
 -- Khoa học
 (47,9,'AUTHOR',0),(48,9,'AUTHOR',0),
 -- Lịch sử
-(81,21,'AUTHOR',0),(82,21,'AUTHOR',0),
 -- Manga
 (85,16,'AUTHOR',0),(86,16,'AUTHOR',0),
 (87,17,'AUTHOR',0),(88,17,'AUTHOR',0),
-(89,18,'AUTHOR',0),(90,18,'AUTHOR',0);
-
+(89,18,'AUTHOR',0)
 GO
 
 -- ===================== BOOK VARIANTS (mỗi sách 1 variant) =====================
@@ -235,12 +199,6 @@ INSERT INTO book_variants (book_id, sku, format, list_price, sale_price, page_co
 (4,'VH-VN-004','PAPERBACK',45000,39000,192,250,1),
 (5,'VH-VN-005','PAPERBACK',35000,30000,96,150,1),
 (6,'VH-VN-006','PAPERBACK',72000,65000,208,290,1),
-(7,'VH-VN-007','PAPERBACK',65000,58000,320,340,1),
-(8,'VH-VN-008','PAPERBACK',55000,48000,180,240,1),
-(9,'VH-VN-009','PAPERBACK',42000,38000,120,180,1),
-(10,'VH-VN-010','PAPERBACK',85000,75000,280,310,1),
-(11,'VH-VN-011','PAPERBACK',79000,69000,160,220,1),
-(12,'VH-VN-012','PAPERBACK',32000,28000,80,130,1),
 -- Văn học nước ngoài (13-24)
 (13,'VH-NN-001','PAPERBACK',120000,99000,420,450,1),
 (14,'VH-NN-002','PAPERBACK',135000,115000,480,480,1),
@@ -248,12 +206,6 @@ INSERT INTO book_variants (book_id, sku, format, list_price, sale_price, page_co
 (16,'VH-NN-004','HARDCOVER',85000,75000,112,250,1),
 (17,'VH-NN-005','PAPERBACK',98000,85000,328,360,1),
 (18,'VH-NN-006','PAPERBACK',75000,65000,152,200,1),
-(19,'VH-NN-007','PAPERBACK',89000,79000,280,320,1),
-(20,'VH-NN-008','PAPERBACK',105000,89000,370,400,1),
-(21,'VH-NN-009','PAPERBACK',85000,72000,196,260,1),
-(22,'VH-NN-010','PAPERBACK',95000,82000,240,300,1),
-(23,'VH-NN-011','PAPERBACK',189000,159000,560,620,1),
-(24,'VH-NN-012','PAPERBACK',179000,149000,480,550,1),
 -- Kinh tế (25-36)
 (25,'KT-001','PAPERBACK',110000,89000,336,380,1),
 (26,'KT-002','PAPERBACK',95000,79000,304,350,1),
@@ -261,96 +213,103 @@ INSERT INTO book_variants (book_id, sku, format, list_price, sale_price, page_co
 (28,'KT-004','HARDCOVER',155000,129000,400,480,1),
 (29,'KT-005','PAPERBACK',125000,105000,320,370,1),
 (30,'KT-006','PAPERBACK',135000,115000,416,430,1),
-(31,'KT-007','PAPERBACK',109000,92000,240,300,1),
-(32,'KT-008','PAPERBACK',185000,159000,720,850,1),
-(33,'KT-009','PAPERBACK',145000,125000,368,420,1),
-(34,'KT-010','PAPERBACK',79000,65000,196,250,1),
-(35,'KT-011','PAPERBACK',169000,145000,520,580,1),
-(36,'KT-012','PAPERBACK',129000,109000,360,400,1),
 -- Kỹ năng sống (37-46)
 (37,'KN-001','PAPERBACK',86000,72000,320,350,1),
 (38,'KN-002','PAPERBACK',79000,65000,304,330,1),
 (39,'KN-003','PAPERBACK',99000,85000,248,290,1),
 (40,'KN-004','PAPERBACK',89000,75000,280,310,1),
 (41,'KN-005','PAPERBACK',125000,105000,420,460,1),
-(42,'KN-006','PAPERBACK',109000,92000,380,400,1),
-(43,'KN-007','PAPERBACK',139000,119000,320,360,1),
-(44,'KN-008','PAPERBACK',75000,62000,240,270,1),
-(45,'KN-009','PAPERBACK',129000,109000,308,350,1),
-(46,'KN-010','PAPERBACK',69000,58000,200,240,1),
 -- Khoa học (47-56)
 (47,'KH-001','PAPERBACK',145000,125000,256,320,1),
 (48,'KH-002','HARDCOVER',175000,149000,224,380,1),
 (49,'KH-003','PAPERBACK',350000,299000,464,520,1),
 (50,'KH-004','PAPERBACK',380000,329000,352,480,1),
 (51,'KH-005','PAPERBACK',125000,105000,400,440,1),
-(52,'KH-006','PAPERBACK',165000,139000,320,380,1),
-(53,'KH-007','PAPERBACK',135000,115000,280,330,1),
-(54,'KH-008','PAPERBACK',155000,129000,360,400,1),
-(55,'KH-009','PAPERBACK',145000,119000,340,380,1),
-(56,'KH-010','PAPERBACK',65000,55000,180,220,1),
 -- Thiếu nhi (57-66)
 (57,'TN-001','HARDCOVER',95000,82000,192,320,1),
 (58,'TN-002','PAPERBACK',75000,65000,288,310,1),
 (59,'TN-003','PAPERBACK',65000,55000,176,230,1),
 (60,'TN-004','PAPERBACK',59000,49000,160,210,1),
 (61,'TN-005','PAPERBACK',49000,42000,200,250,1),
-(62,'TN-006','HARDCOVER',89000,75000,240,350,1),
-(63,'TN-007','PAPERBACK',69000,59000,320,350,1),
-(64,'TN-008','PAPERBACK',55000,45000,144,190,1),
-(65,'TN-009','PAPERBACK',45000,38000,128,170,1),
-(66,'TN-010','PAPERBACK',25000,20000,96,120,1),
 -- Tâm lý (67-76)
 (67,'TL-001','PAPERBACK',69000,58000,192,250,1),
 (68,'TL-002','PAPERBACK',85000,72000,256,300,1),
 (69,'TL-003','PAPERBACK',129000,109000,680,720,1),
 (70,'TL-004','PAPERBACK',119000,99000,320,370,1),
 (71,'TL-005','PAPERBACK',95000,82000,280,320,1),
-(72,'TL-006','PAPERBACK',105000,89000,300,340,1),
-(73,'TL-007','PAPERBACK',75000,62000,184,230,1),
-(74,'TL-008','PAPERBACK',89000,75000,240,280,1),
-(75,'TL-009','PAPERBACK',115000,95000,360,400,1),
-(76,'TL-010','PAPERBACK',69000,58000,176,220,1),
 -- Lịch sử (77-84)
 (77,'LS-001','HARDCOVER',125000,105000,160,350,1),
 (78,'LS-002','HARDCOVER',350000,299000,1200,1500,1),
 (79,'LS-003','PAPERBACK',175000,149000,496,560,1),
 (80,'LS-004','PAPERBACK',95000,82000,320,370,1),
-(81,'LS-005','PAPERBACK',155000,129000,656,700,1),
-(82,'LS-006','PAPERBACK',185000,155000,688,740,1),
-(83,'LS-007','PAPERBACK',195000,165000,1200,1300,1),
-(84,'LS-008','PAPERBACK',165000,139000,960,1000,1),
 -- Manga (85-94)
 (85,'MG-001','PAPERBACK',25000,22000,200,160,1),
 (86,'MG-002','PAPERBACK',25000,22000,200,160,1),
 (87,'MG-003','PAPERBACK',25000,22000,192,155,1),
 (88,'MG-004','PAPERBACK',25000,22000,192,155,1),
 (89,'MG-005','PAPERBACK',22000,19000,180,140,1),
-(90,'MG-006','PAPERBACK',22000,19000,180,140,1),
-(91,'MG-007','PAPERBACK',25000,22000,208,165,1),
-(92,'MG-008','PAPERBACK',25000,22000,200,160,1),
-(93,'MG-009','PAPERBACK',30000,26000,196,160,1),
-(94,'MG-010','PAPERBACK',25000,22000,184,150,1),
 -- Sách giáo khoa (95-100)
 (95,'SGK-001','PAPERBACK',85000,72000,320,380,1),
 (96,'SGK-002','PAPERBACK',145000,125000,400,450,1),
-(97,'SGK-003','PAPERBACK',350000,299000,256,350,1),
-(98,'SGK-004','PAPERBACK',95000,82000,360,400,1),
-(99,'SGK-005','PAPERBACK',75000,65000,280,320,1),
-(100,'SGK-006','PAPERBACK',165000,139000,320,380,1);
+(97,'SGK-003','PAPERBACK',350000,299000,256,350,1)
+GO
+
+-- ===================== BOOK IMAGES =====================
+-- Dán link ảnh thật vào cột url cho từng cuốn.
+-- Có thể thêm nhiều ảnh cho 1 book bằng cách tăng sort_order; ảnh cover để is_cover = 1.
+
+INSERT INTO book_images (book_id, url, alt_text, is_cover, sort_order) VALUES
+(1, N'https://res.cloudinary.com/dg4uqpioc/image/upload/v1774506138/OIP_neyaha.webp', N'Tôi thấy hoa vàng trên cỏ xanh', 1, 0),
+(2, N'https://res.cloudinary.com/dg4uqpioc/image/upload/v1774506352/1574221778_5450_main_jmf7jj.jpg', N'Mắt biếc', 1, 0),
+(3, N'https://res.cloudinary.com/dg4uqpioc/image/upload/v1774506405/10925109_g42pvj.jpg', N'Cho tôi xin một vé đi tuổi thơ', 1, 0),
+(4, N'https://res.cloudinary.com/dg4uqpioc/image/upload/v1774575880/download_wskrea.jpg', N'Dế mèn phiêu lưu ký', 1, 0),
+(5, N'https://res.cloudinary.com/dg4uqpioc/image/upload/v1774575908/images_s0euay.webp', N'Chí Phèo', 1, 0),
+(6, N'https://res.cloudinary.com/dg4uqpioc/image/upload/v1774575993/images_vudapd.webp', N'Cánh đồng bất tận', 1, 0),
+(13, N'https://res.cloudinary.com/dg4uqpioc/image/upload/v1774576812/download_ytsynl.jpg', N'Rừng Na Uy', 1, 0),
+(14, N'https://res.cloudinary.com/dg4uqpioc/image/upload/v1774576834/shopping_ysmfwa.webp', N'Kafka bên bờ biển', 1, 0),
+(15, N'https://res.cloudinary.com/dg4uqpioc/image/upload/v1774576861/download_lc4jjc.jpg', N'Nhà giả kim', 1, 0),
+(16, N'https://res.cloudinary.com/dg4uqpioc/image/upload/v1774576885/shopping_bnhhis.webp', N'Hoàng tử bé', 1, 0),
+(17, N'https://res.cloudinary.com/dg4uqpioc/image/upload/v1774576909/download_iyiefw.jpg', N'1984', 1, 0),
+(18, N'https://res.cloudinary.com/dg4uqpioc/image/upload/v1774576955/download_dgup55.jpg', N'Trại súc vật', 1, 0),
+(25, N'https://res.cloudinary.com/dg4uqpioc/image/upload/v1774576990/shopping_ogpwvv.webp', N'Cha giàu cha nghèo', 1, 0),
+(26, N'https://res.cloudinary.com/dg4uqpioc/image/upload/v1774577009/shopping_d2envd.webp', N'Nghĩ giàu làm giàu', 1, 0),
+(27, N'https://res.cloudinary.com/dg4uqpioc/image/upload/v1774577032/shopping_wlhkpt.webp', N'Dạy con làm giàu - Tập 1', 1, 0),
+(28, N'https://res.cloudinary.com/dg4uqpioc/image/upload/v1774577072/shopping_hnemjy.webp', N'Từ tốt đến vĩ đại', 1, 0),
+(29, N'https://res.cloudinary.com/dg4uqpioc/image/upload/v1774577092/shopping_hpcege.webp', N'Khởi nghiệp tinh gọn', 1, 0),
+(30, N'https://res.cloudinary.com/dg4uqpioc/image/upload/v1774577117/shopping_mm7u7q.webp', N'Tuần làm việc 4 giờ', 1, 0),
+(37, N'https://res.cloudinary.com/dg4uqpioc/image/upload/v1774577241/shopping_ub8tw4.webp', N'Đắc nhân tâm', 1, 0),
+(38, N'https://res.cloudinary.com/dg4uqpioc/image/upload/v1774577259/shopping_ytkav0.webp', N'Quẳng gánh lo đi và vui sống', 1, 0),
+(39, N'https://res.cloudinary.com/dg4uqpioc/image/upload/v1774577303/download_drn9bz.png', N'Nghệ thuật tinh tế của việc đếch quan tâm', 1, 0),
+(40, N'https://res.cloudinary.com/dg4uqpioc/image/upload/v1774577324/download_gs4djl.jpg', N'Bí mật tư duy triệu phú', 1, 0),
+(41, N'https://res.cloudinary.com/dg4uqpioc/image/upload/v1774577344/download_sn3cox.png', N'7 thói quen hiệu quả', 1, 0),
+(47, N'https://res.cloudinary.com/dg4uqpioc/image/upload/v1774577363/download_s9k2ko.jpg', N'Lược sử thời gian', 1, 0),
+(48, N'https://res.cloudinary.com/dg4uqpioc/image/upload/v1774577386/download_qkwmvp.jpg', N'Vũ trụ trong vỏ hạt dẻ', 1, 0),
+(49, N'https://res.cloudinary.com/dg4uqpioc/image/upload/v1774577405/download_uoocru.jpg', N'Clean Code', 1, 0),
+(50, N'https://res.cloudinary.com/dg4uqpioc/image/upload/v1774577439/download_dnaynm.jpg', N'The Pragmatic Programmer', 1, 0),
+(51, N'https://res.cloudinary.com/dg4uqpioc/image/upload/v1774577471/download_xdgh7t.png', N'Giải thuật và lập trình', 1, 0),
+(57, N'https://res.cloudinary.com/dg4uqpioc/image/upload/v1774577493/shopping_sgah2q.webp', N'Dế mèn phiêu lưu ký (bìa cứng)', 1, 0),
+(58, N'https://res.cloudinary.com/dg4uqpioc/image/upload/v1774577513/shopping_ou1mrr.webp', N'Totto-chan bên cửa sổ', 1, 0),
+(59, N'https://res.cloudinary.com/dg4uqpioc/image/upload/v1774577535/shopping_jcvqtb.webp', N'Charlie và nhà máy Sôcôla', 1, 0),
+(60, N'https://res.cloudinary.com/dg4uqpioc/image/upload/v1774577553/shopping_e2lt9s.webp', N'Pippi tất dài', 1, 0),
+(61, N'https://res.cloudinary.com/dg4uqpioc/image/upload/v1774577660/shopping_zpj4so.webp', N'Kính vạn hoa - Tập 1', 1, 0),
+(67, N'https://res.cloudinary.com/dg4uqpioc/image/upload/v1774577689/shopping_dt9ayg.webp', N'Tâm lý học đám đông', 1, 0),
+(68, N'https://res.cloudinary.com/dg4uqpioc/image/upload/v1774577793/download_uozckx.jpg', N'Ý nghĩa cuộc sống', 1, 0),
+(69, N'https://res.cloudinary.com/dg4uqpioc/image/upload/v1774579055/shopping_go2p0k.webp', N'Tội ác và hình phạt', 1, 0),
+(70, N'https://res.cloudinary.com/dg4uqpioc/image/upload/v1774579100/shopping_eoxqu2.webp', N'Flow - Dòng chảy', 1, 0),
+(71, N'https://res.cloudinary.com/dg4uqpioc/image/upload/v1774579122/download_anweei.jpg', N'Triết học hiện sinh', 1, 0),
+(77, N'https://res.cloudinary.com/dg4uqpioc/image/upload/v1774579145/shopping_bfarpp.webp', N'Lịch sử Việt Nam bằng tranh', 1, 0),
+(78, N'https://res.cloudinary.com/dg4uqpioc/image/upload/v1774579164/shopping_fhummb.webp', N'Đại Việt sử ký toàn thư', 1, 0),
+(79, N'https://res.cloudinary.com/dg4uqpioc/image/upload/v1774579184/download_vlovb7.jpg', N'Guns, Germs and Steel', 1, 0),
+(80, N'https://res.cloudinary.com/dg4uqpioc/image/upload/v1774579210/download_obnt5m.jpg', N'Nghìn năm văn hiến', 1, 0),
+(85, N'https://res.cloudinary.com/dg4uqpioc/image/upload/v1774579232/download_egt425.jpg', N'One Piece - Tập 1', 1, 0),
+(86, N'https://res.cloudinary.com/dg4uqpioc/image/upload/v1774579250/download_ewiprr.jpg', N'One Piece - Tập 2', 1, 0),
+(87, N'https://res.cloudinary.com/dg4uqpioc/image/upload/v1774579270/download_timh6z.jpg', N'Conan - Tập 1', 1, 0),
+(88, N'https://res.cloudinary.com/dg4uqpioc/image/upload/v1774579293/download_md0zgt.jpg', N'Conan - Tập 2', 1, 0),
+(89, N'https://res.cloudinary.com/dg4uqpioc/image/upload/v1774579321/download_lulnef.jpg', N'Doraemon - Tập 1', 1, 0),
+(95, N'https://res.cloudinary.com/dg4uqpioc/image/upload/v1774579349/download_jp5y4h.jpg', N'Toán cao cấp - Tập 1', 1, 0),
+(96, N'https://res.cloudinary.com/dg4uqpioc/image/upload/v1774579373/download_avqxcu.jpg', N'Ngữ pháp tiếng Anh nâng cao', 1, 0),
+(97, N'https://res.cloudinary.com/dg4uqpioc/image/upload/v1774579396/shopping_l7bkn3.webp', N'IELTS Academic 18', 1, 0);
 
 GO
 
--- ===================== BOOK IMAGES (placeholder Cloudinary URLs) =====================
-
-INSERT INTO book_images (book_id, url, alt_text, is_cover, sort_order)
-SELECT b.id,
-       'https://res.cloudinary.com/du8cq6vfb/image/upload/v1/bookshop/placeholder_' + CAST(b.id AS VARCHAR) + '.jpg',
-       b.title,
-       1,
-       0
-FROM books b WHERE b.id BETWEEN 1 AND 100;
-
-GO
-
-PRINT N'✅ Seed complete: 10 categories, 25 authors, 100 books, 100 variants, 100 images';
+PRINT N'✅ Seed complete: 10 categories, 25 authors, 50 books, 50 variants, placeholders for image links';

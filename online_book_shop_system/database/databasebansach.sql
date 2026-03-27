@@ -1,3 +1,5 @@
+--create database online_book_shop
+
 /* =========================================================
    BOOKSTORE DATABASE — COMPACT SCHEMA (24 tables)
    SQL Server | Soft-delete + Audit columns
@@ -426,7 +428,7 @@ CREATE TABLE orders (
 
   CONSTRAINT FK_orders_user    FOREIGN KEY (user_id) REFERENCES users(id),
   CONSTRAINT FK_orders_voucher FOREIGN KEY (voucher_id) REFERENCES vouchers(id),
-  CONSTRAINT CK_orders_status  CHECK (status IN ('NEW','CONFIRMED','PACKED','SHIPPED','DELIVERED','COMPLETED','CANCELLED','DELIVERY_FAILED')),
+  CONSTRAINT CK_orders_status  CHECK (status IN ('NEW','CONFIRMED','PACKED','SHIPPED','DELIVERED','COMPLETED','CANCELLED')),
   CONSTRAINT CK_orders_pay    CHECK (payment_status IN ('PENDING','PAID','FAILED','REFUNDED'))
 );
 CREATE UNIQUE INDEX UX_orders_code ON orders(order_code) WHERE deleted_at IS NULL;
@@ -640,48 +642,6 @@ CREATE INDEX IX_audit_created ON audit_logs(created_at);
 CREATE INDEX IX_audit_entity  ON audit_logs(entity_table, entity_id);
 
 
-/* ===================== ENGAGEMENT (tiếp) ===================== */
-
-CREATE TABLE review_reports (
-  id           BIGINT IDENTITY(1,1) PRIMARY KEY,
-  review_id    BIGINT NOT NULL,
-  reporter_id  BIGINT NOT NULL,
-  reason       NVARCHAR(500) NOT NULL,
-  status       VARCHAR(20) NOT NULL DEFAULT 'PENDING',   -- PENDING | APPROVED | REJECTED
-  admin_note   NVARCHAR(500) NULL,
-  reviewed_by  BIGINT NULL,
-  reviewed_at  DATETIME2(0) NULL,
-  created_at   DATETIME2(0) NOT NULL DEFAULT SYSUTCDATETIME(),
-  updated_at   DATETIME2(0) NULL,
-  deleted_at   DATETIME2(0) NULL,
-  row_version  ROWVERSION,
-
-  CONSTRAINT FK_rr_review   FOREIGN KEY (review_id)   REFERENCES reviews(id),
-  CONSTRAINT FK_rr_reporter FOREIGN KEY (reporter_id)  REFERENCES users(id),
-  CONSTRAINT FK_rr_admin    FOREIGN KEY (reviewed_by)  REFERENCES users(id),
-  CONSTRAINT CK_rr_status   CHECK (status IN ('PENDING','APPROVED','REJECTED'))
-);
-CREATE INDEX IX_rr_review   ON review_reports(review_id);
-CREATE INDEX IX_rr_reporter ON review_reports(reporter_id);
-CREATE INDEX IX_rr_status   ON review_reports(status) WHERE deleted_at IS NULL;
-
-CREATE TABLE notifications (
-  id         BIGINT IDENTITY(1,1) PRIMARY KEY,
-  user_id    BIGINT NOT NULL,
-  title      NVARCHAR(200)  NOT NULL,
-  body       NVARCHAR(1000) NOT NULL,
-  type       VARCHAR(40)    NOT NULL DEFAULT 'GENERAL',
-  is_read    BIT NOT NULL DEFAULT 0,
-  ref_id     BIGINT NULL,
-  created_at DATETIME2(0) NOT NULL DEFAULT SYSUTCDATETIME(),
-  deleted_at DATETIME2(0) NULL,
-  row_version ROWVERSION,
-
-  CONSTRAINT FK_notif_user FOREIGN KEY (user_id) REFERENCES users(id)
-);
-CREATE INDEX IX_notif_user    ON notifications(user_id);
-CREATE INDEX IX_notif_unread  ON notifications(user_id, is_read) WHERE deleted_at IS NULL;
-
 /* ===================== SEED DATA ===================== */
 
 INSERT INTO roles (code, name, description, permissions_json) VALUES
@@ -702,6 +662,61 @@ INSERT INTO settings ([group], [key], value_json, description) VALUES
   ('INVENTORY',  'ALLOCATION',      '{"fifoBy":"LOT","reservationTtlMin":30,"conditionPriority":"NEWEST_FIRST","allowStaffOverride":false}', N'Rule xuất kho'),
   ('SYSTEM',     'RESERVATION_TTL', '{"minutes":30}',                                    N'Thời gian giữ hàng');
 
-  ALTER TABLE orders DROP CONSTRAINT CK_orders_status;
-ALTER TABLE orders ADD CONSTRAINT CK_orders_status CHECK (status IN ('NEW','CONFIRMED','PACKED','SHIPPED','DELIVERED','COMPLETED','CANCELLED','DELIVERY_FAILED'));
+
 /* ===================== END — 24 TABLES ===================== */
+
+/* =========================================================
+   UPDATE: Thêm bảng cart_items
+   Giỏ hàng lưu server-side → đồng bộ cross-device
+   Chạy file này SAU khi đã chạy databasebansach.sql
+   ========================================================= */
+
+-- 1) Tạo bảng cart_items
+CREATE TABLE cart_items (
+  id          BIGINT IDENTITY(1,1) PRIMARY KEY,
+  user_id     BIGINT NOT NULL,
+  variant_id  BIGINT NOT NULL,
+  copy_id     BIGINT NULL,              -- NULL = mua theo qty, NOT NULL = chọn cuốn cụ thể
+
+  quantity    INT NOT NULL DEFAULT 1,
+  added_at    DATETIME2(0) NOT NULL DEFAULT SYSUTCDATETIME(),
+  updated_at  DATETIME2(0) NULL,
+
+  CONSTRAINT FK_cart_user    FOREIGN KEY (user_id) REFERENCES users(id),
+  CONSTRAINT FK_cart_variant FOREIGN KEY (variant_id) REFERENCES book_variants(id),
+  CONSTRAINT FK_cart_copy    FOREIGN KEY (copy_id) REFERENCES copies(id),
+  CONSTRAINT CK_cart_qty     CHECK (quantity >= 1),
+  CONSTRAINT UQ_cart_variant UNIQUE (user_id, variant_id, copy_id)
+);
+CREATE INDEX IX_cart_user ON cart_items(user_id);
+
+
+ALTER TABLE books
+ADD stock_quantity INT NOT NULL DEFAULT 0;
+
+/* =========================================================
+   UPDATE: Thêm bảng review_reports
+   Lưu trữ các báo cáo vi phạm đánh giá (report) từ người dùng
+   ========================================================= */
+CREATE TABLE review_reports (
+  id            BIGINT IDENTITY(1,1) PRIMARY KEY,
+  review_id     BIGINT NOT NULL,
+  reporter_id   BIGINT NOT NULL,
+  reason        NVARCHAR(MAX) NOT NULL,
+  status        VARCHAR(20) NOT NULL DEFAULT 'PENDING',
+  admin_note    NVARCHAR(500) NULL,
+  reviewed_by   BIGINT NULL,
+  reviewed_at   DATETIME2(0) NULL,
+
+  created_at    DATETIME2(0) NOT NULL DEFAULT SYSUTCDATETIME(),
+  updated_at    DATETIME2(0) NULL,
+  deleted_at    DATETIME2(0) NULL,
+  row_version   ROWVERSION,
+
+  CONSTRAINT FK_rr_review   FOREIGN KEY (review_id) REFERENCES reviews(id),
+  CONSTRAINT FK_rr_reporter FOREIGN KEY (reporter_id) REFERENCES users(id),
+  CONSTRAINT FK_rr_admin    FOREIGN KEY (reviewed_by) REFERENCES users(id),
+  CONSTRAINT CK_rr_status   CHECK (status IN ('PENDING','APPROVED','REJECTED'))
+);
+CREATE INDEX IX_rr_review   ON review_reports(review_id);
+CREATE INDEX IX_rr_reporter ON review_reports(reporter_id);
