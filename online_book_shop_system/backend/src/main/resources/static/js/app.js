@@ -343,6 +343,11 @@ function nextSlide() {
     showSlide(currentSlide);
 }
 
+function prevSlide() {
+    currentSlide = (currentSlide - 1) % slides.length;
+    showSlide(currentSlide);
+}
+
 /* ===== INIT ===== */
 document.addEventListener("DOMContentLoaded", async () => {
     await syncAuthFromServerSession(API_BASE);
