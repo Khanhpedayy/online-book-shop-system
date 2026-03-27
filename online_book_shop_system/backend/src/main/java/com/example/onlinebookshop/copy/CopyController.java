@@ -8,7 +8,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/inventory/copies")
-@CrossOrigin(origins = "*")
 @Tag(name = "6. Copy Registry")
 public class CopyController {
 

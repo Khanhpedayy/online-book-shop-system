@@ -16,9 +16,12 @@ public class BookVariantDTO {
     private String title;
     private String sku;
     private String isbn;
+    private String publisherName;
+    private Integer publicationYear;
     private String format;
     private BigDecimal salePrice;
     private BigDecimal listPrice;
+    private String coverImageUrl;
     private String description;
     private String status;
 }

@@ -11,7 +11,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/inventory/lots")
-@CrossOrigin(origins = "*")
 @Tag(name = "5. Lot / Goods Receipt")
 public class LotController {
 

@@ -28,6 +28,21 @@ public class BookInfo {
     @Column(name = "isbn10", length = 10)
     private String isbn10;
 
+    @Column(name = "publisher_name", length = 255)
+    private String publisherName;
+
+    @Column(name = "publication_year")
+    private Integer publicationYear;
+
+    @Column(name = "language", length = 50)
+    private String language;
+
+    @Column(name = "tags_json", length = 2000)
+    private String tagsJson;
+
+    @Column(name = "sell_mode", length = 30)
+    private String sellMode;
+
     @Column(nullable = false, length = 255)
     private String title;
 

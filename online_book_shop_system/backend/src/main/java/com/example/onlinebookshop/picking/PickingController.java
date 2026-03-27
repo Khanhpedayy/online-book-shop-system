@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/staff/orders/{orderId}")
-@CrossOrigin(origins = "*")
 @Tag(name = "13. Picking & Allocation")
 public class PickingController {
 

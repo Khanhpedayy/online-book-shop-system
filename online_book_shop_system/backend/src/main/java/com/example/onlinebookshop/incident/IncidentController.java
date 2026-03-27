@@ -8,7 +8,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/staff/incidents")
-@CrossOrigin(origins = "*")
 @Tag(name = "19. Incidents")
 public class IncidentController {
     private final IncidentService service;

@@ -27,6 +27,9 @@ public class BookVariant {
     @Column(nullable = false, length = 80)
     private String sku;
 
+    @Column(name = "format", length = 30)
+    private String format;
+
     @Column(name = "list_price", nullable = false, precision = 18, scale = 2)
     private BigDecimal listPrice = BigDecimal.ZERO;
 

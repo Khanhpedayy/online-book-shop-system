@@ -10,6 +10,11 @@ let currentBooks = [];
 let currentPage = 1;
 let booksPerPage = 8;
 
+function formatVnd(value) {
+    const n = Number(value) || 0;
+    return new Intl.NumberFormat("vi-VN").format(Math.round(n)) + "₫";
+}
+
 /* ===== JWT ===== */
 function getToken() {
     return localStorage.getItem("token");
@@ -76,7 +81,7 @@ function renderBooks(list = currentBooks) {
     console.log("RENDER:", list);
     books.forEach(b => {
         const price = b.salePrice ?? 0;
-        const coverUrl = 'https://covers.openlibrary.org/b/isbn/' + (b.isbn || '0385533229') + '-M.jpg';
+        const coverUrl = b.coverImageUrl || ('https://covers.openlibrary.org/b/isbn/' + (b.isbn || '0385533229') + '-M.jpg');
         const variantId = b.variantId || b.id;
 
         booksContainer.innerHTML += `
@@ -84,7 +89,7 @@ function renderBooks(list = currentBooks) {
             <img class="book-cover" src="${coverUrl}" onerror="this.src='https://via.placeholder.com/220x330?text=Book'">
             <div class="book-info">
                 <div class="book-title">${b.title}</div>
-                <div class="book-price">$${price.toFixed(2)}</div>
+                <div class="book-price">${formatVnd(price)}</div>
                 <div class="book-actions">
                     <input type="number" value="1" min="1" id="qty-${variantId}">
                     <button class="btn" onclick="addToCart(${variantId})">Add to Cart</button>
@@ -148,6 +153,23 @@ async function loadBooks(filters = {}) {
         if (!books.length) {
             booksContainer.innerHTML = "No books found";
             return;
+        }
+
+        // Populate publisher dropdown from current result set (simple, no extra API).
+        const pubSel = document.getElementById("publisherFilter");
+        if (pubSel) {
+            const current = pubSel.value || "";
+            const pubs = Array.from(
+                new Set(
+                    books
+                        .map(b => (b.publisherName || "").trim())
+                        .filter(Boolean)
+                )
+            ).sort((a, b) => a.localeCompare(b));
+            pubSel.innerHTML =
+                '<option value="">All Publishers</option>' +
+                pubs.map(p => `<option value="${escapeHtmlAttr(p)}">${escapeHtmlAttr(p)}</option>`).join("");
+            pubSel.value = pubs.includes(current) ? current : "";
         }
 
         currentBooks = books;
@@ -268,7 +290,7 @@ async function addToCart(id) {
 
 function updateHeaderCart(total, count) {
     if (!headerCartCount) return;
-    headerCartCount.textContent = `$${total.toFixed(2)} (${count})`;
+    headerCartCount.textContent = `${formatVnd(total)} (${count})`;
 }
 
 async function loadCart() {
@@ -280,7 +302,7 @@ async function loadCart() {
         let total = 0, count = 0;
 
         items.forEach(ci => {
-            const price = ci.variant?.salePrice ?? 0;
+            const price = ci.salePrice ?? ci.variant?.salePrice ?? 0;
             total += price * ci.quantity;
             count += ci.quantity;
         });
@@ -318,6 +340,11 @@ function showSlide(index) {
 
 function nextSlide() {
     currentSlide = (currentSlide + 1) % slides.length;
+    showSlide(currentSlide);
+}
+
+function prevSlide() {
+    currentSlide = (currentSlide - 1) % slides.length;
     showSlide(currentSlide);
 }
 

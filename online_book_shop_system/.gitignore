@@ -5,3 +5,6 @@ target/
 *.iml
 uploads
 build.log
+
+# Local PayOS / secrets (never commit)
+**/src/main/resources/application-local.properties

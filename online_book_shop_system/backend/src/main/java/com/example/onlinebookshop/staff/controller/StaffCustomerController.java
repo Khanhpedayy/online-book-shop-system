@@ -19,6 +19,6 @@ public class StaffCustomerController {
     public String lookup(@RequestParam(value = "q", required = false) String q, Model model) {
         model.addAttribute("q", q);
         model.addAttribute("rows", repo.search(q, 200));
-        return "staff/customer-lookup";
+        return "redirect:/staff/workspace/dashboard";
     }
 }

@@ -29,7 +29,7 @@ public class SecurityConfig {
     private final CustomUserDetailsService customUserDetailsService;
 
     public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter,
-                          CustomUserDetailsService customUserDetailsService) {
+            CustomUserDetailsService customUserDetailsService) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
         this.customUserDetailsService = customUserDetailsService;
     }
@@ -42,6 +42,7 @@ public class SecurityConfig {
                 .authenticationProvider(authenticationProvider())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/", "/index.html").permitAll()
+                        .requestMatchers("/payment-result.html", "/payment.html").permitAll()
                         .requestMatchers("/error", "/error/**").permitAll()
                         .requestMatchers("/login", "/login.html", "/post-login", "/admin-entry").permitAll()
                         .requestMatchers("/perform-login").permitAll()
@@ -65,8 +66,10 @@ public class SecurityConfig {
 
                         .requestMatchers("/shipping.html").permitAll()
 
-                        .anyRequest().authenticated()
-                )
+                        .anyRequest().authenticated())
+                // .authorizeHttpRequests(auth -> auth
+                // .anyRequest().permitAll()
+                // );
                 .formLogin(form -> form
                         .loginPage("/login")
                         .loginProcessingUrl("/perform-login")
@@ -74,15 +77,13 @@ public class SecurityConfig {
                         .passwordParameter("password")
                         .defaultSuccessUrl("/post-login", true)
                         .failureUrl("/login?error")
-                        .permitAll()
-                )
+                        .permitAll())
                 .logout(logout -> logout
                         .logoutRequestMatcher(new OrRequestMatcher(
                                 new AntPathRequestMatcher("/logout", "GET"),
                                 new AntPathRequestMatcher("/logout", "POST")))
                         .logoutSuccessUrl("/login?logout")
-                        .permitAll()
-                )
+                        .permitAll())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

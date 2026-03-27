@@ -14,7 +14,6 @@ import java.util.Set;
 
 @RestController
 @RequestMapping("/api/upload")
-@CrossOrigin(origins = "*")
 @Tag(name = "Upload")
 public class UploadController {
 

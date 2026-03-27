@@ -7,7 +7,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/staff/customers")
-@CrossOrigin(origins = "*")
 @Tag(name = "18. Customer Lookup")
 public class CustomerController {
     private final CustomerService service;

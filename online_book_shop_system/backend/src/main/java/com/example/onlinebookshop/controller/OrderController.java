@@ -99,12 +99,16 @@ public class OrderController {
     }
 
     @PostMapping("/{id}/repay")
-    public Map<String, Object> repay(@PathVariable Long id) {
+    public Map<String, Object> repay(@PathVariable Long id, Authentication auth) {
+        Order order = orderService.getOrderDetailByEmail(id, auth.getName());
 
-        Order order = orderService.getOrderById(id);
+        if (order.getPaymentMethod() == null || !"PAYOS".equalsIgnoreCase(order.getPaymentMethod())) {
+            throw new IllegalStateException("Repay is only available for PayOS orders.");
+        }
 
-        if (!"UNPAID".equals(order.getPaymentStatus())) {
-            throw new RuntimeException("Order already paid or not eligible!");
+        String ps = order.getPaymentStatus();
+        if (ps != null && !"PENDING".equalsIgnoreCase(ps) && !"UNPAID".equalsIgnoreCase(ps)) {
+            throw new IllegalStateException("Order already paid or not eligible for repay.");
         }
 
         String paymentUrl = orderService.createPayment(order);

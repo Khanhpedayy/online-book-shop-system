@@ -9,7 +9,6 @@ import java.util.List;
 
 @RestController("orderMgmtController")
 @RequestMapping("/api/staff/orders")
-@CrossOrigin(origins = "*")
 @Tag(name = "11. Staff Orders")
 public class OrderController {
 

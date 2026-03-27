@@ -75,17 +75,17 @@ async function loadOrders() {
 
                     <div>
                         💰 Total: ${formatMoney(o.totalAmount)} <br>
-                        💳 Payment: ${o.paymentMethod} (${o.paymentStatus})
+                        💳 Payment: ${paymentMethodLabel(o)} (${paymentStatusLabel(o)})
                     </div>
 
                     <div style="margin-top:10px;">
                         <button type="button" class="shop-btn" onclick="viewOrder(${o.id})">View</button>
 
-                        ${o.status === "PENDING" ?
+                        ${o.status === "NEW" ?
                 `<button type="button" class="shop-btn shop-btn--secondary" onclick="cancelOrder(${o.id})">Cancel</button>` : ""
             }
 
-                        ${o.paymentStatus === "UNPAID" && o.paymentMethod === "PAYOS" ?
+                        ${payAgainEligible(o) ?
                 `<button type="button" class="shop-btn" onclick="repay(${o.id})">Pay again</button>` : ""
             }
                     </div>
@@ -101,7 +101,36 @@ async function loadOrders() {
 
 /* ===== FORMAT MONEY ===== */
 function formatMoney(value) {
-    return Number(value).toLocaleString('vi-VN') + " VND";
+    if (value == null || value === "") {
+        return "—";
+    }
+    const n = Number(value);
+    if (!Number.isFinite(n)) {
+        return String(value);
+    }
+    return n.toLocaleString("vi-VN", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " VND";
+}
+
+function paymentMethodLabel(o) {
+    const m = o && o.paymentMethod;
+    if (m != null && String(m).trim() !== "") {
+        return String(m).trim().toUpperCase();
+    }
+    return "COD";
+}
+
+function paymentStatusLabel(o) {
+    const s = o && o.paymentStatus;
+    if (s != null && String(s).trim() !== "") {
+        return String(s).trim().toUpperCase();
+    }
+    return "—";
+}
+
+function payAgainEligible(o) {
+    const ps = paymentStatusLabel(o);
+    const pm = paymentMethodLabel(o);
+    return pm === "PAYOS" && (ps === "PENDING" || ps === "UNPAID");
 }
 
 /* ===== VIEW DETAIL ===== */

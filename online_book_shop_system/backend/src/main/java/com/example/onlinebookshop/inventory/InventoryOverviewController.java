@@ -8,7 +8,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/inventory/overview")
-@CrossOrigin(origins = "*")
 @Tag(name = "1. Inventory Overview")
 public class InventoryOverviewController {
 

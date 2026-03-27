@@ -4,6 +4,10 @@
  */
 (function () {
     var SHOP_API_BASE = "http://localhost:8080";
+    function formatVnd(value) {
+        var n = Number(value) || 0;
+        return new Intl.NumberFormat("vi-VN").format(Math.round(n)) + "₫";
+    }
 
     function updateShopHeaderAuth() {
         var token = localStorage.getItem("token");
@@ -75,7 +79,7 @@
         }
         var token = localStorage.getItem("token");
         if (!token) {
-            el.textContent = "$0.00 (0)";
+            el.textContent = "0₫ (0)";
             return;
         }
         try {
@@ -93,12 +97,12 @@
             var total = 0;
             var count = 0;
             items.forEach(function (ci) {
-                var price = ci.variant && ci.variant.salePrice != null ? Number(ci.variant.salePrice) : 0;
+                var price = ci.salePrice != null ? Number(ci.salePrice) : 0;
                 var q = ci.quantity || 0;
                 total += price * q;
                 count += q;
             });
-            el.textContent = "$" + total.toFixed(2) + " (" + count + ")";
+            el.textContent = formatVnd(total) + " (" + count + ")";
         } catch (e) {
             /* ignore */
         }

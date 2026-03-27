@@ -1,16 +1,107 @@
-<h2>Redirecting to payment...</h2>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Payment – Online Book Shop</title>
+    <link rel="stylesheet" href="css/shop.css">
+    <style>
+        .payment-wait { padding: 24px; max-width: 480px; }
+        .payment-wait--error { color: #b91c1c; }
+    </style>
+</head>
+<body class="shop-page">
 
+<header class="shop-header">
+    <div class="logo"><a href="index.html">Online Book Shop</a></div>
+    <div class="search-bar">
+        <input type="search" id="searchInput" placeholder="Search books..." aria-label="Search books">
+        <button type="button" id="searchBtn">Search</button>
+    </div>
+    <nav class="nav">
+        <a href="index.html">Home</a>
+        <a href="profile.html" id="profileLink" style="display:none;">Profile</a>
+        <a href="order-history.html" id="ordersLink" style="display:none;">Orders</a>
+        <a href="login.html" id="loginLink">Login</a>
+        <a href="#" id="logoutLink" style="display:none;">Logout</a>
+        <a href="cart.html" class="cart shop-cart-link">🛒 <span id="headerCartCount">$0.00 (0)</span></a>
+    </nav>
+</header>
+
+<main class="shop-main">
+    <div id="paymentWait" class="payment-wait">
+        <h1>Redirecting to payment…</h1>
+        <p>Please wait while we open PayOS.</p>
+    </div>
+</main>
+
+<footer class="shop-footer">© Online Book Shop</footer>
+
+<script src="js/auth-session.js"></script>
+<script src="js/shop-header.js"></script>
 <script>
-    const API_BASE = 'http://localhost:8080';
+(function () {
+    var API_BASE = "http://localhost:8080";
 
-    const params = new URLSearchParams(window.location.search);
-    const orderId = params.get("orderId");
+    function getToken() {
+        return localStorage.getItem("token");
+    }
 
-    fetch(`${API_BASE}/api/orders/${orderId}/repay`, {
-        method:"POST"
-    })
-        .then(res=>res.json())
-        .then(data=>{
-            window.location.href = data.paymentUrl;
-        });
+    function showError(msg) {
+        var el = document.getElementById("paymentWait");
+        if (el) {
+            el.className = "payment-wait payment-wait--error";
+            el.innerHTML = "<h1>Cannot start payment</h1><p>" + msg + "</p>" +
+                "<p><a href=\"order-history.html\">Back to orders</a></p>";
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", async function () {
+        await syncAuthFromServerSession(API_BASE);
+        if (typeof updateShopHeaderAuth === "function") {
+            updateShopHeaderAuth();
+        }
+        if (typeof updateShopHeaderCart === "function") {
+            updateShopHeaderCart();
+        }
+
+        var params = new URLSearchParams(window.location.search);
+        var orderId = params.get("orderId");
+        if (!orderId) {
+            showError("Missing order id.");
+            return;
+        }
+        if (!getToken()) {
+            window.location.href = "login.html?next=" + encodeURIComponent(window.location.pathname + window.location.search);
+            return;
+        }
+
+        try {
+            var res = await fetch(API_BASE + "/api/orders/" + encodeURIComponent(orderId) + "/repay", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: "Bearer " + getToken()
+                },
+                credentials: "include",
+                body: "{}"
+            });
+            if (!res.ok) {
+                var text = await res.text();
+                throw new Error(text || res.statusText);
+            }
+            var data = await res.json();
+            if (data.paymentUrl) {
+                window.location.href = data.paymentUrl;
+            } else {
+                showError("No payment URL returned.");
+            }
+        } catch (e) {
+            console.error(e);
+            showError(e.message || String(e));
+        }
+    });
+})();
 </script>
+</body>
+</html>

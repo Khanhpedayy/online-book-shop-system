@@ -1,0 +1,30 @@
+-- Patch existing user_addresses table if it was created without all columns.
+IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='user_addresses' AND COLUMN_NAME='label')
+    ALTER TABLE user_addresses ADD label NVARCHAR(80) NULL;
+
+IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='user_addresses' AND COLUMN_NAME='recipient_name')
+    ALTER TABLE user_addresses ADD recipient_name NVARCHAR(150) NOT NULL DEFAULT N'';
+
+IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='user_addresses' AND COLUMN_NAME='phone')
+    ALTER TABLE user_addresses ADD phone NVARCHAR(30) NULL;
+
+IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='user_addresses' AND COLUMN_NAME='line1')
+    ALTER TABLE user_addresses ADD line1 NVARCHAR(255) NOT NULL DEFAULT N'';
+
+IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='user_addresses' AND COLUMN_NAME='line2')
+    ALTER TABLE user_addresses ADD line2 NVARCHAR(255) NULL;
+
+IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='user_addresses' AND COLUMN_NAME='city')
+    ALTER TABLE user_addresses ADD city NVARCHAR(100) NULL;
+
+IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='user_addresses' AND COLUMN_NAME='is_default')
+    ALTER TABLE user_addresses ADD is_default BIT NOT NULL DEFAULT 0;
+
+IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='user_addresses' AND COLUMN_NAME='created_at')
+    ALTER TABLE user_addresses ADD created_at DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME();
+
+IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='user_addresses' AND COLUMN_NAME='deleted_at')
+    ALTER TABLE user_addresses ADD deleted_at DATETIME2 NULL;
+
+IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name='IX_user_addresses_user_id' AND object_id=OBJECT_ID('user_addresses'))
+    CREATE INDEX IX_user_addresses_user_id ON user_addresses(user_id) WHERE deleted_at IS NULL;

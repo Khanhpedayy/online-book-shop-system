@@ -38,7 +38,7 @@ class AdjustmentControllerTest {
     void getAll_returnsOk() throws Exception {
         AdjustmentDTO dto = new AdjustmentDTO();
         dto.setId(1L);
-        dto.setMovementType("ADJUST");
+        dto.setType("ADJUST");
         dto.setReason("DAMAGED");
         when(service.getAll()).thenReturn(List.of(dto));
 

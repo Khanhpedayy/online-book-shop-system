@@ -1,5 +1,6 @@
 package com.example.onlinebookshop.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
@@ -27,10 +28,14 @@ public class Order {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnore
     private User user;
 
     @Column(name = "status", nullable = false, length = 20)
     private String status = "NEW";
+
+    @Column(name = "payment_method", length = 20)
+    private String paymentMethod;
 
     @Column(name = "payment_status", nullable = false, length = 20)
     private String paymentStatus = "PENDING";

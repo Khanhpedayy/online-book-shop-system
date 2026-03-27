@@ -20,8 +20,13 @@ async function parseError(resp) {
     const text = await resp.text();
     try {
         const j = JSON.parse(text);
-        if (j && j.error) {
-            return j.error;
+        if (j) {
+            if (j.message) {
+                return j.message;
+            }
+            if (j.error) {
+                return j.error;
+            }
         }
     } catch (e) { /* ignore */ }
     return text || resp.statusText;
@@ -243,13 +248,23 @@ function startEdit(id) {
 
 async function submitAddress() {
     const msg = document.getElementById('addrMsg');
+    const recipientName = document.getElementById('addrRecipient').value.trim();
+    const line1 = document.getElementById('addrLine1').value.trim();
+    if (!recipientName) {
+        showMsg(msg, 'Recipient is required.', false);
+        return;
+    }
+    if (!line1) {
+        showMsg(msg, 'Address line 1 is required.', false);
+        return;
+    }
     const body = {
-        label: document.getElementById('addrLabel').value,
-        recipientName: document.getElementById('addrRecipient').value,
-        phone: document.getElementById('addrPhone').value,
-        line1: document.getElementById('addrLine1').value,
-        line2: document.getElementById('addrLine2').value,
-        city: document.getElementById('addrCity').value,
+        label: document.getElementById('addrLabel').value.trim(),
+        recipientName,
+        phone: document.getElementById('addrPhone').value.trim(),
+        line1,
+        line2: document.getElementById('addrLine2').value.trim(),
+        city: document.getElementById('addrCity').value.trim(),
         defaultAddress: document.getElementById('addrDefault').checked
     };
     try {

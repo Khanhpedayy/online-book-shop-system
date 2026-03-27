@@ -2,6 +2,8 @@ package com.example.onlinebookshop.Service;
 
 import com.example.onlinebookshop.Entity.*;
 import com.example.onlinebookshop.Repository.*;
+import com.example.onlinebookshop.paymentlog.PaymentLogRepository;
+import com.example.onlinebookshop.payos.PayOSClient;
 import com.example.onlinebookshop.dto.CheckoutRequest;
 import com.example.onlinebookshop.dto.OrderItemRequest;
 import com.example.onlinebookshop.dto.OrderRequest;
@@ -27,13 +29,18 @@ public class OrderServiceImpl implements OrderService {
     private final BookVariantRepository variantRepository;
     private final UserRepository userRepository;
     private final CartItemRepository cartItemRepository;
+    private final PayOSClient payOSClient;
+    private final PaymentLogRepository paymentLogRepository;
 
     public OrderServiceImpl(OrderRepository orderRepository, BookVariantRepository variantRepository,
-                            UserRepository userRepository, CartItemRepository cartItemRepository) {
+                            UserRepository userRepository, CartItemRepository cartItemRepository,
+                            PayOSClient payOSClient, PaymentLogRepository paymentLogRepository) {
         this.orderRepository = orderRepository;
         this.variantRepository = variantRepository;
         this.userRepository = userRepository;
         this.cartItemRepository = cartItemRepository;
+        this.payOSClient = payOSClient;
+        this.paymentLogRepository = paymentLogRepository;
     }
 
     @Override
@@ -95,6 +102,8 @@ public class OrderServiceImpl implements OrderService {
 
         order.setSubtotalAmount(total);
         order.setTotalAmount(total);
+        String pm = request.getPaymentMethod();
+        order.setPaymentMethod(pm != null && !pm.isBlank() ? pm.trim().toUpperCase(Locale.ROOT) : "COD");
         order.setItems(items);
         return orderRepository.save(order);
     }
@@ -136,9 +145,23 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional
     public String createPayment(Order order) {
-        throw new UnsupportedOperationException(
-                "PayOS (or other) payment URL creation is not wired in OrderServiceImpl yet.");
+        if (order.getPaymentMethod() == null || !"PAYOS".equalsIgnoreCase(order.getPaymentMethod())) {
+            throw new IllegalArgumentException("Payment link is only available for PayOS orders.");
+        }
+        String ps = order.getPaymentStatus();
+        if (ps != null && !"PENDING".equalsIgnoreCase(ps) && !"UNPAID".equalsIgnoreCase(ps)) {
+            throw new IllegalStateException("Order is not eligible for payment.");
+        }
+        if (order.getId() == null) {
+            throw new IllegalStateException("Order must be saved before creating a payment link.");
+        }
+        PayOSClient.PayOSCheckoutResult result = payOSClient.createCheckout(
+                order.getId(), order.getTotalAmount(), order.getOrderCode());
+        paymentLogRepository.insertPayOsLink(
+                order.getId(), result.paymentLinkId(), order.getTotalAmount(), result.payosOrderCode());
+        return result.checkoutUrl();
     }
 
     @Override
@@ -153,7 +176,8 @@ public class OrderServiceImpl implements OrderService {
     public Order getOrderDetailByEmail(Long orderId, String email) {
         User user = userRepository.findByEmailAndDeletedAtIsNull(email)
                 .orElseThrow(() -> new RuntimeException("User not found: " + email));
-        Order order = getOrderById(orderId);
+        Order order = orderRepository.findDetailById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found: " + orderId));
         if (order.getDeletedAt() != null) {
             throw new RuntimeException("Order not found: " + orderId);
         }

@@ -52,7 +52,8 @@ async function loadOrder(){
         const o = await apiGet(`/api/orders/${id}/me`);
 
         renderOrderInfo(o);
-        renderItems(o.items);
+        const rawItems = o.items != null ? o.items : [];
+        renderItems(rawItems);
         renderTimeline(o.status);
 
     }catch(e){
@@ -61,32 +62,58 @@ async function loadOrder(){
     }
 }
 
+function displayPaymentMethod(o) {
+    const m = o.paymentMethod;
+    if (m != null && String(m).trim() !== "") {
+        return String(m).trim().toUpperCase();
+    }
+    return "COD";
+}
+
+function displayPaymentStatus(o) {
+    const s = o.paymentStatus;
+    if (s != null && String(s).trim() !== "") {
+        return String(s).trim().toUpperCase();
+    }
+    return "—";
+}
+
 /* ===== ORDER INFO ===== */
 function renderOrderInfo(o){
     const div = document.getElementById("orderInfo");
+    const addr = [o.shipLine1, o.shipLine2].filter(Boolean).join(", ");
 
     div.innerHTML = `
-        <h3>Order #${o.orderCode || o.id}</h3>
-        <p>Status: <b>${o.status}</b></p>
-        <p>Payment: ${o.paymentMethod} (${o.paymentStatus})</p>
+        <h3>Order #${escapeHtml(String(o.orderCode || o.id))}</h3>
+        <p>Status: <b>${escapeHtml(String(o.status || "—"))}</b></p>
+        <p>Payment: <b>${escapeHtml(displayPaymentMethod(o))}</b> (${escapeHtml(displayPaymentStatus(o))})</p>
         <p>Total: ${formatMoney(o.totalAmount)}</p>
 
         <hr>
 
-        <p><b>Recipient:</b> ${o.shipName}</p>
-        <p><b>Phone:</b> ${o.shipPhone}</p>
-        <p><b>Address:</b> ${o.shipLine1}</p>
+        <p><b>Recipient:</b> ${escapeHtml(String(o.shipName || "—"))}</p>
+        <p><b>Phone:</b> ${escapeHtml(String(o.shipPhone || "—"))}</p>
+        <p><b>Address:</b> ${escapeHtml(addr || "—")}</p>
 
         <div style="margin-top:10px;">
             ${o.status === "NEW" ?
-        `<button class="btn" onclick="cancelOrder(${o.id})">Cancel</button>` : ""
+        `<button type="button" class="shop-btn shop-btn--secondary" onclick="cancelOrder(${o.id})">Cancel order</button>` : ""
     }
 
-            ${o.paymentStatus === "UNPAID" && o.paymentMethod === "PAYOS" ?
-        `<button class="btn" onclick="repay(${o.id})">Pay Again</button>` : ""
+            ${(displayPaymentStatus(o) === "PENDING" || displayPaymentStatus(o) === "UNPAID") && displayPaymentMethod(o) === "PAYOS" ?
+        `<button type="button" class="shop-btn" onclick="repay(${o.id})">Pay again</button>` : ""
     }
         </div>
     `;
+}
+
+function escapeHtml(s) {
+    if (s == null) return "";
+    return String(s)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
 }
 
 /* ===== ITEMS ===== */
@@ -95,39 +122,68 @@ function renderItems(items){
     container.innerHTML = "";
 
     if (!items || items.length === 0) {
-        container.innerHTML = "<p>No items found</p>";
+        container.innerHTML = "<p>No line items on this order.</p>";
         return;
     }
 
     items.forEach(i => {
+        const title = i.titleSnapshot || (i.book && i.book.title) || (i.variant && i.variant.sku) || "Item";
+        const qty = i.quantity != null ? i.quantity : 0;
+        const unit = i.unitPrice;
         container.innerHTML += `
             <div class="item">
                 <div>
-                    ${i.titleSnapshot || "Book"} <br>
-                    x${i.quantity}
+                    ${escapeHtml(String(title))} <br>
+                    <span class="shop-muted">×${qty}</span>
                 </div>
                 <div>
-                    ${formatMoney(i.unitPrice)}
+                    ${formatMoney(unit)} <br>
+                    <span class="shop-muted">Line: ${formatMoney(lineTotal(i))}</span>
                 </div>
             </div>
         `;
     });
 }
 
+function lineTotal(i) {
+    if (i.lineTotal != null && i.lineTotal !== "") {
+        return i.lineTotal;
+    }
+    const u = Number(i.unitPrice);
+    const q = Number(i.quantity) || 0;
+    if (Number.isFinite(u) && Number.isFinite(q)) {
+        return u * q;
+    }
+    return null;
+}
+
 /* ===== TIMELINE ===== */
 function renderTimeline(status){
-    const steps = ["NEW","CONFIRMED","SHIPPING","COMPLETED"];
+    const s = (status || "").toString().toUpperCase();
     const container = document.getElementById("timeline");
 
     container.innerHTML = "";
 
-    steps.forEach(s => {
-        const active = steps.indexOf(s) <= steps.indexOf(status);
+    if (s === "CANCELLED") {
+        container.innerHTML = `
+            <div class="step" style="flex:1;">
+                <div class="circle active" style="background:#b91c1c;"></div>
+                <div>Cancelled</div>
+            </div>`;
+        return;
+    }
+
+    const steps = ["NEW","CONFIRMED","SHIPPING","COMPLETED"];
+    const idx = steps.indexOf(s);
+    const activeIdx = idx >= 0 ? idx : 0;
+
+    steps.forEach((step, i) => {
+        const active = i <= activeIdx;
 
         container.innerHTML += `
             <div class="step">
                 <div class="circle ${active ? "active" : ""}"></div>
-                <div>${s}</div>
+                <div>${step}</div>
             </div>
         `;
     });
@@ -160,7 +216,14 @@ async function repay(id){
 
 /* ===== UTIL ===== */
 function formatMoney(v){
-    return Number(v).toLocaleString('vi-VN') + " VND";
+    if (v == null || v === "") {
+        return "—";
+    }
+    const n = Number(v);
+    if (!Number.isFinite(n)) {
+        return String(v);
+    }
+    return n.toLocaleString("vi-VN", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " VND";
 }
 
 /* ===== INIT ===== */
