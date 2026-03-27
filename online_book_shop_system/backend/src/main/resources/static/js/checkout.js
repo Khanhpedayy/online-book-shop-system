@@ -1,7 +1,12 @@
 const API_BASE = 'http://localhost:8080';
 
-const shippingCost = 5; // fixed shipping cost
+const shippingCost = 5000; // fixed shipping cost (VND)
 let subtotal = 0;
+
+function formatVnd(value) {
+    const n = Number(value) || 0;
+    return new Intl.NumberFormat("vi-VN").format(Math.round(n));
+}
 
 // ===== DOM =====
 const orderForm = document.getElementById("orderForm");
@@ -52,9 +57,9 @@ async function logout() {
 function updateTotals() {
     const total = subtotal + shippingCost;
 
-    summaryDiv.querySelector("#subtotalVal").textContent = subtotal.toFixed(2);
-    summaryDiv.querySelector("#shippingVal").textContent = shippingCost.toFixed(2);
-    summaryDiv.querySelector("#totalVal").textContent = total.toFixed(2);
+    summaryDiv.querySelector("#subtotalVal").textContent = formatVnd(subtotal);
+    summaryDiv.querySelector("#shippingVal").textContent = formatVnd(shippingCost);
+    summaryDiv.querySelector("#totalVal").textContent = formatVnd(total);
 }
 
 // ===== LOAD SUMMARY =====
@@ -73,28 +78,25 @@ async function loadCheckoutSummary() {
         let html = "";
 
         items.forEach(ci => {
-            const v = ci.variant;
-            const book = v?.book;
-
-            const title = book?.title || v?.sku || "Unknown";
-            const price = v?.salePrice || 0;
+            const title = ci.title || ci.sku || "Unknown";
+            const price = Number(ci.salePrice || 0);
             const qty = ci.quantity;
             const lineTotal = price * qty;
             subtotal += lineTotal;
 
             html += `
                 <div class="item">
-                    <div><b>${title}</b><br>${qty} x $${price.toFixed(2)}</div>
-                    <div>$${lineTotal.toFixed(2)}</div>
+                    <div><b>${title}</b><br>${qty} x ${formatVnd(price)}₫</div>
+                    <div>${formatVnd(lineTotal)}₫</div>
                 </div>
             `;
         });
 
         html += `
             <hr>
-            <div><span>Subtotal:</span> $<span id="subtotalVal">${subtotal.toFixed(2)}</span></div>
-            <div><span>Shipping:</span> $<span id="shippingVal">${shippingCost.toFixed(2)}</span></div>
-            <div><strong>Total:</strong> $<span id="totalVal">${subtotal.toFixed(2)}</span></div>
+            <div><span>Subtotal:</span> <span id="subtotalVal">${formatVnd(subtotal)}</span>₫</div>
+            <div><span>Shipping:</span> <span id="shippingVal">${formatVnd(shippingCost)}</span>₫</div>
+            <div><strong>Total:</strong> <span id="totalVal">${formatVnd(subtotal + shippingCost)}</span>₫</div>
         `;
         summaryDiv.innerHTML = html;
 

@@ -1,6 +1,11 @@
 const API_BASE = "http://localhost:8080";
 const API = API_BASE + "/api";
 
+function formatVnd(value) {
+    const n = Number(value) || 0;
+    return new Intl.NumberFormat("vi-VN").format(Math.round(n)) + "₫";
+}
+
 function getToken() {
     return localStorage.getItem("token");
 }
@@ -46,7 +51,7 @@ async function loadBook() {
     const book = await apiGet(API + "/books/" + id);
     document.getElementById("title").textContent = book.title;
     document.getElementById("breadcrumbTitle").textContent = book.title;
-    document.getElementById("isbn").textContent = book.isbn13 || "N/A";
+    document.getElementById("isbn").textContent = book.isbn13 || book.isbn10 || "N/A";
     document.getElementById("publisherName").textContent = book.publisherName || "N/A";
     document.getElementById("publicationYear").textContent = book.publicationYear || "N/A";
     document.getElementById("description").textContent = book.description || "";
@@ -59,7 +64,7 @@ async function loadBook() {
     variants.forEach(v => {
         const option = document.createElement("option");
         option.value = v.id;
-        option.textContent = (v.sku || "SKU") + " — $" + Number(v.salePrice || 0).toFixed(2);
+        option.textContent = (v.sku || "SKU") + " — " + formatVnd(v.salePrice || 0);
         variantSelect.appendChild(option);
         if (!selectedVariant) {
             selectedVariant = v;
@@ -67,7 +72,7 @@ async function loadBook() {
     });
 
     if (selectedVariant) {
-        document.getElementById("price").textContent = "$" + Number(selectedVariant.salePrice || 0).toFixed(2);
+        document.getElementById("price").textContent = formatVnd(selectedVariant.salePrice || 0);
         const sq = selectedVariant.stockQuantity;
         document.getElementById("stockStatus").textContent =
             sq != null && sq > 0 ? "In stock (" + sq + ")" : "In stock";
@@ -76,7 +81,7 @@ async function loadBook() {
     variantSelect.onchange = () => {
         const v = variants.find(x => String(x.id) === variantSelect.value);
         if (v) {
-            document.getElementById("price").textContent = "$" + Number(v.salePrice || 0).toFixed(2);
+            document.getElementById("price").textContent = formatVnd(v.salePrice || 0);
         }
     };
 

@@ -67,17 +67,32 @@ public class BookServiceImpl implements BookService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<BookVariantDTO> findBooks(String keyword, String publisherName, Double minPrice, Double maxPrice, Long categoryId) {
+    public List<BookVariantDTO> findBooks(String keyword,
+                                          String publisherName,
+                                          Double minPrice,
+                                          Double maxPrice,
+                                          Long categoryId,
+                                          String format) {
         List<BookVariant> filtered = variantRepository.findAllActiveWithBook().stream()
                 .filter(v -> matchesKeyword(v, keyword))
                 .filter(v -> matchesPublisher(v, publisherName))
                 .filter(v -> matchesPrice(v, minPrice, maxPrice))
                 .filter(v -> matchesCategory(v, categoryId))
+                .filter(v -> matchesFormat(v, format))
                 .collect(Collectors.toList());
         Map<Long, String> coverByBookId = getCoverUrlsByBookIds(filtered);
         return filtered.stream()
                 .map(v -> toDTO(v, coverByBookId))
                 .collect(Collectors.toList());
+    }
+
+    private boolean matchesFormat(BookVariant v, String format) {
+        if (format == null || format.isBlank()) {
+            return true;
+        }
+        String f = format.trim().toUpperCase(Locale.ROOT);
+        String vf = v.getFormat() != null ? v.getFormat().trim().toUpperCase(Locale.ROOT) : "";
+        return vf.equals(f);
     }
 
     private boolean matchesCategory(BookVariant v, Long categoryId) {
@@ -105,15 +120,14 @@ public class BookServiceImpl implements BookService {
         if (publisherName == null || publisherName.isBlank()) {
             return true;
         }
-        // books table has no publisher column; treat filter as loose match on title/description
         String p = publisherName.toLowerCase(Locale.ROOT);
         if (v.getBook() == null) {
             return false;
         }
-        String title = v.getBook().getTitle() != null ? v.getBook().getTitle().toLowerCase(Locale.ROOT) : "";
-        String desc = v.getBook().getShortDescription() != null
-                ? v.getBook().getShortDescription().toLowerCase(Locale.ROOT) : "";
-        return title.contains(p) || desc.contains(p);
+        String pub = v.getBook().getPublisherName() != null
+                ? v.getBook().getPublisherName().toLowerCase(Locale.ROOT)
+                : "";
+        return pub.contains(p);
     }
 
     private boolean matchesPrice(BookVariant v, Double minPrice, Double maxPrice) {
@@ -129,17 +143,49 @@ public class BookServiceImpl implements BookService {
 
     @Override
     @Transactional(readOnly = true)
-    public BookDetailDTO getBookDetail(Long variantId) {
-        BookVariant anchor = variantRepository.findById(variantId)
-                .orElseThrow(() -> new RuntimeException("Book not found"));
-        if (anchor.getDeletedAt() != null || !Boolean.TRUE.equals(anchor.getIsActive())) {
-            throw new RuntimeException("Book not found");
+    public BookDetailDTO getBookDetail(Long id) {
+        // UI uses /api/books/{id} where {id} is typically bookId.
+        // Backward compatible: if no book found by id, treat it as variantId.
+        BookInfo book = bookInfoRepository.findById(id)
+                .filter(b -> b.getDeletedAt() == null && "ACTIVE".equalsIgnoreCase(b.getStatus()))
+                .orElse(null);
+
+        if (book == null) {
+            BookVariant anchor = variantRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Book not found"));
+            if (anchor.getDeletedAt() != null || !Boolean.TRUE.equals(anchor.getIsActive())) {
+                throw new RuntimeException("Book not found");
+            }
+            book = anchor.getBook();
+            if (book == null || book.getDeletedAt() != null || !"ACTIVE".equalsIgnoreCase(book.getStatus())) {
+                throw new RuntimeException("Book not found");
+            }
         }
-        BookInfo book = anchor.getBook();
-        if (book == null || book.getDeletedAt() != null || !"ACTIVE".equalsIgnoreCase(book.getStatus())) {
-            throw new RuntimeException("Book not found");
-        }
+
         String coverUrl = getCoverUrlByBookId(book.getId());
+        final String[] publisherNameRef = new String[]{book.getPublisherName()};
+        final Integer[] publicationYearRef = new Integer[]{book.getPublicationYear()};
+
+        // Defensive: if JPA mapping/cache is out-of-sync, read directly from DB.
+        String pn = publisherNameRef[0];
+        Integer py = publicationYearRef[0];
+        if ((pn == null || pn.isBlank()) && py == null) {
+            String sql = """
+                    SELECT TOP 1 publisher_name, publication_year
+                    FROM books
+                    WHERE id = :bookId AND deleted_at IS NULL
+                    """;
+            MapSqlParameterSource params = new MapSqlParameterSource("bookId", book.getId());
+            namedParameterJdbcTemplate.query(sql, params, rs -> {
+                if (publisherNameRef[0] == null || publisherNameRef[0].isBlank()) {
+                    publisherNameRef[0] = rs.getString("publisher_name");
+                }
+                if (publicationYearRef[0] == null) {
+                    publicationYearRef[0] = rs.getObject("publication_year", Integer.class);
+                }
+            });
+        }
+
         Map<Long, String> coverByBookId = Map.of(book.getId(), coverUrl);
         List<BookVariantDTO> variants = variantRepository.findActiveByBookId(book.getId()).stream()
                 .map(v -> toDTO(v, coverByBookId))
@@ -148,9 +194,10 @@ public class BookServiceImpl implements BookService {
                 .id(book.getId())
                 .title(book.getTitle())
                 .isbn13(book.getIsbn13())
+                .isbn10(book.getIsbn10())
                 .coverImageUrl(coverUrl)
-                .publisherName(null)
-                .publicationYear(null)
+                .publisherName(publisherNameRef[0])
+                .publicationYear(publicationYearRef[0])
                 .description(book.getShortDescription())
                 .variants(variants)
                 .build();
@@ -200,6 +247,9 @@ public class BookServiceImpl implements BookService {
                 .title(v.getBook() != null ? v.getBook().getTitle() : null)
                 .sku(v.getSku())
                 .isbn(v.getBook() != null ? v.getBook().getIsbn13() : null)
+                .publisherName(v.getBook() != null ? v.getBook().getPublisherName() : null)
+                .publicationYear(v.getBook() != null ? v.getBook().getPublicationYear() : null)
+                .format(v.getFormat())
                 .salePrice(v.getSalePrice())
                 .listPrice(v.getListPrice())
                 .coverImageUrl(bookId != null ? coverByBookId.get(bookId) : null)
