@@ -19,6 +19,7 @@ public class BookVariantDTO {
     private String format;
     private BigDecimal salePrice;
     private BigDecimal listPrice;
+    private String coverImageUrl;
     private String description;
     private String status;
 }

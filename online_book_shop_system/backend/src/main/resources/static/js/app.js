@@ -76,7 +76,7 @@ function renderBooks(list = currentBooks) {
     console.log("RENDER:", list);
     books.forEach(b => {
         const price = b.salePrice ?? 0;
-        const coverUrl = 'https://covers.openlibrary.org/b/isbn/' + (b.isbn || '0385533229') + '-M.jpg';
+        const coverUrl = b.coverImageUrl || ('https://covers.openlibrary.org/b/isbn/' + (b.isbn || '0385533229') + '-M.jpg');
         const variantId = b.variantId || b.id;
 
         booksContainer.innerHTML += `

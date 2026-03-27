@@ -80,10 +80,10 @@ async function loadBook() {
         }
     };
 
-    const img =
-        "https://covers.openlibrary.org/b/isbn/" +
-        (book.isbn13 || "0385533229") +
-        "-L.jpg";
+    const img = book.coverImageUrl ||
+        ("https://covers.openlibrary.org/b/isbn/" +
+            (book.isbn13 || "0385533229") +
+            "-L.jpg");
     document.getElementById("bookImage").src = img;
 
     document.getElementById("addCartBtn").onclick = addToCart;
@@ -147,11 +147,9 @@ async function loadRelated(currentBookId) {
             const bid = b.bookId != null ? b.bookId : b.id;
             const card = document.createElement("div");
             card.className = "card shop-card";
-            const isbn = b.isbn || "0385533229";
+            const cardImage = b.coverImageUrl || ("https://covers.openlibrary.org/b/isbn/" + (b.isbn || "0385533229") + "-M.jpg");
             card.innerHTML =
-                "<img src=\"https://covers.openlibrary.org/b/isbn/" +
-                isbn +
-                "-M.jpg\" alt=\"\">" +
+                "<img src=\"" + cardImage + "\" alt=\"\">" +
                 "<p style=\"margin:8px 0 0;font-size:0.9rem;font-weight:600;\">" +
                 String(b.title || "").replace(/</g, "&lt;") +
                 "</p>";
