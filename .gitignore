@@ -4,3 +4,6 @@
 
 # Accidental file from mistyped git command, e.g. `tore --staged .`
 /tore *
+
+# Local secrets — KHONG commit
+**/application-local.properties

@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Book Shop — Quản lý Vận chuyển</title>
+    <meta name="description" content="Quản lý đơn hàng vận chuyển - Online Book Shop">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --bg-primary: #0f0f1a;
+            --bg-secondary: #1a1a2e;
+            --bg-card: rgba(30, 30, 55, 0.85);
+            --accent: #6c63ff;
+            --accent-hover: #7b73ff;
+            --accent-glow: rgba(108, 99, 255, 0.3);
+            --text-primary: #f0f0f5;
+            --text-secondary: #a0a0b8;
+            --text-muted: #6b6b80;
+            --error: #ff4757;
+            --success: #2ed573;
+            --warning: #ffa502;
+            --info: #1e90ff;
+            --border: rgba(255, 255, 255, 0.08);
+            --input-bg: rgba(255, 255, 255, 0.05);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-y: auto;
+        }
+
+        /* Header */
+        .header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(12px);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-left h1 {
+            font-size: 20px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--text-primary), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .user-info {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .btn-logout {
+            padding: 8px 16px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: transparent;
+            color: var(--text-secondary);
+            font-family: inherit;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-logout:hover {
+            border-color: var(--error);
+            color: var(--error);
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px 32px;
+        }
+
+        /* Filter Tabs */
+        .filter-bar {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 8px 18px;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            background: transparent;
+            color: var(--text-secondary);
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-btn.active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+            box-shadow: 0 2px 12px var(--accent-glow);
+        }
+
+        .filter-btn:hover:not(.active) {
+            border-color: var(--accent);
+            color: var(--text-primary);
+        }
+
+        .filter-btn .count {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 1px 7px;
+            border-radius: 10px;
+            font-size: 11px;
+            margin-left: 6px;
+        }
+
+        .filter-btn.active .count {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        /* Stats Row */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            backdrop-filter: blur(12px);
+        }
+
+        .stat-card .stat-number {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .stat-card .stat-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Message */
+        .message {
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 13px;
+            margin-bottom: 16px;
+            display: none;
+            align-items: center;
+            gap: 8px;
+            animation: msgIn 0.3s ease;
+        }
+
+        @keyframes msgIn {
+            from {
+                opacity: 0;
+                transform: translateY(-6px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.error {
+            background: rgba(255, 71, 87, 0.12);
+            border: 1px solid rgba(255, 71, 87, 0.25);
+            color: var(--error);
+            display: flex;
+        }
+
+        .message.success {
+            background: rgba(46, 213, 115, 0.12);
+            border: 1px solid rgba(46, 213, 115, 0.25);
+            color: var(--success);
+            display: flex;
+        }
+
+        /* Order Table */
+        .orders-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: var(--bg-card);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            backdrop-filter: blur(12px);
+        }
+
+        .orders-table th {
+            padding: 14px 16px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: rgba(255, 255, 255, 0.03);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .orders-table td {
+            padding: 14px 16px;
+            font-size: 14px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: middle;
+        }
+
+        .orders-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .orders-table tr:hover td {
+            background: rgba(108, 99, 255, 0.04);
+        }
+
+        /* Status Badges */
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .badge-new {
+            background: rgba(30, 144, 255, 0.15);
+            color: var(--info);
+        }
+
+        .badge-confirmed {
+            background: rgba(108, 99, 255, 0.15);
+            color: var(--accent);
+        }
+
+        .badge-packed {
+            background: rgba(255, 165, 2, 0.15);
+            color: var(--warning);
+        }
+
+        .badge-shipped {
+            background: rgba(46, 213, 115, 0.15);
+            color: var(--success);
+        }
+
+        .badge-delivered {
+            background: rgba(46, 213, 115, 0.25);
+            color: #1ecc62;
+        }
+
+        .badge-failed {
+            background: rgba(255, 71, 87, 0.15);
+            color: var(--error);
+        }
+
+        .badge-cancelled {
+            background: rgba(255, 71, 87, 0.1);
+            color: #cc4455;
+        }
+
+        /* Action Buttons */
+        .action-btn {
+            padding: 6px 14px;
+            border: none;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-right: 4px;
+            margin-bottom: 4px;
+        }
+
+        .action-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .btn-pack {
+            background: rgba(255, 165, 2, 0.15);
+            color: var(--warning);
+            border: 1px solid rgba(255, 165, 2, 0.3);
+        }
+
+        .btn-pack:hover:not(:disabled) {
+            background: rgba(255, 165, 2, 0.25);
+        }
+
+        .btn-ship {
+            background: rgba(108, 99, 255, 0.15);
+            color: var(--accent);
+            border: 1px solid rgba(108, 99, 255, 0.3);
+        }
+
+        .btn-ship:hover:not(:disabled) {
+            background: rgba(108, 99, 255, 0.25);
+        }
+
+        .btn-deliver {
+            background: rgba(46, 213, 115, 0.15);
+            color: var(--success);
+            border: 1px solid rgba(46, 213, 115, 0.3);
+        }
+
+        .btn-deliver:hover:not(:disabled) {
+            background: rgba(46, 213, 115, 0.25);
+        }
+
+        .btn-fail {
+            background: rgba(255, 71, 87, 0.15);
+            color: var(--error);
+            border: 1px solid rgba(255, 71, 87, 0.3);
+        }
+
+        .btn-fail:hover:not(:disabled) {
+            background: rgba(255, 71, 87, 0.25);
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 200;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 32px;
+            width: 100%;
+            max-width: 420px;
+            animation: modalIn 0.3s ease;
+        }
+
+        @keyframes modalIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95) translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .modal h3 {
+            font-size: 18px;
+            margin-bottom: 16px;
+        }
+
+        .modal label {
+            display: block;
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+
+        .modal input,
+        .modal textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: var(--input-bg);
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 14px;
+            outline: none;
+            margin-bottom: 16px;
+            transition: border-color 0.2s;
+        }
+
+        .modal input:focus,
+        .modal textarea:focus {
+            border-color: var(--accent);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        .modal-actions .btn-cancel {
+            padding: 10px 20px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: transparent;
+            color: var(--text-secondary);
+            font-family: inherit;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .modal-actions .btn-confirm {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+            color: white;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+        }
+
+        .empty-state .empty-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 16px;
+            }
+
+            .header {
+                padding: 12px 16px;
+            }
+
+            .orders-table {
+                font-size: 12px;
+            }
+
+            .orders-table th,
+            .orders-table td {
+                padding: 10px 8px;
+            }
+
+            .stats-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-left">
+            <span style="font-size: 24px;">📦</span>
+            <h1>Quản lý Vận chuyển</h1>
+        </div>
+        <div class="header-right">
+            <span class="user-info" id="userInfo"></span>
+            <a href="/admin.html" class="btn-logout" style="text-decoration:none;">🏠 Trang Admin</a>
+            <button class="btn-logout" onclick="logout()">Đăng xuất</button>
+        </div>
+    </div>
+
+    <!-- Main -->
+    <div class="container">
+        <!-- Stats -->
+        <div class="stats-row" id="statsRow">
+            <div class="stat-card">
+                <div class="stat-number" id="statConfirmed" style="color: var(--accent);">0</div>
+                <div class="stat-label">Chờ đóng gói</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="statPacked" style="color: var(--warning);">0</div>
+                <div class="stat-label">Đã đóng gói</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="statShipped" style="color: var(--success);">0</div>
+                <div class="stat-label">Đang giao</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="statDelivered" style="color: #1ecc62;">0</div>
+                <div class="stat-label">Đã giao</div>
+            </div>
+        </div>
+
+        <!-- Filter -->
+        <div class="filter-bar" id="filterBar">
+            <button class="filter-btn active" onclick="filterOrders('ALL')">Tất cả</button>
+            <button class="filter-btn" onclick="filterOrders('CONFIRMED')">Chờ đóng gói</button>
+            <button class="filter-btn" onclick="filterOrders('PACKED')">Đã đóng gói</button>
+            <button class="filter-btn" onclick="filterOrders('SHIPPED')">Đang giao</button>
+            <button class="filter-btn" onclick="filterOrders('DELIVERED')">Đã giao</button>
+            <button class="filter-btn" onclick="filterOrders('DELIVERY_FAILED')">Giao thất bại</button>
+        </div>
+
+        <!-- Messages -->
+        <div class="message" id="message">
+            <span id="msgIcon"></span>
+            <span id="msgText"></span>
+        </div>
+
+        <!-- Table -->
+        <table class="orders-table" id="ordersTable">
+            <thead>
+                <tr>
+                    <th>Mã đơn</th>
+                    <th>Khách hàng</th>
+                    <th>Địa chỉ giao</th>
+                    <th>Tổng tiền</th>
+                    <th>Trạng thái</th>
+                    <th>Người giao</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody id="ordersBody">
+            </tbody>
+        </table>
+
+        <div class="empty-state" id="emptyState" style="display: none;">
+            <div class="empty-icon">📭</div>
+            <p>Không có đơn hàng nào</p>
+        </div>
+    </div>
+
+    <!-- Modal: Nhập tên nhân viên giao -->
+    <div class="modal-overlay" id="shipModal">
+        <div class="modal">
+            <h3>🚚 Bắt đầu giao hàng</h3>
+            <label for="carrierInput">Tên nhân viên giao hàng</label>
+            <input type="text" id="carrierInput" placeholder="VD: Nguyễn Văn A">
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeShipModal()">Hủy</button>
+                <button class="btn-confirm" onclick="confirmShip()">Xác nhận giao</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Lý do giao thất bại -->
+    <div class="modal-overlay" id="failModal">
+        <div class="modal">
+            <h3>❌ Giao hàng thất bại</h3>
+            <label for="failReasonInput">Lý do thất bại</label>
+            <textarea id="failReasonInput" rows="3" placeholder="VD: Khách hàng không có nhà..."></textarea>
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeFailModal()">Hủy</button>
+                <button class="btn-confirm" style="background: linear-gradient(135deg, var(--error), #cc3344);"
+                    onclick="confirmFail()">Xác nhận thất bại</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '';
+        let allOrders = [];
+        let currentFilter = 'ALL';
+        let selectedOrderId = null;
+
+        // === Auth check ===
+        function getToken() {
+            return localStorage.getItem('token');
+        }
+
+        function getUser() {
+            try {
+                return JSON.parse(localStorage.getItem('user'));
+            } catch { return null; }
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = '/login.html';
+        }
+
+        // === Init ===
+        document.addEventListener('DOMContentLoaded', () => {
+            const user = getUser();
+            const token = getToken();
+            if (!token || !user) {
+                window.location.href = '/login.html';
+                return;
+            }
+            if (!['ADMIN', 'STAFF', 'MANAGER'].includes(user.role)) {
+                alert('Bạn không có quyền truy cập trang này');
+                window.location.href = '/index.html';
+                return;
+            }
+            document.getElementById('userInfo').textContent = `${user.fullName} (${user.role})`;
+            loadOrders();
+        });
+
+        // === API calls ===
+        async function apiCall(url, method = 'GET', body = null) {
+            const options = {
+                method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + getToken()
+                }
+            };
+            if (body) options.body = JSON.stringify(body);
+            const res = await fetch(API_BASE + url, options);
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || 'Lỗi hệ thống');
+            return data;
+        }
+
+        // === Load orders ===
+        async function loadOrders() {
+            try {
+                allOrders = await apiCall('/api/staff/orders/all');
+                updateStats();
+                renderOrders();
+            } catch (err) {
+                showMessage('error', 'Không thể tải danh sách đơn hàng: ' + err.message);
+            }
+        }
+
+        function updateStats() {
+            const count = (status) => allOrders.filter(o => o.status === status).length;
+            document.getElementById('statConfirmed').textContent = count('CONFIRMED');
+            document.getElementById('statPacked').textContent = count('PACKED');
+            document.getElementById('statShipped').textContent = count('SHIPPED');
+            document.getElementById('statDelivered').textContent = count('DELIVERED');
+        }
+
+        // === Filter ===
+        function filterOrders(status) {
+            currentFilter = status;
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.textContent.includes(
+                    status === 'ALL' ? 'Tất cả' :
+                        status === 'CONFIRMED' ? 'Chờ đóng gói' :
+                            status === 'PACKED' ? 'Đã đóng gói' :
+                                status === 'SHIPPED' ? 'Đang giao' :
+                                    status === 'DELIVERED' ? 'Đã giao' :
+                                        'Giao thất bại'
+                ));
+            });
+            renderOrders();
+        }
+
+        // === Render ===
+        function renderOrders() {
+            const filtered = currentFilter === 'ALL' ? allOrders : allOrders.filter(o => o.status === currentFilter);
+            const tbody = document.getElementById('ordersBody');
+            const empty = document.getElementById('emptyState');
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = '';
+                empty.style.display = 'block';
+                document.getElementById('ordersTable').style.display = 'none';
+                return;
+            }
+
+            empty.style.display = 'none';
+            document.getElementById('ordersTable').style.display = '';
+
+            tbody.innerHTML = filtered.map(order => `
+                <tr>
+                    <td><strong>${order.orderCode || '—'}</strong></td>
+                    <td>${order.shipName || '—'}<br><small style="color: var(--text-muted);">${order.shipPhone || ''}</small></td>
+                    <td style="max-width: 200px;">${order.shipLine1 || '—'}${order.shipLine2 ? '<br>' + order.shipLine2 : ''}</td>
+                    <td><strong>${formatCurrency(order.totalAmount)}</strong></td>
+                    <td>${getStatusBadge(order.status)}</td>
+                    <td>${order.carrier || '<span style="color:var(--text-muted)">—</span>'}</td>
+                    <td>${getActions(order)}</td>
+                </tr>
+            `).join('');
+        }
+
+        function getStatusBadge(status) {
+            const map = {
+                'NEW': ['badge-new', 'Mới'],
+                'CONFIRMED': ['badge-confirmed', 'Đã xác nhận'],
+                'PACKED': ['badge-packed', 'Đã đóng gói'],
+                'SHIPPED': ['badge-shipped', 'Đang giao'],
+                'DELIVERED': ['badge-delivered', 'Đã giao'],
+                'DELIVERY_FAILED': ['badge-failed', 'Giao thất bại'],
+                'CANCELLED': ['badge-cancelled', 'Đã hủy'],
+                'COMPLETED': ['badge-delivered', 'Hoàn thành']
+            };
+            const [cls, label] = map[status] || ['', status];
+            return `<span class="badge ${cls}">${label}</span>`;
+        }
+
+        function getActions(order) {
+            switch (order.status) {
+                case 'CONFIRMED':
+                    return `<button class="action-btn btn-pack" onclick="packOrder(${order.id})">📦 Đóng gói</button>`;
+                case 'PACKED':
+                    return `<button class="action-btn btn-ship" onclick="openShipModal(${order.id})">🚚 Giao hàng</button>`;
+                case 'SHIPPED':
+                    return `<button class="action-btn btn-deliver" onclick="deliverOrder(${order.id})">✅ Thành công</button>
+                            <button class="action-btn btn-fail" onclick="openFailModal(${order.id})">❌ Thất bại</button>`;
+                default:
+                    return '<span style="color:var(--text-muted); font-size:12px;">—</span>';
+            }
+        }
+
+        function formatCurrency(amount) {
+            if (!amount) return '0 ₫';
+            return new Intl.NumberFormat('vi-VN').format(amount) + ' ₫';
+        }
+
+        // === Actions ===
+        async function packOrder(id) {
+            try {
+                const data = await apiCall(`/api/staff/orders/${id}/pack`, 'POST');
+                showMessage('success', data.message);
+                await loadOrders();
+            } catch (err) {
+                showMessage('error', err.message);
+            }
+        }
+
+        function openShipModal(id) {
+            selectedOrderId = id;
+            document.getElementById('carrierInput').value = getUser()?.fullName || '';
+            document.getElementById('shipModal').classList.add('active');
+        }
+
+        function closeShipModal() {
+            document.getElementById('shipModal').classList.remove('active');
+            selectedOrderId = null;
+        }
+
+        async function confirmShip() {
+            const carrier = document.getElementById('carrierInput').value.trim();
+            if (!carrier) {
+                alert('Vui lòng nhập tên nhân viên giao hàng');
+                return;
+            }
+            try {
+                const data = await apiCall(`/api/staff/orders/${selectedOrderId}/ship`, 'POST', { carrier });
+                showMessage('success', data.message);
+                closeShipModal();
+                await loadOrders();
+            } catch (err) {
+                showMessage('error', err.message);
+            }
+        }
+
+        async function deliverOrder(id) {
+            if (!confirm('Xác nhận đơn hàng này đã giao thành công?')) return;
+            try {
+                const data = await apiCall(`/api/staff/orders/${id}/deliver`, 'POST');
+                showMessage('success', data.message);
+                await loadOrders();
+            } catch (err) {
+                showMessage('error', err.message);
+            }
+        }
+
+        function openFailModal(id) {
+            selectedOrderId = id;
+            document.getElementById('failReasonInput').value = '';
+            document.getElementById('failModal').classList.add('active');
+        }
+
+        function closeFailModal() {
+            document.getElementById('failModal').classList.remove('active');
+            selectedOrderId = null;
+        }
+
+        async function confirmFail() {
+            const reason = document.getElementById('failReasonInput').value.trim() || 'Giao hàng thất bại';
+            try {
+                const data = await apiCall(`/api/staff/orders/${selectedOrderId}/fail`, 'POST', { reason });
+                showMessage('success', data.message);
+                closeFailModal();
+                await loadOrders();
+            } catch (err) {
+                showMessage('error', err.message);
+            }
+        }
+
+        // === Message helpers ===
+        function showMessage(type, text) {
+            const msg = document.getElementById('message');
+            const icon = document.getElementById('msgIcon');
+            const txt = document.getElementById('msgText');
+            msg.className = 'message ' + type;
+            icon.textContent = type === 'error' ? '⚠' : '✓';
+            txt.textContent = text;
+            // Auto hide after 5s
+            setTimeout(() => {
+                msg.className = 'message';
+            }, 5000);
+        }
+    </script>
+</body>
+
+</html>

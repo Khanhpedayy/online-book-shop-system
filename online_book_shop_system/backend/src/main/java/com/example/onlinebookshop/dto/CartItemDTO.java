@@ -16,11 +16,9 @@ public class CartItemDTO {
     private Long variantId;
     private Long bookId;
     private Long copyId;
-    private Integer quantity;
-
+    private int quantity;
     private String title;
     private String sku;
     private BigDecimal salePrice;
     private String coverImageUrl;
 }
-

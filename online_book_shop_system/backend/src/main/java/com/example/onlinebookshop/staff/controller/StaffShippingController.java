@@ -31,8 +31,8 @@ public class StaffShippingController {
 
     @PostMapping("/{orderId}/ship/confirm")
     public String confirmShip(@PathVariable long orderId,
-                              @RequestParam("carrier") String carrier,
-                              @RequestParam("trackingCode") String trackingCode,
+                              @RequestParam(value = "carrier", required = false) String carrier,
+                              @RequestParam(value = "trackingCode", required = false) String trackingCode,
                               RedirectAttributes ra) {
         try {
             service.confirmShipped(orderId, carrier, trackingCode);

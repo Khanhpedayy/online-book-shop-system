@@ -14,5 +14,7 @@ public interface UserService {
 
     UserDTO updateUser(Long id, CreateUserRequest request);
 
+    void resetCustomerPassword(Long id);
+
     UserDTO toggleUserStatus(Long id);
 }

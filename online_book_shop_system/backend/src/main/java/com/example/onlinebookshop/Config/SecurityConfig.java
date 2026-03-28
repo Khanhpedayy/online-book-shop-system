@@ -53,13 +53,18 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/categories").permitAll()
 
                         .requestMatchers("/api/me/**").authenticated()
-
-                        .requestMatchers("/api/payos/webhook").permitAll()
+                        .requestMatchers("/api/me/reviews/**").authenticated()
+                        .requestMatchers("/api/me/notifications/**").authenticated()
+                        .requestMatchers("/api/me/review-reports").authenticated()
+                        .requestMatchers("/api/me/support-tickets/**").authenticated()
 
                         .requestMatchers("/staff/**").hasAnyRole("STAFF")
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/manager/**").hasAnyRole("MANAGER", "ADMIN")
                         .requestMatchers("/api/inventory/**").hasAnyRole("MANAGER", "ADMIN")
+                        .requestMatchers("/api/staff/**").hasAnyRole("STAFF", "ADMIN", "MANAGER")
+
+                        .requestMatchers("/shipping.html").permitAll()
 
                         .anyRequest().authenticated())
                 // .authorizeHttpRequests(auth -> auth

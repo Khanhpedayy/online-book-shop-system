@@ -15,6 +15,9 @@
         var logoutLink = document.getElementById("logoutLink");
         var profileLink = document.getElementById("profileLink");
         var ordersLink = document.getElementById("ordersLink");
+        var reviewsLink = document.getElementById("reviewsLink");
+        var supportLink = document.getElementById("supportLink");
+        var notifLink = document.getElementById("notifLink");
         if (!loginLink || !logoutLink) {
             return;
         }
@@ -27,6 +30,15 @@
             if (ordersLink) {
                 ordersLink.style.display = "inline";
             }
+            if (reviewsLink) {
+                reviewsLink.style.display = "inline";
+            }
+            if (notifLink) {
+                notifLink.style.display = "inline";
+            }
+            if (supportLink) {
+                supportLink.style.display = "inline";
+            }
         } else {
             loginLink.style.display = "inline";
             logoutLink.style.display = "none";
@@ -35,6 +47,15 @@
             }
             if (ordersLink) {
                 ordersLink.style.display = "none";
+            }
+            if (reviewsLink) {
+                reviewsLink.style.display = "none";
+            }
+            if (notifLink) {
+                notifLink.style.display = "none";
+            }
+            if (supportLink) {
+                supportLink.style.display = "none";
             }
         }
     }
@@ -123,6 +144,23 @@
         });
     }
 
+    /* ── Notification badge ── */
+    window.updateNotifBadge = async function () {
+        var badge = document.getElementById("notifBadge");
+        if (!badge) return;
+        var token = localStorage.getItem("token");
+        if (!token) { badge.textContent = ""; return; }
+        try {
+            var r = await fetch(SHOP_API_BASE + "/api/me/notifications/unread-count", {
+                headers: { Authorization: "Bearer " + token },
+                credentials: "include"
+            });
+            if (!r.ok) return;
+            var data = await r.json();
+            badge.textContent = (data.count > 0) ? data.count : "";
+        } catch (e) { /* ignore */ }
+    };
+
     document.addEventListener("DOMContentLoaded", async function () {
         if (typeof syncAuthFromServerSession === "function") {
             await syncAuthFromServerSession(SHOP_API_BASE);
@@ -131,5 +169,7 @@
         bindLogout();
         initShopHeaderSearch();
         updateShopHeaderCart();
+        updateNotifBadge();
+        setInterval(updateNotifBadge, 30000); // poll every 30s
     });
 })();

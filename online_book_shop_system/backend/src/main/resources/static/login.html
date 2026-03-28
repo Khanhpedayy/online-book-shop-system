@@ -34,6 +34,33 @@
             --input-focus: rgba(108, 99, 255, 0.15);
         }
 
+        body.light-mode {
+            --bg-primary: #f4f5f7;
+            --bg-secondary: #e5e7eb;
+            --bg-card: rgba(255, 255, 255, 0.95);
+            --accent: #5a52d5;
+            --accent-hover: #4a42b5;
+            --accent-glow: rgba(90, 82, 213, 0.15);
+            --text-primary: #111122;
+            --text-secondary: #4b5563;
+            --text-muted: #6b7280;
+            --border: rgba(0, 0, 0, 0.08);
+            --input-bg: rgba(0, 0, 0, 0.03);
+            --input-focus: rgba(90, 82, 213, 0.1);
+        }
+
+        body.light-mode .card {
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06), 0 0 60px var(--accent-glow);
+        }
+
+        body.light-mode .tabs {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        body.light-mode .store-top {
+            background: #ffffff;
+        }
+
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background: var(--bg-primary);
@@ -42,10 +69,10 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            overflow-x: hidden;
             overflow-y: auto;
+            overflow-x: hidden;
             position: relative;
-            padding-top: 44px;
+            padding: 40px 0;
             box-sizing: border-box;
         }
 
@@ -115,6 +142,7 @@
             z-index: 1;
             width: 100%;
             max-width: 440px;
+            margin: auto;
             padding: 20px;
         }
 
@@ -447,9 +475,8 @@
             background: #1a1a2e;
             padding: 10px 20px;
             display: flex;
-            justify-content: center;
+            justify-content: space-between;
             align-items: center;
-            gap: 16px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.06);
         }
 
@@ -470,6 +497,7 @@
 
     <div class="store-top">
         <a href="index.html">← Online Book Shop</a>
+        <button onclick="toggleTheme()" style="background:none;border:none;color:var(--text-primary);cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px;">🌓 Giao diện</button>
     </div>
 
     <div class="bg-gradient"></div>
@@ -523,11 +551,14 @@
                         <div class="spinner"></div>
                     </button>
                 </form>
+                <div style="text-align:center; margin-top:14px;">
+                    <a href="#" onclick="switchTab('forgot'); return false;" style="color:var(--accent); font-size:13px; text-decoration:none;">🔑 Quên mật khẩu?</a>
+                </div>
             </div>
 
             <!-- Register Form -->
             <div class="form-section" id="registerForm">
-                <form onsubmit="handleRegister(event)">
+                <form id="step1Form" onsubmit="handleRegister(event)">
                     <div class="form-group">
                         <label for="regName">Họ và tên</label>
                         <div class="input-wrapper">
@@ -536,7 +567,7 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="regEmail">Email</label>
+                        <label for="regEmail">Email *</label>
                         <div class="input-wrapper">
                             <input type="email" id="regEmail" placeholder="you@example.com" required
                                 autocomplete="email">
@@ -551,17 +582,104 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="regPassword">Mật khẩu (tối thiểu 6 ký tự)</label>
+                        <label for="regPassword">Mật khẩu * (≥ 8 ký tự, hoa, thường, số, đặc biệt)</label>
                         <div class="input-wrapper">
-                            <input type="password" id="regPassword" placeholder="••••••••" required minlength="6"
-                                autocomplete="new-password">
+                            <input type="password" id="regPassword" placeholder="••••••••" required minlength="8"
+                                autocomplete="new-password" oninput="validatePasswordUI()">
                             <span class="icon">🔒</span>
                             <button type="button" class="toggle-password"
                                 onclick="togglePassword('regPassword', this)">👁</button>
                         </div>
+                        <div id="passwordStrength"
+                            style="display: none; color: var(--error); font-size: 13px; margin-top: 8px; line-height: 1.5;">
+                            Mật khẩu yếu. Yêu cầu:<br>
+                            • Tối thiểu 8 ký tự<br>
+                            • Gồm chữ in HOA, in thường<br>
+                            • Gồm số và ký tự đặc biệt
+                        </div>
                     </div>
                     <button type="submit" class="btn-primary" id="registerBtn">
                         <span class="btn-text">Tạo tài khoản</span>
+                        <div class="spinner"></div>
+                    </button>
+                </form>
+
+                <form id="step2Form" onsubmit="handleVerifyOtp(event)" style="display: none;">
+                    <br />
+                    <div class="form-group">
+                        <label for="regOtp">Mã xác thực (OTP) đã gửi về email</label>
+                        <div class="input-wrapper">
+                            <input type="text" id="regOtp" placeholder="123456" required maxlength="6"
+                                style="letter-spacing: 4px; font-weight: bold; text-align: center;">
+                            <span class="icon">🔑</span>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-primary" id="verifyOtpBtn">
+                        <span class="btn-text">Xác nhận</span>
+                        <div class="spinner"></div>
+                    </button>
+                    <button type="button" onclick="backToStep1()"
+                        style="margin-top: 12px; width: 100%; padding: 10px; background: transparent; color: var(--text-muted); border: none; cursor: pointer;">←
+                        Quay lại sửa thông tin</button>
+                </form>
+            </div>
+
+            <!-- Forgot Password Form -->
+            <div class="form-section" id="forgotForm">
+                <!-- Step 1: Enter email -->
+                <form id="forgotStep1" onsubmit="handleForgotPassword(event)">
+                    <div class="form-group">
+                        <label for="forgotEmail">Nhập email tài khoản của bạn</label>
+                        <div class="input-wrapper">
+                            <input type="email" id="forgotEmail" placeholder="you@example.com" required autocomplete="email">
+                            <span class="icon">✉</span>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-primary" id="forgotBtn">
+                        <span class="btn-text">Gửi mã xác thực</span>
+                        <div class="spinner"></div>
+                    </button>
+                    <button type="button" onclick="switchTab('login')" style="margin-top:12px; width:100%; padding:10px; background:transparent; color:var(--text-muted); border:none; cursor:pointer; font-family:inherit; font-size:13px;">← Quay lại đăng nhập</button>
+                </form>
+
+                <!-- Step 2: Enter OTP -->
+                <form id="forgotStep2" onsubmit="handleForgotVerifyOtp(event)" style="display:none;">
+                    <div class="form-group">
+                        <label for="forgotOtp">Mã xác thực (OTP) đã gửi về email</label>
+                        <div class="input-wrapper">
+                            <input type="text" id="forgotOtp" placeholder="123456" required maxlength="6" style="letter-spacing:4px; font-weight:bold; text-align:center;">
+                            <span class="icon">🔑</span>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-primary" id="forgotVerifyBtn">
+                        <span class="btn-text">Xác nhận OTP</span>
+                        <div class="spinner"></div>
+                    </button>
+                    <button type="button" onclick="forgotBackToStep1()" style="margin-top:12px; width:100%; padding:10px; background:transparent; color:var(--text-muted); border:none; cursor:pointer; font-family:inherit; font-size:13px;">← Quay lại nhập email</button>
+                </form>
+
+                <!-- Step 3: New password -->
+                <form id="forgotStep3" onsubmit="handleResetPassword(event)" style="display:none;">
+                    <div class="form-group">
+                        <label for="newPassword">Mật khẩu mới * (≥ 8 ký tự, hoa, thường, số, đặc biệt)</label>
+                        <div class="input-wrapper">
+                            <input type="password" id="newPassword" placeholder="••••••••" required minlength="8" autocomplete="new-password" oninput="validateResetPasswordUI()">
+                            <span class="icon">🔒</span>
+                            <button type="button" class="toggle-password" onclick="togglePassword('newPassword', this)">👁</button>
+                        </div>
+                        <div id="resetPwStrength" style="display:none; color:var(--error); font-size:13px; margin-top:8px; line-height:1.5;">
+                            Mật khẩu yếu. Yêu cầu:<br>• Tối thiểu 8 ký tự<br>• Gồm chữ in HOA, in thường<br>• Gồm số và ký tự đặc biệt
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmPassword">Xác nhận mật khẩu mới</label>
+                        <div class="input-wrapper">
+                            <input type="password" id="confirmPassword" placeholder="••••••••" required minlength="8" autocomplete="new-password">
+                            <span class="icon">🔒</span>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-primary" id="resetPwBtn">
+                        <span class="btn-text">Đặt lại mật khẩu</span>
                         <div class="spinner"></div>
                     </button>
                 </form>
@@ -571,7 +689,8 @@
             <div class="seed-info">
                 <strong>Tài khoản mẫu:</strong><br>
                 Customer: <code>customer@example.com</code> / <code>123456</code><br>
-                Admin: <code>admin@bookshop.com</code> / <code>admin123</code>
+                Admin: <code>admin@bookshop.com</code> / <code>admin123</code><br>
+                Staff: <code>staff@bookshop.com</code> / <code>staff123</code>
             </div>
         </div>
     </div>
@@ -597,15 +716,36 @@
 
         const API_BASE = '';  // Same origin
 
+        (function initTheme() {
+            const savedTheme = localStorage.getItem('adminTheme');
+            if (savedTheme === 'light') {
+                document.body.classList.add('light-mode');
+            }
+        })();
+
+        function toggleTheme() {
+            document.body.classList.toggle('light-mode');
+            if (document.body.classList.contains('light-mode')) {
+                localStorage.setItem('adminTheme', 'light');
+            } else {
+                localStorage.setItem('adminTheme', 'dark');
+            }
+        }
+
         // === Tab switching ===
         function switchTab(tab) {
             hideMessage();
             document.getElementById('loginForm').classList.toggle('active', tab === 'login');
             document.getElementById('registerForm').classList.toggle('active', tab === 'register');
-            document.getElementById('tabLogin').classList.toggle('active', tab === 'login');
+            document.getElementById('forgotForm').classList.toggle('active', tab === 'forgot');
+            document.getElementById('tabLogin').classList.toggle('active', tab === 'login' || tab === 'forgot');
             document.getElementById('tabRegister').classList.toggle('active', tab === 'register');
             document.getElementById('subtitle').textContent =
-                tab === 'login' ? 'Đăng nhập để tiếp tục' : 'Tạo tài khoản mới';
+                tab === 'login' ? 'Đăng nhập để tiếp tục' :
+                tab === 'forgot' ? 'Đặt lại mật khẩu' :
+                'Tạo tài khoản mới';
+            // Reset forgot password steps
+            if (tab === 'forgot') forgotResetSteps();
         }
 
         // === Message helpers ===
@@ -677,6 +817,8 @@
                 setTimeout(() => {
                     if (data.role === 'ADMIN') {
                         window.location.href = '/admin.html';
+                    } else if (data.role === 'STAFF' || data.role === 'MANAGER') {
+                        window.location.href = '/shipping.html';
                     } else {
                         window.location.href = '/index.html';
                     }
@@ -690,10 +832,39 @@
         }
 
         // === Register ===
+        let tempRegData = null;
+
+        function validatePasswordUI() {
+            const pw = document.getElementById('regPassword').value;
+            const pwBox = document.getElementById('passwordStrength');
+            if (pw.length === 0) {
+                pwBox.style.display = 'none';
+                document.getElementById('regPassword').style.borderColor = 'var(--border)';
+                return;
+            }
+            const strongRegex = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^a-zA-Z\\d]).{8,}$");
+            if (!strongRegex.test(pw)) {
+                pwBox.style.display = 'block';
+                document.getElementById('regPassword').style.borderColor = 'var(--error)';
+            } else {
+                pwBox.style.display = 'none';
+                document.getElementById('regPassword').style.borderColor = 'var(--success)';
+            }
+        }
+
         async function handleRegister(e) {
             e.preventDefault();
             hideMessage();
             setLoading('registerBtn', true);
+
+            // Resets borders
+            document.getElementById('regEmail').style.borderColor = 'var(--border)';
+            document.getElementById('regPhone').style.borderColor = 'var(--border)';
+            if (document.getElementById('passwordStrength').style.display === 'none') {
+                // Keep password border green if it's currently valid, else reset
+            } else {
+                document.getElementById('regPassword').style.borderColor = 'var(--border)';
+            }
 
             const fullName = document.getElementById('regName').value.trim();
             const email = document.getElementById('regEmail').value.trim();
@@ -711,32 +882,210 @@
 
                 if (!res.ok) {
                     showMessage('error', data.error || 'Đăng ký thất bại');
+                    if (data.field) {
+                        const fieldMap = { 'email': 'regEmail', 'phone': 'regPhone', 'password': 'regPassword' };
+                        if (fieldMap[data.field]) {
+                            document.getElementById(fieldMap[data.field]).style.borderColor = 'var(--error)';
+                        }
+                    }
                     return;
                 }
 
-                // Save token and user info
-                localStorage.setItem('token', data.token);
-                localStorage.setItem('user', JSON.stringify({
-                    email: data.email,
-                    fullName: data.fullName,
-                    role: data.role
-                }));
-
-                showMessage('success', `Tạo tài khoản thành công! Chào, ${data.fullName}!`);
-
-                // Redirect based on role
-                setTimeout(() => {
-                    if (data.role === 'ADMIN') {
-                        window.location.href = '/admin.html';
-                    } else {
-                        window.location.href = '/index.html';
-                    }
-                }, 1200);
+                if (data.requireOtp) {
+                    tempRegData = { email, password, fullName, phone };
+                    showMessage('success', data.message);
+                    document.getElementById('step1Form').style.display = 'none';
+                    document.getElementById('step2Form').style.display = 'block';
+                }
 
             } catch (err) {
                 showMessage('error', 'Không thể kết nối đến server. Vui lòng thử lại.');
             } finally {
                 setLoading('registerBtn', false);
+            }
+        }
+
+        async function handleVerifyOtp(e) {
+            e.preventDefault();
+            hideMessage();
+            setLoading('verifyOtpBtn', true);
+            const otp = document.getElementById('regOtp').value.trim();
+            document.getElementById('regOtp').style.borderColor = 'var(--border)';
+
+            try {
+                const reqData = { ...tempRegData, otp };
+                const res = await fetch(API_BASE + '/api/auth/verify-register-otp', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(reqData)
+                });
+                const data = await res.json();
+
+                if (!res.ok) {
+                    showMessage('error', data.error || 'Xác thực thất bại');
+                    if (data.field === 'otp') {
+                        document.getElementById('regOtp').style.borderColor = 'var(--error)';
+                    }
+                    return;
+                }
+
+                showMessage('success', `Tạo tài khoản thành công! Trở về đăng nhập...`);
+
+                // Move back to login tab after success
+                setTimeout(() => {
+                    switchTab('login');
+                    document.getElementById('loginEmail').value = tempRegData.email;
+                    document.getElementById('loginPassword').value = ''; // require manual pass entry for security
+                    backToStep1();
+                }, 1500);
+            } catch (err) {
+                showMessage('error', 'Không thể kết nối đến server.');
+            } finally {
+                setLoading('verifyOtpBtn', false);
+            }
+        }
+
+        function backToStep1() {
+            document.getElementById('step2Form').style.display = 'none';
+            document.getElementById('step1Form').style.display = 'block';
+            document.getElementById('regOtp').value = '';
+        }
+
+        // === Forgot Password ===
+        let forgotEmail = '';
+        let resetToken = '';
+
+        function forgotResetSteps() {
+            document.getElementById('forgotStep1').style.display = 'block';
+            document.getElementById('forgotStep2').style.display = 'none';
+            document.getElementById('forgotStep3').style.display = 'none';
+            document.getElementById('forgotEmail').value = '';
+            document.getElementById('forgotOtp').value = '';
+            forgotEmail = '';
+            resetToken = '';
+        }
+
+        function forgotBackToStep1() {
+            hideMessage();
+            document.getElementById('forgotStep1').style.display = 'block';
+            document.getElementById('forgotStep2').style.display = 'none';
+        }
+
+        async function handleForgotPassword(e) {
+            e.preventDefault();
+            hideMessage();
+            setLoading('forgotBtn', true);
+
+            forgotEmail = document.getElementById('forgotEmail').value.trim();
+
+            try {
+                const res = await fetch(API_BASE + '/api/auth/forgot-password', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: forgotEmail })
+                });
+                const data = await res.json();
+
+                if (!res.ok) {
+                    showMessage('error', data.error || 'Thất bại');
+                    return;
+                }
+
+                showMessage('success', data.message);
+                document.getElementById('forgotStep1').style.display = 'none';
+                document.getElementById('forgotStep2').style.display = 'block';
+            } catch (err) {
+                showMessage('error', 'Không thể kết nối đến server.');
+            } finally {
+                setLoading('forgotBtn', false);
+            }
+        }
+
+        async function handleForgotVerifyOtp(e) {
+            e.preventDefault();
+            hideMessage();
+            setLoading('forgotVerifyBtn', true);
+
+            const otp = document.getElementById('forgotOtp').value.trim();
+
+            try {
+                const res = await fetch(API_BASE + '/api/auth/verify-forgot-otp', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: forgotEmail, otp })
+                });
+                const data = await res.json();
+
+                if (!res.ok) {
+                    showMessage('error', data.error || 'Mã OTP không đúng');
+                    document.getElementById('forgotOtp').style.borderColor = 'var(--error)';
+                    return;
+                }
+
+                resetToken = data.resetToken;
+                showMessage('success', 'Xác thực thành công! Nhập mật khẩu mới.');
+                document.getElementById('forgotStep2').style.display = 'none';
+                document.getElementById('forgotStep3').style.display = 'block';
+            } catch (err) {
+                showMessage('error', 'Không thể kết nối đến server.');
+            } finally {
+                setLoading('forgotVerifyBtn', false);
+            }
+        }
+
+        function validateResetPasswordUI() {
+            const pw = document.getElementById('newPassword').value;
+            const box = document.getElementById('resetPwStrength');
+            if (pw.length === 0) { box.style.display = 'none'; document.getElementById('newPassword').style.borderColor = 'var(--border)'; return; }
+            const strong = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z\d]).{8,}$/;
+            if (!strong.test(pw)) { box.style.display = 'block'; document.getElementById('newPassword').style.borderColor = 'var(--error)'; }
+            else { box.style.display = 'none'; document.getElementById('newPassword').style.borderColor = 'var(--success)'; }
+        }
+
+        async function handleResetPassword(e) {
+            e.preventDefault();
+            hideMessage();
+
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (newPassword !== confirmPassword) {
+                showMessage('error', 'Mật khẩu xác nhận không khớp');
+                document.getElementById('confirmPassword').style.borderColor = 'var(--error)';
+                return;
+            }
+
+            const strong = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z\d]).{8,}$/;
+            if (!strong.test(newPassword)) {
+                showMessage('error', 'Mật khẩu chưa đủ mạnh');
+                return;
+            }
+
+            setLoading('resetPwBtn', true);
+
+            try {
+                const res = await fetch(API_BASE + '/api/auth/reset-password', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ resetToken, newPassword })
+                });
+                const data = await res.json();
+
+                if (!res.ok) {
+                    showMessage('error', data.error || 'Thất bại');
+                    return;
+                }
+
+                showMessage('success', 'Đặt lại mật khẩu thành công! Đang chuyển về đăng nhập...');
+                setTimeout(() => {
+                    switchTab('login');
+                    document.getElementById('loginEmail').value = forgotEmail;
+                    hideMessage();
+                }, 2000);
+            } catch (err) {
+                showMessage('error', 'Không thể kết nối đến server.');
+            } finally {
+                setLoading('resetPwBtn', false);
             }
         }
 

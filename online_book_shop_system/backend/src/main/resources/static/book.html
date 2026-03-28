@@ -58,6 +58,35 @@
             object-fit: cover;
             border-radius: 8px;
         }
+        /* ── Reviews ── */
+        .reviews-section { max-width: 1100px; margin: 40px auto; padding: 0 20px; }
+        .reviews-section h2 { font-size: 1.25rem; margin-bottom: 6px; }
+        .rv-summary { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; }
+        .rv-avg-score { font-size: 2.8rem; font-weight: 800; color: #1e293b; line-height: 1; }
+        .rv-avg-stars { color: #f59e0b; font-size: 1.4rem; }
+        .rv-avg-count { color: #94a3b8; font-size: 0.9rem; }
+        .rv-card {
+            background: var(--shop-card-bg);
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border-left: 4px solid #f59e0b;
+        }
+        .rv-card-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; justify-content: space-between; }
+        .rv-stars { color: #f59e0b; font-size: 1.1rem; letter-spacing: 1px; flex-shrink: 0; }
+        .rv-report-btn {
+            margin-left: auto; padding: 4px 10px; border-radius: 6px; border: 1px solid #fca5a5;
+            background: transparent; color: #dc2626; cursor: pointer; font-size: 0.8rem;
+            font-weight: 600; transition: background .2s;
+        }
+        .rv-report-btn:hover { background: #fee2e2; }
+        .rv-stars { color: #f59e0b; font-size: 1.1rem; letter-spacing: 1px; }
+        .rv-author { font-weight: 700; font-size: 0.9rem; }
+        .rv-date { color: #94a3b8; font-size: 0.82rem; }
+        .rv-title { font-weight: 700; margin-bottom: 4px; }
+        .rv-content { color: #374151; font-size: 0.93rem; line-height: 1.6; white-space: pre-wrap; }
+        .rv-empty { color: #94a3b8; text-align: center; padding: 28px 0; }
     </style>
 </head>
 <body class="shop-page">
@@ -72,6 +101,9 @@
         <a href="index.html">Home</a>
         <a href="profile.html" id="profileLink" style="display:none;">Profile</a>
         <a href="order-history.html" id="ordersLink" style="display:none;">Orders</a>
+        <a href="reviews.html" id="reviewsLink" style="display:none;">Reviews</a>
+        <a href="support.html" id="supportLink" style="display:none;">Support</a>
+        <a href="notifications.html" id="notifLink" style="display:none;">🔔 <span id="notifBadge" style="background:#6366f1;color:#fff;border-radius:10px;padding:1px 7px;font-size:0.75rem;font-weight:700;margin-left:2px;"></span></a>
         <a href="login.html" id="loginLink">Login</a>
         <a href="#" id="logoutLink" style="display:none;">Logout</a>
         <a href="cart.html" class="cart shop-cart-link">🛒 <span id="headerCartCount">$0.00 (0)</span></a>
@@ -112,6 +144,18 @@
 <div class="related">
     <h2>Related books</h2>
     <div class="related-grid" id="relatedBooks"></div>
+</div>
+
+<div class="reviews-section">
+    <h2>⭐ Customer Reviews</h2>
+    <div id="reviewSummary" class="rv-summary" style="display:none;">
+        <div class="rv-avg-score" id="avgScore">0</div>
+        <div>
+            <div class="rv-avg-stars" id="avgStars"></div>
+            <div class="rv-avg-count" id="avgCount"></div>
+        </div>
+    </div>
+    <div id="reviewsList"><p class="rv-empty">Loading reviews...</p></div>
 </div>
 
 <footer class="shop-footer">© Online Book Shop</footer>

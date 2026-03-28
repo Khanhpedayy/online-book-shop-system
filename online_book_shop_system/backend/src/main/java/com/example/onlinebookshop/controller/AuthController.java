@@ -21,6 +21,9 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import com.example.onlinebookshop.Service.EmailOtpService;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -31,17 +34,23 @@ public class AuthController {
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtils jwtUtils;
+    private final EmailOtpService emailOtpService;
+
+    // Cache: resetToken -> email (for password reset flow)
+    private final Map<String, String> resetTokenCache = new ConcurrentHashMap<>();
 
     public AuthController(AuthenticationManager authenticationManager,
             UserRepository userRepository,
             RoleRepository roleRepository,
             PasswordEncoder passwordEncoder,
-            JwtUtils jwtUtils) {
+            JwtUtils jwtUtils,
+            EmailOtpService emailOtpService) {
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtils = jwtUtils;
+        this.emailOtpService = emailOtpService;
     }
 
     /**
@@ -104,20 +113,57 @@ public class AuthController {
     public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
         // Validate input
         if (request.getEmail() == null || request.getEmail().isBlank()) {
-            return ResponseEntity.badRequest().body(Map.of("error", "Email là bắt buộc"));
-        }
-        if (request.getPassword() == null || request.getPassword().length() < 6) {
-            return ResponseEntity.badRequest().body(Map.of("error", "Mật khẩu phải có ít nhất 6 ký tự"));
+            return ResponseEntity.badRequest().body(Map.of("error", "Email là bắt buộc", "field", "email"));
         }
         if (request.getFullName() == null || request.getFullName().isBlank()) {
-            return ResponseEntity.badRequest().body(Map.of("error", "Họ tên là bắt buộc"));
+            return ResponseEntity.badRequest().body(Map.of("error", "Họ tên là bắt buộc", "field", "name"));
         }
 
         // Check duplicate email
         Optional<User> existingUser = userRepository.findByEmailAndDeletedAtIsNull(request.getEmail());
         if (existingUser.isPresent()) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(Map.of("error", "Email này đã được đăng ký"));
+                    .body(Map.of("error", "Email này đã được sử dụng", "field", "email"));
+        }
+
+        // Check duplicate phone
+        if (request.getPhone() != null && !request.getPhone().isBlank()) {
+            Optional<User> existingPhone = userRepository.findByPhoneAndDeletedAtIsNull(request.getPhone());
+            if (existingPhone.isPresent()) {
+                return ResponseEntity.status(HttpStatus.CONFLICT)
+                        .body(Map.of("error", "Số điện thoại này đã được sử dụng", "field", "phone"));
+            }
+        }
+
+        // Validate password (cuối cùng)
+        if (request.getPassword() == null || request.getPassword().length() < 8) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", "Mật khẩu phải có ít nhất 8 ký tự", "field", "password"));
+        }
+        if (!request.getPassword().matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^a-zA-Z\\d]).{8,}$")) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error",
+                            "Mật khẩu chưa đủ mạnh. Cần ít nhất 8 ký tự, có chữ hoa, chữ thường, số và ký tự đặc biệt",
+                            "field", "password"));
+        }
+
+        // Generate and send OTP
+        String otp = emailOtpService.generateAndSendOtp(request.getEmail());
+        System.out.println("Generated OTP for " + request.getEmail() + ": " + otp);
+
+        return ResponseEntity.ok(Map.of("message", "Đã gửi mã OTP đến email của bạn", "requireOtp", true));
+    }
+
+    @PostMapping("/verify-register-otp")
+    public ResponseEntity<?> verifyRegisterOtp(@RequestBody com.example.onlinebookshop.dto.OtpVerifyRequest request) {
+        if (request.getOtp() == null || request.getOtp().isBlank()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Mã xác thực không được để trống"));
+        }
+
+        boolean isValid = emailOtpService.verifyOtp(request.getEmail(), request.getOtp());
+        if (!isValid) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", "Mã xác thực không hợp lệ hoặc đã hết hạn", "field", "otp"));
         }
 
         // Get CUSTOMER role
@@ -134,15 +180,86 @@ public class AuthController {
         user.setStatus("ACTIVE");
         userRepository.save(user);
 
-        // Generate token and return
-        String token = jwtUtils.generateToken(user.getEmail(), "CUSTOMER");
-
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(LoginResponse.builder()
-                        .token(token)
-                        .email(user.getEmail())
-                        .fullName(user.getFullName())
-                        .role("CUSTOMER")
-                        .build());
+                .body(Map.of("message", "Tạo tài khoản thành công"));
+    }
+
+    // ========== FORGOT PASSWORD ==========
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestBody Map<String, String> request) {
+        String email = request.get("email");
+        if (email == null || email.isBlank()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Email là bắt buộc"));
+        }
+
+        Optional<User> userOpt = userRepository.findByEmailAndDeletedAtIsNull(email.trim());
+        if (userOpt.isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Email không tồn tại trong hệ thống"));
+        }
+
+        User user = userOpt.get();
+        if (!"ACTIVE".equalsIgnoreCase(user.getStatus())) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Tài khoản đã bị vô hiệu hóa"));
+        }
+
+        String otp = emailOtpService.generateAndSendPasswordResetOtp(email.trim());
+        System.out.println("Password reset OTP for " + email + ": " + otp);
+
+        return ResponseEntity.ok(Map.of("message", "Đã gửi mã OTP đến email của bạn", "requireOtp", true));
+    }
+
+    @PostMapping("/verify-forgot-otp")
+    public ResponseEntity<?> verifyForgotOtp(@RequestBody Map<String, String> request) {
+        String email = request.get("email");
+        String otp = request.get("otp");
+
+        if (email == null || otp == null || otp.isBlank()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Email và mã OTP là bắt buộc"));
+        }
+
+        boolean isValid = emailOtpService.verifyOtp(email.trim(), otp.trim());
+        if (!isValid) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", "Mã xác thực không hợp lệ hoặc đã hết hạn"));
+        }
+
+        // Generate a one-time reset token
+        String resetToken = UUID.randomUUID().toString();
+        resetTokenCache.put(resetToken, email.trim());
+
+        return ResponseEntity.ok(Map.of("message", "Xác thực thành công", "resetToken", resetToken));
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> request) {
+        String resetToken = request.get("resetToken");
+        String newPassword = request.get("newPassword");
+
+        if (resetToken == null || newPassword == null) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Thiếu thông tin"));
+        }
+
+        String email = resetTokenCache.remove(resetToken);
+        if (email == null) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Phiên đặt lại mật khẩu đã hết hạn. Vui lòng thử lại"));
+        }
+
+        // Validate password strength
+        if (newPassword.length() < 8) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Mật khẩu phải có ít nhất 8 ký tự"));
+        }
+        if (!newPassword.matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^a-zA-Z\\d]).{8,}$")) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", "Mật khẩu chưa đủ mạnh. Cần chữ hoa, chữ thường, số và ký tự đặc biệt"));
+        }
+
+        User user = userRepository.findByEmailAndDeletedAtIsNull(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        user.setPasswordHash(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+
+        return ResponseEntity.ok(Map.of("message", "Đặt lại mật khẩu thành công!"));
     }
 }

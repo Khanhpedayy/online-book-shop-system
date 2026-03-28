@@ -18,13 +18,16 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EmailOtpService emailOtpService;
 
     public UserServiceImpl(UserRepository userRepository,
             RoleRepository roleRepository,
-            PasswordEncoder passwordEncoder) {
+            PasswordEncoder passwordEncoder,
+            EmailOtpService emailOtpService) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
+        this.emailOtpService = emailOtpService;
     }
 
     @Override
@@ -149,12 +152,49 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng với ID: " + id));
 
         if ("ACTIVE".equals(user.getStatus())) {
-            user.setStatus("INACTIVE");
+            user.setStatus("DISABLED");
         } else {
             user.setStatus("ACTIVE");
         }
 
         return toDTO(userRepository.save(user));
+    }
+
+    @Override
+    public void resetCustomerPassword(Long id) {
+        User user = userRepository.findByIdWithRole(id)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng với ID: " + id));
+        if (!"CUSTOMER".equals(user.getRole().getCode())) {
+            throw new IllegalArgumentException("Chỉ có thể reset mật khẩu cho tài khoản Customer");
+        }
+        
+        // Generate random 8-character secure password
+        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*";
+        StringBuilder sb = new StringBuilder();
+        java.util.Random rnd = new java.util.Random();
+        sb.append((char)(rnd.nextInt(26) + 'A')); // Ensure Upper
+        sb.append((char)(rnd.nextInt(26) + 'a')); // Ensure Lower
+        sb.append((char)(rnd.nextInt(10) + '0')); // Ensure Digit
+        sb.append("!@#$%^&*".charAt(rnd.nextInt(8))); // Ensure Special
+        for (int i = 0; i < 4; i++) {
+            sb.append(chars.charAt(rnd.nextInt(chars.length())));
+        }
+        // Shuffle the characters
+        char[] arr = sb.toString().toCharArray();
+        for (int i = arr.length - 1; i > 0; i--) {
+            int index = rnd.nextInt(i + 1);
+            char a = arr[index];
+            arr[index] = arr[i];
+            arr[i] = a;
+        }
+        String newPassword = new String(arr);
+        
+        user.setPasswordHash(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+        
+        if (user.getEmail() != null && !user.getEmail().isBlank()) {
+            emailOtpService.sendNewPassword(user.getEmail(), newPassword);
+        }
     }
 
     private UserDTO toDTO(User user) {

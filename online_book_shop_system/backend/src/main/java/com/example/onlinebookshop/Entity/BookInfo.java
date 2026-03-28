@@ -58,6 +58,9 @@ public class BookInfo {
     @Column(name = "description_html", length = 4000)
     private String descriptionHtml;
 
+    @Column(name = "stock_quantity")
+    private Integer stockQuantity = 0;
+
     @Column(name = "status", nullable = false, length = 20)
     private String status = "ACTIVE";
 

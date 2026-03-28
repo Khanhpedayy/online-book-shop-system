@@ -14,8 +14,8 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     @Query("""
             SELECT DISTINCT o FROM Order o
             LEFT JOIN FETCH o.items i
-            LEFT JOIN FETCH i.book
-            LEFT JOIN FETCH i.variant
+            LEFT JOIN FETCH i.variant v
+            LEFT JOIN FETCH v.book
             WHERE o.id = :id
             """)
     Optional<Order> findDetailById(@Param("id") Long id);
