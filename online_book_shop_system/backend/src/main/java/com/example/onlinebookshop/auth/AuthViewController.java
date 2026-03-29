@@ -57,7 +57,7 @@ public class AuthViewController {
             return "redirect:/staff/dashboard";
         }
         if (isManager) {
-            return "redirect:/pages/inventory-overview.html";
+            return "redirect:/pages/dashboard.html";
         }
         if (isAdmin) {
             return "redirect:/admin-entry";

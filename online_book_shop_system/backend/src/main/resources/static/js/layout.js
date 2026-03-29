@@ -27,7 +27,6 @@ const Layout = {
                 { label: 'Sắp xếp lên kệ (Bản sao)', href: 'copies.html', icon: 'bi-qr-code-scan' },
                 { label: 'Điều chỉnh', href: 'adjustments.html', icon: 'bi-arrow-down-up' },
                 { label: 'Kiểm kê', href: 'stocktaking.html', icon: 'bi-clipboard-check' },
-                { label: 'Cài đặt Điều phối', href: 'staff-allocation-settings.html', icon: 'bi-gear-wide-connected' },
             ],
         },
         {
@@ -36,16 +35,14 @@ const Layout = {
                 { label: 'Bảng điều khiển', href: 'staff-dashboard.html', icon: 'bi-speedometer2' },
                 { label: 'Đơn hàng', href: 'staff-orders.html', icon: 'bi-bag' },
                 { label: 'Nhận trả hàng', href: 'staff-returns.html', icon: 'bi-arrow-return-left' },
-                { label: 'Khách hàng', href: 'staff-customers.html', icon: 'bi-person-lines-fill' },
+                { label: 'Xử lý Trả hàng', href: 'returns.html', icon: 'bi-arrow-return-left' },
                 { label: 'Sự cố', href: 'staff-incidents.html', icon: 'bi-exclamation-triangle' },
             ],
         },
         {
             title: 'Hệ thống',
             items: [
-                { label: 'Xử lý Trả hàng', href: 'returns.html', icon: 'bi-arrow-return-left' },
                 { label: 'Báo cáo', href: 'reports.html', icon: 'bi-bar-chart' },
-                { label: 'Cài đặt', href: 'settings.html', icon: 'bi-sliders' },
             ],
         },
     ],
@@ -113,8 +110,11 @@ const Layout = {
                 <span class="bc-active">${label}</span>
             </div>
             <div class="header-actions">
-                <button title="Tìm kiếm"><i class="bi bi-search"></i></button>
-                <button title="Thông báo"><i class="bi bi-bell"></i></button>
+                <form id="logout-form" action="/logout" method="post" style="display:inline">
+                    <button id="btn-logout" type="submit" title="Đăng xuất">
+                        <i class="bi bi-box-arrow-right"></i> Đăng xuất
+                    </button>
+                </form>
             </div>`;
     },
 
