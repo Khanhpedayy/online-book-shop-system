@@ -230,7 +230,7 @@
             tbody.innerHTML = filtered.map(r => `<tr>
         <td><a href="javascript:void(0)" onclick="showDetail(${r.id})" class="fw-semibold text-primary">${r.lotCode}</a>${r.receiptCode ? `<div class="text-muted" style="font-size:10px">Phiếu nhận: ${r.receiptCode}</div>` : ''}</td>
         <td><div class="fw-medium text-truncate" style="max-width:200px">${r.bookTitle || '—'}</div><div class="text-muted small">${r.variantSku || '—'} • ${r.supplierName || ''}</div></td>
-        <td><span class="text-success fw-medium">+${r.qtyReceived}</span><span class="text-muted mx-1">/</span><span class="fw-semibold">${r.qtyAvailable}</span><span class="text-muted small ms-1">có sẵn</span></td>
+        <td><span class="text-success fw-medium">+${r.qtyAvailable}</span><span class="text-muted mx-1">/</span><span class="fw-semibold">${r.qtyReceived}</span><span class="text-muted small ms-1">có sẵn</span></td>
         <td class="fw-medium">${(r.unitCost || 0).toLocaleString()}₫</td>
         <td><span class="badge bg-${condColor[r.conditionDefault] || 'secondary'}">${condLabel[r.conditionDefault] || r.conditionDefault || '—'}</span></td>
         <td><span class="${r.ageDays > 90 ? 'text-danger fw-bold' : r.ageDays > 60 ? 'text-warning' : 'text-muted'}">${r.ageDays || 0} ngày</span></td>

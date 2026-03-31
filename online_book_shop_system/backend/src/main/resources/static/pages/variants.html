@@ -352,7 +352,17 @@
                 else { await api.post('/management/variants', payload); showToast('Đã tạo biến thể', 'success'); }
                 bootstrap.Modal.getInstance(document.getElementById('formModal')).hide();
                 variants = await api.get('/management/variants'); renderKPI(); render();
-            } catch (e) { showToast('Lỗi: ' + (e.message || 'Thất bại'), 'danger'); }
+            } catch (e) {
+                const msg = e.message || '';
+                if (msg.includes('UX_bv_sku') || msg.includes('sku')) {
+                    const field = document.getElementById('f_sku');
+                    field.classList.add('is-invalid');
+                    field.focus();
+                    showToast('SKU "' + (document.getElementById('f_sku').value) + '" đã tồn tại. Vui lòng dùng SKU khác.', 'danger');
+                } else {
+                    showToast('Lỗi: ' + (msg || 'Thất bại'), 'danger');
+                }
+            }
         }
 
         function openPrice(id) {
