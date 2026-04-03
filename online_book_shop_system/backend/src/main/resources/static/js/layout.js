@@ -35,8 +35,7 @@ const Layout = {
             items: [
                 { label: 'Bảng điều khiển', href: 'staff-dashboard.html', icon: 'bi-speedometer2' },
                 { label: 'Đơn hàng', href: 'staff-orders.html', icon: 'bi-bag' },
-                { label: 'Nhận trả hàng', href: 'staff-returns.html', icon: 'bi-arrow-return-left' },
-                { label: 'Khách hàng', href: 'staff-customers.html', icon: 'bi-person-lines-fill' },
+
                 { label: 'Sự cố', href: 'staff-incidents.html', icon: 'bi-exclamation-triangle' },
             ],
         },
@@ -113,8 +112,7 @@ const Layout = {
                 <span class="bc-active">${label}</span>
             </div>
             <div class="header-actions">
-                <button title="Tìm kiếm"><i class="bi bi-search"></i></button>
-                <button title="Thông báo"><i class="bi bi-bell"></i></button>
+                <a href="logout.html" id="logoutLink" style="display:none;">Logout</a>
             </div>`;
     },
 

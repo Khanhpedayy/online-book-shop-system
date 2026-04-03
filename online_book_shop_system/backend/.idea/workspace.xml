@@ -6,7 +6,11 @@
   <component name="ChangeListManager">
     <list default="true" id="b0cef7af-9eae-4572-a7cc-fd78853d29dd" name="Changes" comment="fix backend logic and cleaning UI">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/admin.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/admin.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/auth/AuthViewController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/auth/AuthViewController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/static/js/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/js/app.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/static/js/layout.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/js/layout.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/static/pages/stock.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/pages/stock.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/auth/login.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/auth/login.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -136,6 +140,7 @@
       <workItem from="1774483636832" duration="10773000" />
       <workItem from="1774644367592" duration="3684000" />
       <workItem from="1774648697658" duration="1458000" />
+      <workItem from="1774677375221" duration="10181000" />
     </task>
     <task id="LOCAL-00001" summary="fix merge">
       <option name="closed" value="true" />
