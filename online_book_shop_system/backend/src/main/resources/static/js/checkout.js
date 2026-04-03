@@ -1,7 +1,7 @@
 const API_BASE = 'http://localhost:8080';
 
-const shippingCost = 5000; // fixed shipping cost (VND)
 let subtotal = 0;
+let shippingFeeQuote = 0;
 
 function formatVnd(value) {
     const n = Number(value) || 0;
@@ -55,10 +55,17 @@ async function logout() {
 
 // ===== UPDATE TOTALS =====
 function updateTotals() {
-    const total = subtotal + shippingCost;
+    const total = subtotal + shippingFeeQuote;
 
     summaryDiv.querySelector("#subtotalVal").textContent = formatVnd(subtotal);
-    summaryDiv.querySelector("#shippingVal").textContent = formatVnd(shippingCost);
+    const shipEl = summaryDiv.querySelector("#shippingVal");
+    if (shipEl) {
+        if (shippingFeeQuote <= 0 && subtotal > 0) {
+            shipEl.textContent = "Miễn phí";
+        } else {
+            shipEl.textContent = formatVnd(shippingFeeQuote) + "₫";
+        }
+    }
     summaryDiv.querySelector("#totalVal").textContent = formatVnd(total);
 }
 
@@ -92,11 +99,19 @@ async function loadCheckoutSummary() {
             `;
         });
 
+        try {
+            const quote = await apiGet(`/api/shipping/quote?subtotal=${encodeURIComponent(subtotal)}`);
+            shippingFeeQuote = Number(quote.shippingFee) || 0;
+        } catch (e) {
+            console.warn("shipping quote", e);
+            shippingFeeQuote = 0;
+        }
+
         html += `
             <hr>
-            <div><span>Subtotal:</span> <span id="subtotalVal">${formatVnd(subtotal)}</span>₫</div>
-            <div><span>Shipping:</span> <span id="shippingVal">${formatVnd(shippingCost)}</span>₫</div>
-            <div><strong>Total:</strong> <span id="totalVal">${formatVnd(subtotal + shippingCost)}</span>₫</div>
+            <div><span>Subtotal:</span> <span id="subtotalVal"></span>₫</div>
+            <div><span>Shipping:</span> <span id="shippingVal"></span></div>
+            <div><strong>Total:</strong> <span id="totalVal"></span>₫</div>
         `;
         summaryDiv.innerHTML = html;
 

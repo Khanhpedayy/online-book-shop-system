@@ -5,6 +5,7 @@ import com.example.onlinebookshop.Repository.*;
 import com.example.onlinebookshop.Service.OrderServiceImpl;
 import com.example.onlinebookshop.paymentlog.PaymentLogRepository;
 import com.example.onlinebookshop.payos.PayOSClient;
+import com.example.onlinebookshop.shipping.ShippingFeeService;
 import com.example.onlinebookshop.dto.OrderItemRequest;
 import com.example.onlinebookshop.dto.OrderRequest;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,6 +23,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -45,6 +47,9 @@ class OrderServiceTest {
     @Mock
     private PaymentLogRepository paymentLogRepository;
 
+    @Mock
+    private ShippingFeeService shippingFeeService;
+
     @InjectMocks
     private OrderServiceImpl orderService;
 
@@ -63,30 +68,19 @@ class OrderServiceTest {
         user.setFullName("Test Customer");
         user.setStatus("ACTIVE");
 
-        bookInfo = new BookInfo(
-                1L,          // id
-                null,        // categoryId
-                null,        // isbn13
-                null,        // isbn10
-                "Clean Code",// title
-                null,        // subtitle
-                "slug",      // slug
-                null,        // shortDescription
-                null,        // descriptionHtml
-                "ACTIVE",    // status
-                null,        // createdAt
-                null         // deletedAt
-        );
-        variant = new BookVariant(
-                1L,
-                bookInfo,
-                "SKU-001",
-                BigDecimal.valueOf(39.99), // listPrice
-                BigDecimal.valueOf(39.99), // salePrice
-                true,                       // isActive
-                null,
-                null
-        );
+        bookInfo = new BookInfo();
+        bookInfo.setId(1L);
+        bookInfo.setTitle("Clean Code");
+        bookInfo.setSlug("slug");
+        bookInfo.setStatus("ACTIVE");
+
+        variant = new BookVariant();
+        variant.setId(1L);
+        variant.setBook(bookInfo);
+        variant.setSku("SKU-001");
+        variant.setListPrice(BigDecimal.valueOf(39.99));
+        variant.setSalePrice(BigDecimal.valueOf(39.99));
+        variant.setIsActive(true);
 
         validRequest = new OrderRequest(
                 List.of(new OrderItemRequest(1L, 2)),
@@ -97,6 +91,8 @@ class OrderServiceTest {
                 "COD",
                 1L
         );
+
+        when(shippingFeeService.computeShippingFee(any(BigDecimal.class))).thenReturn(BigDecimal.ZERO);
     }
 
     @Test
@@ -116,6 +112,7 @@ class OrderServiceTest {
         assertThat(result.getTotalAmount()).isEqualByComparingTo(BigDecimal.valueOf(79.98));
         assertThat(result.getStatus()).isEqualTo("NEW");
         verify(orderRepository).save(any(Order.class));
+        verify(shippingFeeService).computeShippingFee(eq(BigDecimal.valueOf(79.98)));
     }
 
     @Test

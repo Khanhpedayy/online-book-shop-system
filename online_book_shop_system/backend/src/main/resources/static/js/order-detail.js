@@ -30,10 +30,11 @@ async function apiPost(path){
         credentials: 'include'
     });
 
-    if(!res.ok) throw new Error(await res.text());
-
+    const text = await res.text();
+    if (!res.ok) throw new Error(text || res.statusText);
+    if (!text.trim()) return {};
     try {
-        return await res.json();
+        return JSON.parse(text);
     } catch {
         return {};
     }
@@ -100,7 +101,7 @@ function renderOrderInfo(o){
         `<button type="button" class="shop-btn shop-btn--secondary" onclick="cancelOrder(${o.id})">Cancel order</button>` : ""
     }
 
-            ${(displayPaymentStatus(o) === "PENDING" || displayPaymentStatus(o) === "UNPAID") && displayPaymentMethod(o) === "PAYOS" ?
+            ${(displayPaymentStatus(o) === "PENDING" || displayPaymentStatus(o) === "UNPAID" || displayPaymentStatus(o) === "CANCELLED") && displayPaymentMethod(o) === "PAYOS" ?
         `<button type="button" class="shop-btn" onclick="repay(${o.id})">Pay again</button>` : ""
     }
         </div>

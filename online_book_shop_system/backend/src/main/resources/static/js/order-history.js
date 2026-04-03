@@ -25,8 +25,14 @@ async function apiPost(path) {
         headers,
         credentials: 'include'
     });
-    if (!res.ok) throw new Error(await res.text());
-    return res.json();
+    const text = await res.text();
+    if (!res.ok) throw new Error(text || res.statusText);
+    if (!text.trim()) return {};
+    try {
+        return JSON.parse(text);
+    } catch {
+        return {};
+    }
 }
 
 /* ===== LOAD ORDERS ===== */
@@ -130,7 +136,7 @@ function paymentStatusLabel(o) {
 function payAgainEligible(o) {
     const ps = paymentStatusLabel(o);
     const pm = paymentMethodLabel(o);
-    return pm === "PAYOS" && (ps === "PENDING" || ps === "UNPAID");
+    return pm === "PAYOS" && (ps === "PENDING" || ps === "UNPAID" || ps === "CANCELLED");
 }
 
 /* ===== VIEW DETAIL ===== */

@@ -4,6 +4,7 @@ import com.example.onlinebookshop.Entity.*;
 import com.example.onlinebookshop.Repository.*;
 import com.example.onlinebookshop.paymentlog.PaymentLogRepository;
 import com.example.onlinebookshop.payos.PayOSClient;
+import com.example.onlinebookshop.shipping.ShippingFeeService;
 import com.example.onlinebookshop.dto.CheckoutRequest;
 import com.example.onlinebookshop.dto.OrderItemRequest;
 import com.example.onlinebookshop.dto.OrderRequest;
@@ -31,16 +32,19 @@ public class OrderServiceImpl implements OrderService {
     private final CartItemRepository cartItemRepository;
     private final PayOSClient payOSClient;
     private final PaymentLogRepository paymentLogRepository;
+    private final ShippingFeeService shippingFeeService;
 
     public OrderServiceImpl(OrderRepository orderRepository, BookVariantRepository variantRepository,
                             UserRepository userRepository, CartItemRepository cartItemRepository,
-                            PayOSClient payOSClient, PaymentLogRepository paymentLogRepository) {
+                            PayOSClient payOSClient, PaymentLogRepository paymentLogRepository,
+                            ShippingFeeService shippingFeeService) {
         this.orderRepository = orderRepository;
         this.variantRepository = variantRepository;
         this.userRepository = userRepository;
         this.cartItemRepository = cartItemRepository;
         this.payOSClient = payOSClient;
         this.paymentLogRepository = paymentLogRepository;
+        this.shippingFeeService = shippingFeeService;
     }
 
     @Override
@@ -71,7 +75,7 @@ public class OrderServiceImpl implements OrderService {
         order.setShipPhone(phone);
         order.setShipLine1(request.getShippingAddress());
 
-        BigDecimal total = BigDecimal.ZERO;
+        BigDecimal subtotal = BigDecimal.ZERO;
         List<OrderItem> items = new ArrayList<>();
 
         for (OrderItemRequest itemReq : request.getItems()) {
@@ -87,8 +91,8 @@ public class OrderServiceImpl implements OrderService {
 
             int qty = itemReq.getQuantity() != null && itemReq.getQuantity() > 0 ? itemReq.getQuantity() : 1;
             BigDecimal unitPrice = variant.getSalePrice() != null ? variant.getSalePrice() : BigDecimal.ZERO;
-            BigDecimal subtotal = unitPrice.multiply(BigDecimal.valueOf(qty));
-            total = total.add(subtotal);
+            BigDecimal line = unitPrice.multiply(BigDecimal.valueOf(qty));
+            subtotal = subtotal.add(line);
 
             OrderItem item = new OrderItem();
             item.setOrder(order);
@@ -100,8 +104,10 @@ public class OrderServiceImpl implements OrderService {
             items.add(item);
         }
 
-        order.setSubtotalAmount(total);
-        order.setTotalAmount(total);
+        BigDecimal shippingFee = shippingFeeService.computeShippingFee(subtotal);
+        order.setSubtotalAmount(subtotal);
+        order.setShippingFee(shippingFee);
+        order.setTotalAmount(subtotal.add(shippingFee));
         String pm = request.getPaymentMethod();
         order.setPaymentMethod(pm != null && !pm.isBlank() ? pm.trim().toUpperCase(Locale.ROOT) : "COD");
         order.setItems(items);
@@ -151,7 +157,10 @@ public class OrderServiceImpl implements OrderService {
             throw new IllegalArgumentException("Payment link is only available for PayOS orders.");
         }
         String ps = order.getPaymentStatus();
-        if (ps != null && !"PENDING".equalsIgnoreCase(ps) && !"UNPAID".equalsIgnoreCase(ps)) {
+        if (ps != null
+                && !"PENDING".equalsIgnoreCase(ps)
+                && !"UNPAID".equalsIgnoreCase(ps)
+                && !"CANCELLED".equalsIgnoreCase(ps)) {
             throw new IllegalStateException("Order is not eligible for payment.");
         }
         if (order.getId() == null) {
