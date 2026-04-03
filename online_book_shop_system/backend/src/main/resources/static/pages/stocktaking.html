@@ -85,9 +85,18 @@
                 <div class="modal-body">
                     <form class="needs-validation" id="createForm" novalidate onsubmit="event.preventDefault(); createSession();">
                         <div class="mb-3">
-                            <label class="form-label">Phạm vi (Scope)</label>
-                            <input type="text" class="form-control" id="f_scope" placeholder="VD: ALL, VARIANT:1, LOT:5">
-                            <div class="form-text">Bỏ trống để kiểm kê Toàn bộ (ALL)</div>
+                            <label class="form-label">Phạm vi kiểm kê</label>
+                            <select class="form-select" id="f_scope_type" onchange="toggleScopeInput()">
+                                <option value="ALL">Toàn bộ (tất cả lô)</option>
+                                <option value="LOT">Theo Lô (Lot Code)</option>
+                                <option value="VARIANT">Theo SKU (Biến thể)</option>
+                            </select>
+                        </div>
+                        <div class="mb-3" id="f_scope_value_wrap" style="display:none">
+                            <label class="form-label" id="f_scope_value_label">Mã Lô</label>
+                            <input type="text" class="form-control" id="f_scope_value"
+                                placeholder="Nhập mã lô, VD: LOT-2026-015">
+                            <div class="form-text" id="f_scope_hint">Nhập đúng mã lô trong hệ thống.</div>
                         </div>
                         <div class="mb-3"><label class="form-label">Ghi chú</label><textarea class="form-control" id="f_note"
                                 rows="2" placeholder="Nhập ghi chú hoặc lý do..."></textarea></div>
@@ -144,21 +153,57 @@
     </tr>`).join('');
         }
 
+        function toggleScopeInput() {
+            const type = document.getElementById('f_scope_type').value;
+            const wrap = document.getElementById('f_scope_value_wrap');
+            const label = document.getElementById('f_scope_value_label');
+            const hint  = document.getElementById('f_scope_hint');
+            const input = document.getElementById('f_scope_value');
+            if (type === 'ALL') {
+                wrap.style.display = 'none';
+                input.value = '';
+            } else if (type === 'LOT') {
+                wrap.style.display = '';
+                label.textContent = 'Mã Lô (Lot Code)';
+                input.placeholder = 'VD: LOT-2026-015';
+                hint.textContent = 'Nhập đúng mã lô như hiển thị trong danh sách lô.';
+            } else {
+                wrap.style.display = '';
+                label.textContent = 'Mã SKU (biến thể)';
+                input.placeholder = 'VD: BK-001-PB';
+                hint.textContent = 'Nhập đúng mã SKU của biến thể cần kiểm kê.';
+            }
+        }
+
         function openCreate() {
             document.getElementById('createForm').reset();
             document.getElementById('createForm').classList.remove('was-validated');
+            document.getElementById('f_scope_type').value = 'ALL';
+            document.getElementById('f_scope_value_wrap').style.display = 'none';
+            document.getElementById('f_scope_value').value = '';
             new bootstrap.Modal(document.getElementById('createModal')).show();
         }
 
         async function createSession() {
             const form = document.getElementById('createForm');
-            if (!form.checkValidity()) {
-                form.classList.add('was-validated');
+            const scopeType  = document.getElementById('f_scope_type').value;
+            const scopeValue = (document.getElementById('f_scope_value').value || '').trim();
+
+            // validate: nếu chọn LOT hoặc VARIANT thì phải nhập mã
+            if (scopeType !== 'ALL' && !scopeValue) {
+                showToast(scopeType === 'LOT' ? 'Vui lòng nhập mã lô.' : 'Vui lòng nhập mã SKU.', 'warning');
+                document.getElementById('f_scope_value').focus();
                 return;
             }
+
+            // Build scope string gửi lên backend
+            let scope = undefined;
+            if (scopeType === 'LOT')     scope = 'LOT:'     + scopeValue;
+            if (scopeType === 'VARIANT') scope = 'VARIANT:' + scopeValue;
+
             try {
                 const result = await api.post('/inventory/stocktaking', {
-                    scope: document.getElementById('f_scope').value.trim() || undefined,
+                    scope,
                     note: document.getElementById('f_note').value.trim() || undefined,
                 });
                 showToast('Đã tạo phiên kiểm kê: ' + (result.sessionCode || ''), 'success');

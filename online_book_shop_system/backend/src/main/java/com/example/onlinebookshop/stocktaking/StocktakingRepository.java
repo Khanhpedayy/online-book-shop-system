@@ -17,20 +17,38 @@ public class StocktakingRepository {
         this.jdbc = jdbc;
     }
 
-    /* â”€â”€ Get expected stock by lot â”€â”€ */
+    /* ── Get expected stock by lot ── */
     public List<StocktakingEntryDTO> getExpectedStock(String scope) {
+        boolean hasScope = scope != null && !scope.isBlank();
+
+        // Khi kiểm kê toàn bộ: chỉ lấy lô còn hàng (qty > 0).
+        // Khi kiểm kê theo lô/SKU cụ thể: lấy cả lô qty = 0 vì mục đích là xác minh thực tế.
+        String qtyFilter = hasScope ? "l.qty_available >= 0 " : "l.qty_available > 0 ";
+
         StringBuilder sql = new StringBuilder(
                 "SELECT l.variant_id, v.sku, b.title, l.id AS lot_id, l.lot_code, l.qty_available AS expected_qty "
                         + "FROM lots l "
                         + "JOIN book_variants v ON l.variant_id = v.id "
                         + "JOIN books b ON v.book_id = b.id "
-                        + "WHERE l.deleted_at IS NULL AND l.qty_available > 0 ");
+                        + "WHERE l.deleted_at IS NULL AND " + qtyFilter);
 
-        if (scope != null && scope.startsWith("VARIANT:")) {
-            sql.append("AND l.variant_id = ").append(scope.substring(8)).append(" ");
-        } else if (scope != null && scope.startsWith("LOT:")) {
-            sql.append("AND l.id = ").append(scope.substring(4)).append(" ");
+        if (hasScope) {
+            if (scope.startsWith("VARIANT:")) {
+                String sku = scope.substring(8).trim();
+                if (sku.isEmpty())
+                    throw new IllegalArgumentException("Vui lòng nhập mã SKU sau 'VARIANT:'");
+                sql.append("AND v.sku = N'").append(sku.replace("'", "''")).append("' ");
+            } else if (scope.startsWith("LOT:")) {
+                String lotCode = scope.substring(4).trim();
+                if (lotCode.isEmpty())
+                    throw new IllegalArgumentException("Vui lòng nhập mã lô sau 'LOT:'");
+                sql.append("AND l.lot_code = '").append(lotCode.replace("'", "''")).append("' ");
+            } else {
+                throw new IllegalArgumentException(
+                    "Scope không hợp lệ: '" + scope + "'. Dùng 'LOT:{lot_code}' hoặc 'VARIANT:{sku}', hoặc bỏ trống.");
+            }
         }
+        // scope null hoặc trống → kiểm kê toàn bộ
         sql.append("ORDER BY v.sku, l.lot_code");
 
         return jdbc.query(sql.toString(), (rs, i) -> {
@@ -45,7 +63,7 @@ public class StocktakingRepository {
         });
     }
 
-    /* â”€â”€ Save session to settings â”€â”€ */
+    /* ── Save session to settings ── */
     public void saveSession(StocktakingSessionDTO session) {
         try {
             String json = objectMapper.writeValueAsString(session);
@@ -63,7 +81,7 @@ public class StocktakingRepository {
         }
     }
 
-    /* â”€â”€ Get session from settings â”€â”€ */
+    /* ── Get session from settings ── */
     public StocktakingSessionDTO getSession(String sessionCode) {
         String sql = "SELECT value_json FROM settings WHERE [group] = 'STOCKTAKING' AND [key] = ?";
         List<String> list = jdbc.query(sql, (rs, i) -> rs.getString("value_json"), sessionCode);
@@ -76,7 +94,7 @@ public class StocktakingRepository {
         }
     }
 
-    /* â”€â”€ List all sessions â”€â”€ */
+    /* ── List all sessions ── */
     public List<StocktakingSessionDTO> getAllSessions() {
         String sql = "SELECT value_json FROM settings WHERE [group] = 'STOCKTAKING' ORDER BY updated_at DESC";
         List<String> jsons = jdbc.query(sql, (rs, i) -> rs.getString("value_json"));
@@ -90,17 +108,20 @@ public class StocktakingRepository {
         return sessions;
     }
 
-    /* â”€â”€ Update lot qty â”€â”€ */
+    /* ── Update lot qty ── */
     public void updateLotQtyAvailable(Long lotId, int delta) {
         jdbc.update("UPDATE lots SET qty_available = qty_available + ?, updated_at = SYSUTCDATETIME() WHERE id = ?",
                 delta, lotId);
     }
 
-    /* â”€â”€ Log adjustment transaction â”€â”€ */
-    public void logAdjustment(Long variantId, Long lotId, int qty, String note) {
+    /* ── Log adjustment transaction ── */
+    // delta > 0: thực đếm nhiều hơn sổ sách → nhập thêm (IN)
+    // delta < 0: thực đếm ít hơn sổ sách  → xuất bớt (OUT)
+    // Cột quantity phải > 0 (CK_it_qty) → dùng Math.abs, hướng encode qua movement_type
+    public void logAdjustment(Long variantId, Long lotId, int delta, String note) {
+        String movementType = delta > 0 ? "IN" : "OUT";
         jdbc.update("INSERT INTO inventory_transactions (movement_type, variant_id, lot_id, quantity, "
-                        + "reference_type, reason, note) VALUES ('ADJUST', ?, ?, ?, 'STOCKTAKING', 'COUNT_DIFF', ?)",
-                variantId, lotId, qty, note);
+                        + "reference_type, reason, note) VALUES (?, ?, ?, ?, 'STOCKTAKING', 'COUNT_DIFF', ?)",
+                movementType, variantId, lotId, Math.abs(delta), note);
     }
 }
-
