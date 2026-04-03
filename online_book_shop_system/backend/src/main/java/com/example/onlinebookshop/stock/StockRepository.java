@@ -14,11 +14,17 @@ public class StockRepository {
         this.jdbc = jdbc;
     }
 
-    /* ═══ LIST STOCK ═══ */
+    /* ══ Subquery tính tổng qty_available từ lots theo book ══ */
+    private static final String LOT_STOCK_SUBQUERY =
+            "(SELECT ISNULL(SUM(l.qty_available), 0) " +
+            " FROM lots l " +
+            " JOIN book_variants v ON v.id = l.variant_id " +
+            " WHERE v.book_id = b.id AND l.deleted_at IS NULL)";
 
+    /* ═══ LIST STOCK (aggregate từ lots) ═══ */
     public List<StockItemDTO> findAllStock() {
-        String sql = "SELECT b.id AS book_id, b.title, b.isbn13, c.name AS category_name, "
-                + "b.status, ISNULL(b.stock_quantity, 0) AS stock_quantity, "
+        String sql = "SELECT b.id AS book_id, b.title, b.isbn13, c.name AS category_name, b.status, "
+                + LOT_STOCK_SUBQUERY + " AS stock_quantity, "
                 + "(SELECT TOP 1 bi.url FROM book_images bi "
                 + " WHERE bi.book_id = b.id AND bi.is_cover = 1 AND bi.deleted_at IS NULL "
                 + " ORDER BY bi.sort_order) AS cover_image_url "
@@ -39,39 +45,28 @@ public class StockRepository {
         });
     }
 
-    /* ═══ GET STOCK FOR ONE BOOK ═══ */
-
-    public Integer getStockQuantity(Long bookId) {
-        return jdbc.queryForObject(
-                "SELECT ISNULL(stock_quantity, 0) FROM books WHERE id = ? AND deleted_at IS NULL",
+    /* ═══ GET STOCK FOR ONE BOOK (aggregate từ lots) ═══ */
+    public int getStockQuantity(Long bookId) {
+        Integer val = jdbc.queryForObject(
+                "SELECT ISNULL(SUM(l.qty_available), 0) " +
+                "FROM lots l " +
+                "JOIN book_variants v ON v.id = l.variant_id " +
+                "WHERE v.book_id = ? AND l.deleted_at IS NULL",
                 Integer.class, bookId);
+        return val != null ? val : 0;
     }
 
-    /* ═══ UPDATE STOCK QUANTITY ═══ */
-
-    public void setStockQuantity(Long bookId, int quantity) {
-        jdbc.update("UPDATE books SET stock_quantity = ?, updated_at = SYSUTCDATETIME() WHERE id = ? AND deleted_at IS NULL",
-                quantity, bookId);
-    }
-
-    /* ═══ INSERT ADJUSTMENT RECORD ═══ */
-
-    public void insertAdjustment(Long bookId, String type, int quantity, int oldQty, int newQty,
-                                  String reason, String note) {
-        jdbc.update("INSERT INTO stock_adjustments (book_id, adjustment_type, quantity, old_quantity, "
-                        + "new_quantity, reason, note) VALUES (?, ?, ?, ?, ?, ?, ?)",
-                bookId, type, quantity, oldQty, newQty, reason, note);
-    }
-
-    /* ═══ GET ADJUSTMENTS ═══ */
-
+    /* ═══ GET ADJUSTMENTS (lịch sử inventory_transactions) ═══ */
     public List<StockAdjustmentDTO> findAdjustments(Long bookId) {
-        String sql = "SELECT sa.id, sa.book_id, b.title AS book_title, sa.adjustment_type, "
-                + "sa.quantity, sa.old_quantity, sa.new_quantity, sa.reason, sa.note, sa.created_at "
-                + "FROM stock_adjustments sa "
-                + "JOIN books b ON b.id = sa.book_id "
-                + "WHERE " + (bookId != null ? "sa.book_id = ? " : "1=1 ")
-                + "ORDER BY sa.created_at DESC";
+        // Đọc từ inventory_transactions thay vì stock_adjustments, lọc theo book nếu có
+        String sql = "SELECT it.id, v.book_id, b.title AS book_title, it.movement_type AS adjustment_type, "
+                + "it.quantity, it.reason, it.note, it.created_at "
+                + "FROM inventory_transactions it "
+                + "JOIN book_variants v ON v.id = it.variant_id "
+                + "JOIN books b ON b.id = v.book_id "
+                + "WHERE it.reference_type = 'STOCKTAKING' "
+                + (bookId != null ? "AND v.book_id = ? " : "")
+                + "ORDER BY it.created_at DESC";
         if (bookId != null) {
             return jdbc.query(sql, (rs, i) -> mapAdjustment(rs), bookId);
         }
@@ -79,7 +74,6 @@ public class StockRepository {
     }
 
     /* ═══ CHECK BOOK EXISTS ═══ */
-
     public boolean bookExists(Long bookId) {
         Integer count = jdbc.queryForObject(
                 "SELECT COUNT(*) FROM books WHERE id = ? AND deleted_at IS NULL", Integer.class, bookId);
@@ -93,8 +87,6 @@ public class StockRepository {
         d.setBookTitle(rs.getString("book_title"));
         d.setAdjustmentType(rs.getString("adjustment_type"));
         d.setQuantity(rs.getInt("quantity"));
-        d.setOldQuantity(rs.getInt("old_quantity"));
-        d.setNewQuantity(rs.getInt("new_quantity"));
         d.setReason(rs.getString("reason"));
         d.setNote(rs.getString("note"));
         if (rs.getTimestamp("created_at") != null)
