@@ -5,6 +5,7 @@ import com.example.onlinebookshop.Repository.*;
 import com.example.onlinebookshop.paymentlog.PaymentLogRepository;
 import com.example.onlinebookshop.payos.PayOSClient;
 import com.example.onlinebookshop.shipping.ShippingFeeService;
+import com.example.onlinebookshop.util.VietnamPhoneUtils;
 import com.example.onlinebookshop.dto.CheckoutRequest;
 import com.example.onlinebookshop.dto.OrderItemRequest;
 import com.example.onlinebookshop.dto.OrderRequest;
@@ -127,12 +128,30 @@ public class OrderServiceImpl implements OrderService {
         if (request.getShippingAddress() == null || request.getShippingAddress().isBlank()) {
             throw new IllegalArgumentException("Shipping address is required");
         }
+        if (request.getRecipientName() == null || request.getRecipientName().isBlank()) {
+            throw new IllegalArgumentException("Recipient name is required");
+        }
+        String rawPhone = request.getPhone();
+        if (rawPhone == null || rawPhone.isBlank()) {
+            throw new IllegalArgumentException("Phone number is required");
+        }
+        String phoneNorm = VietnamPhoneUtils.normalizeVnPhone(rawPhone.trim());
+        if (!VietnamPhoneUtils.isValidVnPhone(phoneNorm)) {
+            throw new IllegalArgumentException("Số điện thoại không hợp lệ (VD: 09xxxxxxxx).");
+        }
+
+        User buyer = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found: " + userId));
+        String checkoutEmail = request.getEmail();
+        if (checkoutEmail == null || checkoutEmail.isBlank()) {
+            checkoutEmail = buyer.getEmail();
+        }
 
         List<OrderItemRequest> items = cartItems.stream()
                 .map(ci -> new OrderItemRequest(ci.getVariant().getId(), ci.getQuantity()))
                 .toList();
-        OrderRequest orderRequest = new OrderRequest(items, request.getEmail(), request.getShippingAddress(),
-                request.getRecipientName(), request.getPhone(), request.getPaymentMethod(), request.getCustomerId());
+        OrderRequest orderRequest = new OrderRequest(items, checkoutEmail, request.getShippingAddress(),
+                request.getRecipientName().trim(), phoneNorm, request.getPaymentMethod(), request.getCustomerId());
         Order order = placeOrder(orderRequest);
         cartItemRepository.deleteAll(cartItems);
         return order;

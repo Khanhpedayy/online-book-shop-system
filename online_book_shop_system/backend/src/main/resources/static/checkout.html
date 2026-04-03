@@ -9,8 +9,12 @@
         .checkout-title { font-size: 1.75rem; margin: 0 0 24px; }
         .shop-checkout-grid .card h2 { margin-top: 0; font-size: 1.2rem; }
         #orderForm .shop-btn { width: 100%; margin-top: 8px; }
+        #orderForm .shop-select { width: 100%; margin-bottom: 10px; }
+        #orderForm label.checkout-label { display: block; font-size: 0.88rem; margin-bottom: 4px; color: #64748b; }
         .success { color: #15803d; }
         .error { color: #b91c1c; }
+        .checkout-hint { margin: 0 0 10px; font-size: 0.9rem; color: #64748b; }
+        .checkout-hint a { color: inherit; }
     </style>
 </head>
 <body class="shop-page">
@@ -41,9 +45,13 @@
         <div class="card shop-card">
             <h2>Shipping</h2>
             <form id="orderForm">
-                <input class="shop-input" id="orderEmail" type="email" placeholder="Email" required>
+                <p class="checkout-hint">Choose one of your <a href="profile.html">saved addresses</a>, or pick &quot;Type manually&quot; and fill the fields yourself.</p>
+                <label class="checkout-label" for="savedAddressSelect">Ship to</label>
+                <select class="shop-select" id="savedAddressSelect" aria-label="Saved address">
+                    <option value="">Type manually</option>
+                </select>
                 <input class="shop-input" id="orderRecipient" placeholder="Recipient name" required>
-                <input class="shop-input" id="orderPhone" placeholder="Phone" required>
+                <input class="shop-input" id="orderPhone" placeholder="VN mobile (09xxxxxxxx)" required maxlength="15">
                 <input class="shop-input" id="orderAddress" placeholder="Full address" required>
                 <select class="shop-select" id="paymentMethod">
                     <option value="COD">Cash on delivery</option>
@@ -65,6 +73,7 @@
 
 <script src="js/auth-session.js"></script>
 <script src="js/shop-header.js"></script>
+<script src="js/phone-utils.js"></script>
 <script src="js/checkout.js"></script>
 </body>
 </html>
