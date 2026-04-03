@@ -6,7 +6,6 @@ const headerCartCount = document.getElementById('headerCartCount');
 const subtotalEl = document.getElementById('cartSubtotal');
 const shippingEl = document.getElementById('cartShipping');
 const totalEl = document.getElementById('cartTotal');
-const shippingCost = 5000;
 
 function formatVnd(value) {
     const n = Number(value) || 0;
@@ -76,11 +75,19 @@ async function apiPut(path, data) {
     return resp.json();
 }
 
-function updateCartTotals(subtotal) {
-    const total = subtotal + shippingCost;
+function updateCartTotals(subtotal, shippingFee) {
+    const sub = Number(subtotal) || 0;
+    const ship = Number(shippingFee) || 0;
+    const total = sub + ship;
 
-    subtotalEl.textContent = formatVnd(subtotal);
-    shippingEl.textContent = formatVnd(shippingCost);
+    subtotalEl.textContent = formatVnd(sub);
+    if (ship <= 0 && sub > 0) {
+        shippingEl.textContent = "Miễn phí";
+    } else if (sub <= 0 && ship <= 0) {
+        shippingEl.textContent = "—";
+    } else {
+        shippingEl.textContent = formatVnd(ship) + "₫";
+    }
     totalEl.textContent = formatVnd(total);
 }
 
@@ -93,7 +100,7 @@ async function loadCart() {
         if (!Array.isArray(items) || items.length === 0) {
             cartContainer.innerHTML = 'Your cart is empty.';
             updateHeaderCart(0, 0);
-            updateCartTotals(0);
+            updateCartTotals(0, 0);
             return;
         }
 
@@ -175,8 +182,16 @@ async function loadCart() {
             });
         });
 
+        let shippingFee = 0;
+        try {
+            const quote = await apiGet(`/api/shipping/quote?subtotal=${encodeURIComponent(subtotal)}`);
+            shippingFee = Number(quote.shippingFee) || 0;
+        } catch (e2) {
+            console.warn("shipping quote", e2);
+        }
+
         updateHeaderCart(subtotal, quantityCount);
-        updateCartTotals(subtotal);
+        updateCartTotals(subtotal, shippingFee);
 
     } catch (e) {
         console.error(e);

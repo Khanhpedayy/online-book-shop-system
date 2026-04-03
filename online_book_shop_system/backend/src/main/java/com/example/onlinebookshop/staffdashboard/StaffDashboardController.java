@@ -34,4 +34,3 @@ public class StaffDashboardController {
         return service.getAlerts();
     }
 }
-

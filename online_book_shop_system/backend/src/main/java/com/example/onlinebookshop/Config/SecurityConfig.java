@@ -51,6 +51,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/books/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/categories").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/shipping/quote").permitAll()
 
                         .requestMatchers("/api/me/**").authenticated()
                         .requestMatchers("/api/me/reviews/**").authenticated()
@@ -60,16 +61,13 @@ public class SecurityConfig {
 
                         .requestMatchers("/staff/**").hasAnyRole("STAFF")
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/api/manager/**").hasAnyRole("MANAGER", "ADMIN")
-                        .requestMatchers("/api/inventory/**").hasAnyRole("MANAGER", "ADMIN")
+                        .requestMatchers("/api/management/**").hasAnyRole("MANAGER", "ADMIN")
                         .requestMatchers("/api/staff/**").hasAnyRole("STAFF", "ADMIN", "MANAGER")
 
                         .requestMatchers("/shipping.html").permitAll()
 
                         .anyRequest().authenticated())
-                // .authorizeHttpRequests(auth -> auth
-                // .anyRequest().permitAll()
-                // );
+
                 .formLogin(form -> form
                         .loginPage("/login")
                         .loginProcessingUrl("/perform-login")

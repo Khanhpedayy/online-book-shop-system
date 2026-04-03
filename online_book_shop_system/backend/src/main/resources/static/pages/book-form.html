@@ -266,12 +266,20 @@
                                     <div class="col-md-4">
                                         <label class="form-label">ISBN-13</label>
                                         <input type="text" class="form-control font-monospace" id="f_isbn13"
-                                               placeholder="978-xxx-xxx-xxx-x" maxlength="17">
+                                               placeholder="9781234567890" maxlength="13"
+                                               inputmode="numeric"
+                                               pattern="[0-9]{13}"
+                                               oninput="sanitizeIsbn(this, 13)">
+                                        <div class="invalid-feedback">ISBN-13 phải đúng 13 chữ số (0–9)</div>
                                     </div>
                                     <div class="col-md-4">
                                         <label class="form-label">ISBN-10</label>
                                         <input type="text" class="form-control font-monospace" id="f_isbn10"
-                                               placeholder="Tùy chọn" maxlength="13">
+                                               placeholder="1234567890" maxlength="10"
+                                               inputmode="numeric"
+                                               pattern="[0-9]{10}"
+                                               oninput="sanitizeIsbn(this, 10)">
+                                        <div class="invalid-feedback">ISBN-10 phải đúng 10 chữ số (0–9)</div>
                                     </div>
                                     <div class="col-md-4">
                                         <label class="form-label">Ngôn ngữ</label>
@@ -704,6 +712,44 @@
         `).join('');
     }
 
+    /* ========== ISBN HELPERS ========== */
+    /**
+     * Strip anything that is not a digit while the user types.
+     * Called via oninput on both ISBN fields.
+     */
+    function sanitizeIsbn(input, maxLen) {
+        const digits = input.value.replace(/\D/g, '').slice(0, maxLen);
+        input.value = digits;
+        // Live feedback: show invalid state only when the field has content but wrong length
+        if (digits.length === 0 || digits.length === maxLen) {
+            input.classList.remove('is-invalid');
+        } else {
+            input.classList.add('is-invalid');
+        }
+    }
+
+    /**
+     * Validate both ISBN fields before saving.
+     * Returns true if valid (or empty), false and shows toast if invalid.
+     */
+    function validateIsbns() {
+        const isbn13 = document.getElementById('f_isbn13').value.trim();
+        const isbn10 = document.getElementById('f_isbn10').value.trim();
+        if (isbn13 && !/^[0-9]{13}$/.test(isbn13)) {
+            document.getElementById('f_isbn13').classList.add('is-invalid');
+            document.getElementById('f_isbn13').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            showToast('ISBN-13 phải đúng 13 chữ số', 'warning');
+            return false;
+        }
+        if (isbn10 && !/^[0-9]{10}$/.test(isbn10)) {
+            document.getElementById('f_isbn10').classList.add('is-invalid');
+            document.getElementById('f_isbn10').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            showToast('ISBN-10 phải đúng 10 chữ số', 'warning');
+            return false;
+        }
+        return true;
+    }
+
     /* ========== SAVE ========== */
     async function saveBook() {
         const form = document.getElementById('bookForm');
@@ -715,6 +761,7 @@
             if (firstInvalid) firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
             return;
         }
+        if (!validateIsbns()) return;
 
         // Check if any images still uploading
         if (images.some(i => i.uploading)) {
@@ -769,7 +816,20 @@
                     : 'books.html';
             }, 800);
         } catch (e) {
-            showToast('Lỗi: ' + (e.message || 'Lưu sách thất bại'), 'danger');
+            const msg = e.message || '';
+            if (msg.includes('UX_books_isbn13') || msg.includes('isbn13')) {
+                const field = document.getElementById('f_isbn13');
+                field.classList.add('is-invalid');
+                field.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                showToast('ISBN-13 này đã tồn tại trong hệ thống. Vui lòng kiểm tra lại.', 'danger');
+            } else if (msg.includes('UX_books_isbn10') || msg.includes('isbn10')) {
+                const field = document.getElementById('f_isbn10');
+                field.classList.add('is-invalid');
+                field.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                showToast('ISBN-10 này đã tồn tại trong hệ thống. Vui lòng kiểm tra lại.', 'danger');
+            } else {
+                showToast('Lỗi: ' + (msg || 'Lưu sách thất bại'), 'danger');
+            }
             btn.disabled = false;
             btn.innerHTML = `<i class="bi bi-floppy"></i> <span>${editingId ? 'Cập nhật' : 'Tạo'} Sách</span>`;
         }

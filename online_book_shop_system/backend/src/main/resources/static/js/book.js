@@ -205,7 +205,7 @@ async function loadRelated(currentBookId) {
         const seen = new Set();
         const picks = [];
         for (const b of books) {
-            const bid = b.bookId != null ? b.bookId : b.id;
+            const bid = b.bookId;
             if (bid == null || bid === Number(currentBookId) || seen.has(bid)) {
                 continue;
             }
@@ -216,7 +216,7 @@ async function loadRelated(currentBookId) {
             }
         }
         picks.forEach(b => {
-            const bid = b.bookId != null ? b.bookId : b.id;
+            const bid = b.bookId;
             const card = document.createElement("div");
             card.className = "card shop-card";
             const cardImage = b.coverImageUrl || ("https://covers.openlibrary.org/b/isbn/" + (b.isbn || "0385533229") + "-M.jpg");

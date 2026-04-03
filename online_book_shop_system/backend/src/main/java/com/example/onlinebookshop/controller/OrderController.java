@@ -94,8 +94,9 @@ public class OrderController {
     }
 
     @PostMapping("/{id}/cancel")
-    public void cancel(@PathVariable Long id, Authentication auth) {
+    public Map<String, Object> cancel(@PathVariable Long id, Authentication auth) {
         orderService.cancelOrder(id, auth.getName());
+        return Map.of("ok", true);
     }
 
     @PostMapping("/{id}/repay")
@@ -105,9 +106,15 @@ public class OrderController {
         if (order.getPaymentMethod() == null || !"PAYOS".equalsIgnoreCase(order.getPaymentMethod())) {
             throw new IllegalStateException("Repay is only available for PayOS orders.");
         }
+        if ("CANCELLED".equalsIgnoreCase(order.getStatus())) {
+            throw new IllegalStateException("Cannot pay for a cancelled order.");
+        }
 
         String ps = order.getPaymentStatus();
-        if (ps != null && !"PENDING".equalsIgnoreCase(ps) && !"UNPAID".equalsIgnoreCase(ps)) {
+        if (ps != null
+                && !"PENDING".equalsIgnoreCase(ps)
+                && !"UNPAID".equalsIgnoreCase(ps)
+                && !"CANCELLED".equalsIgnoreCase(ps)) {
             throw new IllegalStateException("Order already paid or not eligible for repay.");
         }
 

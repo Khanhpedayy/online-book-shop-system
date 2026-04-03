@@ -235,8 +235,8 @@
             document.getElementById('kpiCards').innerHTML = `
         <div class="col-md-3"><div class="stats-card"><div class="stats-icon" style="background:#eef2ff;color:#4f46e5"><i class="bi bi-grid"></i></div><div class="stats-label">Tổng số biến thể</div><div class="stats-value">${total}</div></div></div>
         <div class="col-md-3"><div class="stats-card"><div class="stats-icon" style="background:#ecfdf5;color:#059669"><i class="bi bi-check-circle"></i></div><div class="stats-label">Đang HĐ</div><div class="stats-value">${active}</div></div></div>
-        <div class="col-md-3"><div class="stats-card"><div class="stats-icon" style="background:#faf5ff;color:#7c3aed"><i class="bi bi-boxes"></i></div><div class="stats-label">Tổng tồn kho</div><div class="stats-value">${ts}</div></div></div>
-        <div class="col-md-3"><div class="stats-card"><div class="stats-icon" style="background:#eff6ff;color:#3b82f6"><i class="bi bi-shop"></i></div><div class="stats-label">Có sẵn</div><div class="stats-value">${av}</div></div></div>`;
+        <div class="col-md-3"><div class="stats-card"><div class="stats-icon" style="background:#faf5ff;color:#7c3aed"><i class="bi bi-boxes"></i></div><div class="stats-label">Tổng SL nhập</div><div class="stats-value">${ts}</div></div></div>
+        <div class="col-md-3"><div class="stats-card"><div class="stats-icon" style="background:#eff6ff;color:#3b82f6"><i class="bi bi-shop"></i></div><div class="stats-label">Tổng tồn kho </div><div class="stats-value">${av}</div></div></div>`;
         }
 
         function render() {
@@ -352,7 +352,17 @@
                 else { await api.post('/management/variants', payload); showToast('Đã tạo biến thể', 'success'); }
                 bootstrap.Modal.getInstance(document.getElementById('formModal')).hide();
                 variants = await api.get('/management/variants'); renderKPI(); render();
-            } catch (e) { showToast('Lỗi: ' + (e.message || 'Thất bại'), 'danger'); }
+            } catch (e) {
+                const msg = e.message || '';
+                if (msg.includes('UX_bv_sku') || msg.includes('sku')) {
+                    const field = document.getElementById('f_sku');
+                    field.classList.add('is-invalid');
+                    field.focus();
+                    showToast('SKU "' + (document.getElementById('f_sku').value) + '" đã tồn tại. Vui lòng dùng SKU khác.', 'danger');
+                } else {
+                    showToast('Lỗi: ' + (msg || 'Thất bại'), 'danger');
+                }
+            }
         }
 
         function openPrice(id) {

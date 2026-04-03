@@ -128,6 +128,7 @@
         if (canRetry && actions) {
             var retryBtn = document.createElement("button");
             retryBtn.type = "button";
+            retryBtn.id = "payAgainBtn";
             retryBtn.className = "shop-btn";
             retryBtn.textContent = "Pay again";
             retryBtn.addEventListener("click", function () {
@@ -143,6 +144,27 @@
         }
 
         return out;
+    }
+
+    async function hideRepayIfOrderCancelled(out) {
+        if (!out || !out.orderId) return;
+        if (!getToken()) return;
+        var payBtn = document.getElementById("payAgainBtn");
+        if (!payBtn) return;
+        try {
+            var res = await fetch(API_BASE + "/api/orders/" + encodeURIComponent(out.orderId) + "/me", {
+                headers: { Authorization: "Bearer " + getToken() },
+                credentials: "include"
+            });
+            if (!res.ok) return;
+            var order = await res.json();
+            var st = order.status != null ? String(order.status).trim().toUpperCase() : "";
+            if (st === "CANCELLED") {
+                payBtn.remove();
+            }
+        } catch (e) {
+            console.warn("Could not check order status for repay:", e);
+        }
     }
 
     async function trySyncPayosPayment(out) {
@@ -194,6 +216,7 @@
             updateShopHeaderCart();
         }
         var out = render();
+        await hideRepayIfOrderCancelled(out);
         await trySyncPayosPayment(out);
     });
 })();
