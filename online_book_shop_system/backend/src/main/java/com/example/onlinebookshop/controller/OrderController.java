@@ -106,6 +106,9 @@ public class OrderController {
         if (order.getPaymentMethod() == null || !"PAYOS".equalsIgnoreCase(order.getPaymentMethod())) {
             throw new IllegalStateException("Repay is only available for PayOS orders.");
         }
+        if ("CANCELLED".equalsIgnoreCase(order.getStatus())) {
+            throw new IllegalStateException("Cannot pay for a cancelled order.");
+        }
 
         String ps = order.getPaymentStatus();
         if (ps != null

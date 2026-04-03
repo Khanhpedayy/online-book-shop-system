@@ -101,7 +101,9 @@ function renderOrderInfo(o){
         `<button type="button" class="shop-btn shop-btn--secondary" onclick="cancelOrder(${o.id})">Cancel order</button>` : ""
     }
 
-            ${(displayPaymentStatus(o) === "PENDING" || displayPaymentStatus(o) === "UNPAID" || displayPaymentStatus(o) === "CANCELLED") && displayPaymentMethod(o) === "PAYOS" ?
+            ${String(o.status || "").toUpperCase() !== "CANCELLED"
+        && (displayPaymentStatus(o) === "PENDING" || displayPaymentStatus(o) === "UNPAID" || displayPaymentStatus(o) === "CANCELLED")
+        && displayPaymentMethod(o) === "PAYOS" ?
         `<button type="button" class="shop-btn" onclick="repay(${o.id})">Pay again</button>` : ""
     }
         </div>

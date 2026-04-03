@@ -156,6 +156,9 @@ public class OrderServiceImpl implements OrderService {
         if (order.getPaymentMethod() == null || !"PAYOS".equalsIgnoreCase(order.getPaymentMethod())) {
             throw new IllegalArgumentException("Payment link is only available for PayOS orders.");
         }
+        if ("CANCELLED".equalsIgnoreCase(order.getStatus())) {
+            throw new IllegalStateException("Cannot create payment for a cancelled order.");
+        }
         String ps = order.getPaymentStatus();
         if (ps != null
                 && !"PENDING".equalsIgnoreCase(ps)

@@ -134,6 +134,8 @@ function paymentStatusLabel(o) {
 }
 
 function payAgainEligible(o) {
+    const st = o && o.status != null ? String(o.status).trim().toUpperCase() : "";
+    if (st === "CANCELLED") return false;
     const ps = paymentStatusLabel(o);
     const pm = paymentMethodLabel(o);
     return pm === "PAYOS" && (ps === "PENDING" || ps === "UNPAID" || ps === "CANCELLED");

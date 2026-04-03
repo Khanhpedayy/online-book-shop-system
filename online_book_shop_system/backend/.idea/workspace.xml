@@ -4,23 +4,29 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b0cef7af-9eae-4572-a7cc-fd78853d29dd" name="Changes" comment="fix backend logic and cleaning UI">
+    <list default="true" id="b0cef7af-9eae-4572-a7cc-fd78853d29dd" name="Changes" comment="final fix">
       <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_rebase_[Changes]/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_rebase_[Changes]1/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_rebase__Changes_.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_rebase__Changes_1.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/Config/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/Config/SecurityConfig.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/Entity/BookInfo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/Entity/BookInfo.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/Entity/Order.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/Entity/Order.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/Repository/OrderRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/Repository/OrderRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/Service/ShippingServiceImpl.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/Service/OrderServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/Service/OrderServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/controller/OrderController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/controller/OrderController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/admin.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/admin.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../database/seed_100_books.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../database/seed_copies.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../database/seed_orders_for_review_test.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../database/seed_revenue_data.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../database/seed_shipping_data.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/static/book.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/book.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/static/cart.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/cart.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/static/checkout.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/checkout.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/static/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/static/js/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/js/app.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/static/js/book.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/js/book.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/static/js/cart.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/js/cart.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/static/js/checkout.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/js/checkout.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/static/js/order-detail.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/js/order-detail.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/static/js/order-history.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/js/order-history.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/static/js/shop-header.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/js/shop-header.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/static/order-history.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/order-history.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/example/onlinebookshop/customer/OrderServiceTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/example/onlinebookshop/customer/OrderServiceTest.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -52,7 +58,7 @@
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;https://github.com/Khanhpedayy/online-book-shop-system.git&quot;,
-    &quot;accountId&quot;: &quot;7585d1b3-d615-4a0c-8689-e1376ed8f94e&quot;
+    &quot;accountId&quot;: &quot;50e38387-d2be-4a7b-81d2-4c2d07ab351a&quot;
   }
 }</component>
   <component name="McpProjectServerCommands">
@@ -115,8 +121,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-30f59d01ecdd-2fc7cc6b9a17-intellij.indexing.shared.core-IU-253.30387.90" />
-        <option value="bundled-js-predefined-d6986cc7102b-9b0f141eb926-JavaScript-IU-253.30387.90" />
+        <option value="bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.26830.84" />
+        <option value="bundled-js-predefined-d6986cc7102b-3aa1da707db6-JavaScript-IU-252.26830.84" />
       </set>
     </attachedChunks>
   </component>
@@ -150,6 +156,9 @@
       <workItem from="1774483636832" duration="10773000" />
       <workItem from="1774644367592" duration="3684000" />
       <workItem from="1774648697658" duration="1458000" />
+      <workItem from="1774677366709" duration="4945000" />
+      <workItem from="1775055711783" duration="563000" />
+      <workItem from="1775195153019" duration="2101000" />
     </task>
     <task id="LOCAL-00001" summary="fix merge">
       <option name="closed" value="true" />
