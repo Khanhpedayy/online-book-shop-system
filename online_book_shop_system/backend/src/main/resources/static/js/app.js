@@ -93,6 +93,8 @@ function renderBooks(list = currentBooks) {
         const price = b.salePrice ?? 0;
         const coverUrl = b.coverImageUrl || ('https://covers.openlibrary.org/b/isbn/' + (b.isbn || '0385533229') + '-M.jpg');
         const variantId = b.variantId || b.id;
+        // Detail API resolves book by id first; book id and variant id are different sequences — must use bookId for View.
+        const bookDetailId = b.bookId != null ? b.bookId : variantId;
 
         booksContainer.innerHTML += `
         <div class="book">
@@ -103,7 +105,7 @@ function renderBooks(list = currentBooks) {
                 <div class="book-actions">
                     <input type="number" value="1" min="1" id="qty-${variantId}">
                     <button class="btn" onclick="addToCart(${variantId})">Add to Cart</button>
-                    <button class="btn btn-secondary" onclick="openBook(${bookId})">View</button>
+                    <button class="btn btn-secondary" onclick="openBook(${bookDetailId})">View</button>
                 </div>
             </div>
         </div>`;
@@ -324,8 +326,9 @@ async function loadCart() {
 }
 
 /* ===== NAV ===== */
-function openBook(bookId) {
-    window.location = "book.html?id=" + bookId;
+function openBook(bookDetailId) {
+    if (bookDetailId == null) return;
+    window.location = "book.html?id=" + encodeURIComponent(String(bookDetailId));
 }
 
 /* ===== SORT ===== */
