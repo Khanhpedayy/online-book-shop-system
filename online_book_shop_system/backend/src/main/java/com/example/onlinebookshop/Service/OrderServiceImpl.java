@@ -5,6 +5,7 @@ import com.example.onlinebookshop.Repository.*;
 import com.example.onlinebookshop.paymentlog.PaymentLogRepository;
 import com.example.onlinebookshop.payos.PayOSClient;
 import com.example.onlinebookshop.shipping.ShippingFeeService;
+import com.example.onlinebookshop.stock.StockRepository;
 import com.example.onlinebookshop.util.VietnamPhoneUtils;
 import com.example.onlinebookshop.dto.CheckoutRequest;
 import com.example.onlinebookshop.dto.OrderItemRequest;
@@ -36,11 +37,13 @@ public class OrderServiceImpl implements OrderService {
     private final PayOSClient payOSClient;
     private final PaymentLogRepository paymentLogRepository;
     private final ShippingFeeService shippingFeeService;
+    private final StockRepository stockRepository;
 
     public OrderServiceImpl(OrderRepository orderRepository, BookVariantRepository variantRepository,
                             UserRepository userRepository, CartItemRepository cartItemRepository,
                             PayOSClient payOSClient, PaymentLogRepository paymentLogRepository,
-                            ShippingFeeService shippingFeeService) {
+                            ShippingFeeService shippingFeeService,
+                            StockRepository stockRepository) {
         this.orderRepository = orderRepository;
         this.variantRepository = variantRepository;
         this.userRepository = userRepository;
@@ -48,6 +51,7 @@ public class OrderServiceImpl implements OrderService {
         this.payOSClient = payOSClient;
         this.paymentLogRepository = paymentLogRepository;
         this.shippingFeeService = shippingFeeService;
+        this.stockRepository = stockRepository;
     }
 
     @Override
@@ -115,7 +119,8 @@ public class OrderServiceImpl implements OrderService {
 
         for (Map.Entry<Long, Integer> e : orderQtyByBookId.entrySet()) {
             BookInfo b = bookByIdForStock.get(e.getKey());
-            int available = b.getStockQuantity() != null ? b.getStockQuantity() : 0;
+            // Same source as cart: aggregate lots.qty_available (books.stock_quantity is often stale).
+            int available = stockRepository.getStockQuantity(e.getKey());
             int requested = e.getValue();
             if (requested > available) {
                 String title = b.getTitle() != null ? b.getTitle() : "sản phẩm này";

@@ -20,6 +20,8 @@ public class BookDetailDTO {
     private String publisherName;
     private Integer publicationYear;
     private String description;
+    /** Book-level stock (same for all variants in current model). */
+    private Integer stockQuantity;
 
     private List<BookVariantDTO> variants;
 

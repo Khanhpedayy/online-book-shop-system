@@ -42,6 +42,18 @@ public class SecurityConfig {
                 .authenticationProvider(authenticationProvider())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/", "/index.html").permitAll()
+                        // Storefront HTML (guests browse books/cart; APIs still enforce auth where needed)
+                        .requestMatchers(
+                                "/book.html",
+                                "/cart.html",
+                                "/checkout.html",
+                                "/profile.html",
+                                "/order-history.html",
+                                "/order-detail.html",
+                                "/reviews.html",
+                                "/support.html",
+                                "/notifications.html"
+                        ).permitAll()
                         .requestMatchers("/payment-result.html", "/payment.html").permitAll()
                         .requestMatchers("/error", "/error/**").permitAll()
                         .requestMatchers("/login", "/login.html", "/post-login", "/admin-entry").permitAll()

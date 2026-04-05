@@ -4,6 +4,7 @@ import com.example.onlinebookshop.Entity.BookInfo;
 import com.example.onlinebookshop.Entity.BookVariant;
 import com.example.onlinebookshop.Repository.BookInfoRepository;
 import com.example.onlinebookshop.Repository.BookVariantRepository;
+import com.example.onlinebookshop.stock.StockRepository;
 import com.example.onlinebookshop.dto.BookDetailDTO;
 import com.example.onlinebookshop.dto.BookVariantDTO;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -27,13 +28,16 @@ public class BookServiceImpl implements BookService {
     private final BookVariantRepository variantRepository;
     private final BookInfoRepository bookInfoRepository;
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+    private final StockRepository stockRepository;
 
     public BookServiceImpl(BookVariantRepository variantRepository,
                            BookInfoRepository bookInfoRepository,
-                           NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
+                           NamedParameterJdbcTemplate namedParameterJdbcTemplate,
+                           StockRepository stockRepository) {
         this.variantRepository = variantRepository;
         this.bookInfoRepository = bookInfoRepository;
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
+        this.stockRepository = stockRepository;
     }
 
     @Override
@@ -199,6 +203,7 @@ public class BookServiceImpl implements BookService {
                 .publisherName(publisherNameRef[0])
                 .publicationYear(publicationYearRef[0])
                 .description(book.getShortDescription())
+                .stockQuantity(stockRepository.getStockQuantity(book.getId()))
                 .variants(variants)
                 .build();
     }

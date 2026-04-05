@@ -1,10 +1,9 @@
 package com.example.onlinebookshop.payos;
 
-import com.example.onlinebookshop.Entity.BookInfo;
 import com.example.onlinebookshop.Entity.Order;
 import com.example.onlinebookshop.Entity.OrderItem;
-import com.example.onlinebookshop.Repository.BookInfoRepository;
 import com.example.onlinebookshop.Repository.OrderRepository;
+import com.example.onlinebookshop.stock.StockRepository;
 import com.example.onlinebookshop.paymentlog.PayOsAffectedOrderRow;
 import com.example.onlinebookshop.paymentlog.PaymentLogRepository;
 import org.springframework.stereotype.Service;
@@ -16,21 +15,22 @@ import java.util.Map;
 
 /**
  * Applies PayOS payment status to DB and, when an order first becomes PAID via PayOS,
- * decrements {@link BookInfo#getStockQuantity()} by line quantities (grouped per book).
+ * decrements {@code lots.qty_available} by line quantities (grouped per book), then
+ * refreshes {@code books.stock_quantity} from lots (same model as cart / checkout validation).
  */
 @Service
 public class PayOsPaymentSyncService {
 
     private final PaymentLogRepository paymentLogRepository;
     private final OrderRepository orderRepository;
-    private final BookInfoRepository bookInfoRepository;
+    private final StockRepository stockRepository;
 
     public PayOsPaymentSyncService(PaymentLogRepository paymentLogRepository,
                                    OrderRepository orderRepository,
-                                   BookInfoRepository bookInfoRepository) {
+                                   StockRepository stockRepository) {
         this.paymentLogRepository = paymentLogRepository;
         this.orderRepository = orderRepository;
-        this.bookInfoRepository = bookInfoRepository;
+        this.stockRepository = stockRepository;
     }
 
     @Transactional
@@ -89,12 +89,14 @@ public class PayOsPaymentSyncService {
         }
 
         for (Map.Entry<Long, Integer> e : qtyByBookId.entrySet()) {
-            int updated = bookInfoRepository.decrementStockBy(e.getKey(), e.getValue());
-            if (updated != 1) {
+            int need = e.getValue();
+            int deducted = stockRepository.decrementAvailableForBook(e.getKey(), need);
+            if (deducted != need) {
                 throw new IllegalStateException(
                         "Không trừ được tồn kho cho sách id=" + e.getKey()
-                                + " (cần " + e.getValue() + "). Có thể tồn kho không đủ hoặc đã bị trừ.");
+                                + " (cần " + need + ", trừ được " + deducted + "). Có thể tồn kho không đủ hoặc đã bị trừ.");
             }
+            stockRepository.refreshBookStockQuantityFromLots(e.getKey());
         }
     }
 }

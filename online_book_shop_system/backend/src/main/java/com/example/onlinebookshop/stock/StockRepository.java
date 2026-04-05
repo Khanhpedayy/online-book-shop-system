@@ -56,6 +56,79 @@ public class StockRepository {
         return val != null ? val : 0;
     }
 
+    /**
+     * Decrements {@code lots.qty_available} for the given book (FIFO by lot id).
+     *
+     * @return units actually deducted (equals {@code requestedQty} when enough stock existed)
+     */
+    public int decrementAvailableForBook(long bookId, int requestedQty) {
+        if (requestedQty <= 0) {
+            return 0;
+        }
+        int remaining = requestedQty;
+        while (remaining > 0) {
+            Long lotId = jdbc.query(
+                    """
+                            SELECT TOP (1) l.id
+                            FROM lots l
+                            INNER JOIN book_variants v ON v.id = l.variant_id
+                            WHERE v.book_id = ? AND l.deleted_at IS NULL AND l.qty_available > 0
+                            ORDER BY l.id
+                            """,
+                    ps -> ps.setLong(1, bookId),
+                    rs -> rs.next() ? rs.getLong(1) : null);
+            if (lotId == null) {
+                break;
+            }
+            Integer available = jdbc.queryForObject(
+                    "SELECT qty_available FROM lots WHERE id = ? AND deleted_at IS NULL",
+                    Integer.class,
+                    lotId);
+            int av = available != null ? available : 0;
+            if (av <= 0) {
+                continue;
+            }
+            int take = Math.min(remaining, av);
+            int updated = jdbc.update(
+                    """
+                            UPDATE lots
+                            SET qty_available = qty_available - ?,
+                                updated_at = SYSUTCDATETIME()
+                            WHERE id = ?
+                              AND deleted_at IS NULL
+                              AND qty_available >= ?
+                            """,
+                    take,
+                    lotId,
+                    take);
+            if (updated != 1) {
+                throw new IllegalStateException("Concurrent inventory update for lot id=" + lotId);
+            }
+            remaining -= take;
+        }
+        return requestedQty - remaining;
+    }
+
+    /** Sets {@code books.stock_quantity} to the current sum of {@code lots.qty_available} for the book. */
+    public void refreshBookStockQuantityFromLots(long bookId) {
+        jdbc.update(
+                """
+                        UPDATE b
+                        SET b.stock_quantity = s.total,
+                            b.updated_at = SYSUTCDATETIME()
+                        FROM books b
+                        CROSS APPLY (
+                            SELECT ISNULL(SUM(l.qty_available), 0) AS total
+                            FROM lots l
+                            INNER JOIN book_variants v ON v.id = l.variant_id
+                            WHERE v.book_id = b.id AND l.deleted_at IS NULL
+                        ) s
+                        WHERE b.id = ?
+                          AND b.deleted_at IS NULL
+                        """,
+                bookId);
+    }
+
     /* ═══ GET ADJUSTMENTS (lịch sử inventory_transactions) ═══ */
     public List<StockAdjustmentDTO> findAdjustments(Long bookId) {
         // Đọc từ inventory_transactions thay vì stock_adjustments, lọc theo book nếu có

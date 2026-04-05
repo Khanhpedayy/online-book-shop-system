@@ -71,17 +71,27 @@ async function loadBook() {
         }
     });
 
+    function stockLabel(b, v) {
+        const sq = b.stockQuantity != null ? b.stockQuantity : v && v.stockQuantity;
+        if (sq != null && sq <= 0) {
+            return "Out of stock";
+        }
+        if (sq != null && sq > 0) {
+            return "In stock (" + sq + ")";
+        }
+        return "In stock";
+    }
+
     if (selectedVariant) {
         document.getElementById("price").textContent = formatVnd(selectedVariant.salePrice || 0);
-        const sq = selectedVariant.stockQuantity;
-        document.getElementById("stockStatus").textContent =
-            sq != null && sq > 0 ? "In stock (" + sq + ")" : "In stock";
+        document.getElementById("stockStatus").textContent = stockLabel(book, selectedVariant);
     }
 
     variantSelect.onchange = () => {
         const v = variants.find(x => String(x.id) === variantSelect.value);
         if (v) {
             document.getElementById("price").textContent = formatVnd(v.salePrice || 0);
+            document.getElementById("stockStatus").textContent = stockLabel(book, v);
         }
     };
 
