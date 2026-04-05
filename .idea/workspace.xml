@@ -4,15 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="634e8fec-2e29-47dc-a295-d1d0284ed318" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/controller/ManagerStockOutController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/controller/ManagerOrderController.java" beforeDir="false" afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/controller/ManagerOrderController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/controller/StaffWorkspaceController.java" beforeDir="false" afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/controller/StaffWorkspaceController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/dto/OrderItemRow.java" beforeDir="false" afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/dto/OrderItemRow.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/resources/static/pages/manager-stockout-workspace.html" beforeDir="false" afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/resources/static/pages/manager-stockout-workspace.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/online_book_shop_system/database/databasebansach.sql" beforeDir="false" afterPath="$PROJECT_DIR$/online_book_shop_system/database/databasebansach.sql" afterDir="false" />
-    </list>
+    <list default="true" id="634e8fec-2e29-47dc-a295-d1d0284ed318" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
