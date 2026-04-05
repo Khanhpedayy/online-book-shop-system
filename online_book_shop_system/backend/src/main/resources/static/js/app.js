@@ -103,7 +103,7 @@ function renderBooks(list = currentBooks) {
                 <div class="book-actions">
                     <input type="number" value="1" min="1" id="qty-${variantId}">
                     <button class="btn" onclick="addToCart(${variantId})">Add to Cart</button>
-                    <button class="btn btn-secondary" onclick="openBook(${bookId})">View</button>
+                    <button class="btn btn-secondary" onclick="openBook(${variantId})">View</button>
                 </div>
             </div>
         </div>`;

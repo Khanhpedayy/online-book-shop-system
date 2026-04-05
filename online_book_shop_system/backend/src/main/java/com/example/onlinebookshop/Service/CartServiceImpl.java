@@ -9,6 +9,7 @@ import com.example.onlinebookshop.Repository.CartItemRepository;
 import com.example.onlinebookshop.Repository.UserRepository;
 import com.example.onlinebookshop.dto.AddToCartRequest;
 import com.example.onlinebookshop.dto.UpdateCartItemRequest;
+import com.example.onlinebookshop.stock.StockRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,13 +23,16 @@ public class CartServiceImpl implements CartService {
     private final CartItemRepository cartItemRepository;
     private final BookVariantRepository variantRepository;
     private final UserRepository userRepository;
+    private final StockRepository stockRepository;
 
     public CartServiceImpl(CartItemRepository cartItemRepository,
                            BookVariantRepository variantRepository,
-                           UserRepository userRepository) {
+                           UserRepository userRepository,
+                           StockRepository stockRepository) {
         this.cartItemRepository = cartItemRepository;
         this.variantRepository = variantRepository;
         this.userRepository = userRepository;
+        this.stockRepository = stockRepository;
     }
 
     private Long resolveUserIdByEmail(String email) {
@@ -38,13 +42,14 @@ public class CartServiceImpl implements CartService {
     }
 
     /**
-     * {@code books.stock_quantity} is per title; all variants of the same book share it.
+     * Checks stock using the real lot-based quantity from the {@code lots} table,
+     * NOT the stale {@code books.stock_quantity} column which is never updated by the lot flow.
      */
     private void assertCartBookQtyWithinStock(Long userId, BookInfo book, int newTotalQtyForThisBookInCart) {
         if (book == null || book.getId() == null) {
             return;
         }
-        int available = book.getStockQuantity() != null ? book.getStockQuantity() : 0;
+        int available = stockRepository.getStockQuantity(book.getId());
         if (newTotalQtyForThisBookInCart > available) {
             String title = book.getTitle() != null ? book.getTitle() : "sản phẩm này";
             throw new IllegalArgumentException(String.format(
