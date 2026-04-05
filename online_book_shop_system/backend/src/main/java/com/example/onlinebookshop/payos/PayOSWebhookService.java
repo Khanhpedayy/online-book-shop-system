@@ -1,6 +1,5 @@
 package com.example.onlinebookshop.payos;
 
-import com.example.onlinebookshop.paymentlog.PaymentLogRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -8,10 +7,10 @@ import java.util.Map;
 @Service
 public class PayOSWebhookService {
 
-    private final PaymentLogRepository paymentLogRepository;
+    private final PayOsPaymentSyncService payOsPaymentSyncService;
 
-    public PayOSWebhookService(PaymentLogRepository paymentLogRepository) {
-        this.paymentLogRepository = paymentLogRepository;
+    public PayOSWebhookService(PayOsPaymentSyncService payOsPaymentSyncService) {
+        this.payOsPaymentSyncService = payOsPaymentSyncService;
     }
 
     public void applyPaymentResult(Map<String, Object> data, String paymentSignatureStatus) {
@@ -32,8 +31,8 @@ public class PayOSWebhookService {
             status = "UNPAID";
         }
 
-        // PAID => orders.payment_status = PAID and payment_logs.status = PAID
-        paymentLogRepository.syncPaymentStatusByPaymentLinkId(paymentLinkId, status);
+        // PAID => orders.payment_status = PAID and payment_logs.status = PAID; then reduce book stock once
+        payOsPaymentSyncService.syncPaymentStatusByPaymentLinkId(paymentLinkId, status);
     }
 }
 

@@ -74,35 +74,7 @@
         </div>
     </div>
 
-    <!-- Change Condition Modal -->
-    <div class="modal fade" id="condModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title fw-bold" id="condTitle"><i class="bi bi-arrow-repeat me-1"></i> Đổi tình
-                        trạng</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="p-3 bg-light rounded mb-3"><span class="text-muted">Hiện tại: </span><span
-                            class="badge bg-info" id="condCurrent"></span></div>
-                    <form id="condForm">
-                        <div class="mb-3"><label class="form-label">Tình trạng mới <span
-                                    class="text-danger">*</span></label>
-                            <select class="form-select" id="cf_conditionGrade" required>
-                                <option value="NEW"> Mới (New)</option>
-                                <option value="LIKE_NEW"> Như mới (Like New)</option>
-                                <option value="GOOD"> Tốt (Good)</option>
-                                <option value="FAIR"> Khá (Fair)</option>
-                            </select>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer"><button type="button" class="btn btn-secondary"
-                        data-bs-dismiss="modal">Hủy</button><button type="button" class="btn btn-primary"
-                        onclick="saveCond()">Cập nhật</button></div>
-            </div>
-        </div>
-    </div>
+
 
     <!-- Move Location Modal -->
     <div class="modal fade" id="moveModal" tabindex="-1">
@@ -232,7 +204,6 @@
         <td><span class="badge bg-${stColor[r.status] || 'secondary'}">${stLabel[r.status] || r.status}</span></td>
         <td>
             <button class="btn btn-sm btn-light" title="Xem vòng đời" onclick="showLifecycle(${r.id})"><i class="bi bi-clock-history"></i></button>
-            <button class="btn btn-sm btn-light" title="Đổi tình trạng" onclick="openCond(${r.id})"><i class="bi bi-pencil"></i></button>
             <button class="btn btn-sm btn-light" title="Đổi vị trí" onclick="openMove(${r.id})"><i class="bi bi-geo-alt"></i></button>
             <button class="btn btn-sm btn-light" title="Đánh dấu trạng thái" onclick="openStatus(${r.id})"><i class="bi bi-exclamation-triangle"></i></button>
         </td>
@@ -261,24 +232,6 @@
         }
 
         function findCopy(id) { return copies.find(c => c.id === id); }
-
-        function openCond(id) {
-            activeCopy = findCopy(id); if (!activeCopy) return;
-            document.getElementById('condTitle').innerHTML = `<i class="bi bi-arrow-repeat me-1"></i> Đổi tình trạng — <span class="text-primary font-monospace small">${activeCopy.copyCode}</span>`;
-            document.getElementById('condCurrent').textContent = condLabel[activeCopy.conditionGrade] || activeCopy.conditionGrade;
-            document.getElementById('cf_conditionGrade').value = activeCopy.conditionGrade;
-            new bootstrap.Modal(document.getElementById('condModal')).show();
-        }
-
-        async function saveCond() {
-            if (!activeCopy) return;
-            try {
-                await api.put(`/inventory/copies/${activeCopy.id}/condition`, { conditionGrade: document.getElementById('cf_conditionGrade').value });
-                showToast('Đã cập nhật tình trạng', 'success');
-                bootstrap.Modal.getInstance(document.getElementById('condModal')).hide();
-                copies = await api.get('/inventory/copies'); renderKPI(); render();
-            } catch (e) { showToast('Thất bại', 'danger'); }
-        }
 
         function openMove(id) {
             activeCopy = findCopy(id); if (!activeCopy) return;

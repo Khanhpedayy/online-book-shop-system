@@ -5,6 +5,7 @@ import com.example.onlinebookshop.Entity.UserAddress;
 import com.example.onlinebookshop.Repository.UserAddressRepository;
 import com.example.onlinebookshop.Repository.UserRepository;
 import com.example.onlinebookshop.dto.*;
+import com.example.onlinebookshop.util.VietnamPhoneUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -56,14 +57,22 @@ public class CustomerAccountServiceImpl implements CustomerAccountService {
         }
         if (request.getPhone() != null) {
             String ph = request.getPhone().trim();
-            if (!ph.isEmpty() && (user.getPhone() == null || !user.getPhone().equals(ph))) {
-                userRepository.findByPhoneAndDeletedAtIsNull(ph)
-                        .filter(other -> !other.getId().equals(user.getId()))
-                        .ifPresent(x -> {
-                            throw new IllegalArgumentException("Số điện thoại đã được dùng");
-                        });
+            if (ph.isEmpty()) {
+                user.setPhone(null);
+            } else {
+                String norm = VietnamPhoneUtils.normalizeVnPhone(ph);
+                if (!VietnamPhoneUtils.isValidVnPhone(norm)) {
+                    throw new IllegalArgumentException("Số điện thoại không hợp lệ (VD: 09xxxxxxxx).");
+                }
+                if (user.getPhone() == null || !user.getPhone().equals(norm)) {
+                    userRepository.findByPhoneAndDeletedAtIsNull(norm)
+                            .filter(other -> !other.getId().equals(user.getId()))
+                            .ifPresent(x -> {
+                                throw new IllegalArgumentException("Số điện thoại đã được dùng");
+                            });
+                }
+                user.setPhone(norm);
             }
-            user.setPhone(ph.isEmpty() ? null : ph);
         }
         if (request.getAvatarUrl() != null) {
             user.setAvatarUrl(request.getAvatarUrl().isBlank() ? null : request.getAvatarUrl().trim());
@@ -177,6 +186,12 @@ public class CustomerAccountServiceImpl implements CustomerAccountService {
         if (request.getLine1() == null || request.getLine1().isBlank()) {
             throw new IllegalArgumentException("line1 (địa chỉ) là bắt buộc");
         }
+        if (request.getPhone() != null && !request.getPhone().isBlank()) {
+            String n = VietnamPhoneUtils.normalizeVnPhone(request.getPhone().trim());
+            if (!VietnamPhoneUtils.isValidVnPhone(n)) {
+                throw new IllegalArgumentException("Số điện thoại không hợp lệ (VD: 09xxxxxxxx).");
+            }
+        }
     }
 
     private static void fillAddress(UserAddress a, AddressRequest request) {
@@ -185,7 +200,11 @@ public class CustomerAccountServiceImpl implements CustomerAccountService {
         }
         a.setRecipientName(request.getRecipientName().trim());
         if (request.getPhone() != null) {
-            a.setPhone(request.getPhone().isBlank() ? null : request.getPhone().trim());
+            if (request.getPhone().isBlank()) {
+                a.setPhone(null);
+            } else {
+                a.setPhone(VietnamPhoneUtils.normalizeVnPhone(request.getPhone().trim()));
+            }
         }
         a.setLine1(request.getLine1().trim());
         if (request.getLine2() != null) {

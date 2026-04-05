@@ -13,15 +13,28 @@ const orderForm = document.getElementById("orderForm");
 const orderResult = document.getElementById("orderResult");
 const summaryDiv = document.getElementById("checkoutSummary");
 
-const emailInput = document.getElementById("orderEmail");
 const addressInput = document.getElementById("orderAddress");
 const recipientInput = document.getElementById("orderRecipient");
 const phoneInput = document.getElementById("orderPhone");
+const savedAddressSelect = document.getElementById("savedAddressSelect");
 const paymentMethodSelect = document.getElementById("paymentMethod");
+
+let savedAddressesList = [];
+let checkoutProfileFallback = null;
 // ===== API =====
 function getToken() {
     return localStorage.getItem("token");
 }
+async function readApiErrorMessage(res) {
+    const text = await res.text();
+    if (!text || !text.trim()) return res.statusText || "Request failed";
+    try {
+        const j = JSON.parse(text);
+        if (j && j.message) return String(j.message);
+    } catch (_) { /* plain text */ }
+    return text;
+}
+
 async function apiGet(path) {
     const headers = {};
     const t = getToken();
@@ -30,7 +43,7 @@ async function apiGet(path) {
         headers,
         credentials: 'include'
     });
-    if (!res.ok) throw new Error(await res.text());
+    if (!res.ok) throw new Error(await readApiErrorMessage(res));
     return res.json();
 }
 
@@ -44,7 +57,7 @@ async function apiPost(path, body){
         credentials: 'include',
         body:JSON.stringify(body)
     });
-    if(!res.ok) throw new Error(await res.text());
+    if(!res.ok) throw new Error(await readApiErrorMessage(res));
     return res.json();
 }
 
@@ -67,6 +80,106 @@ function updateTotals() {
         }
     }
     summaryDiv.querySelector("#totalVal").textContent = formatVnd(total);
+}
+
+function formatShippingAddressFromProfile(a) {
+    if (!a) return "";
+    const parts = [a.line1, a.line2].filter(x => x != null && String(x).trim() !== "");
+    const street = parts.join(", ");
+    const city = a.city != null && String(a.city).trim() !== "" ? String(a.city).trim() : "";
+    if (street && city) return street + ", " + city;
+    return street || city;
+}
+
+function sortAddressesForDisplay(list) {
+    if (!list || list.length === 0) return [];
+    return [...list].sort((a, b) => {
+        const ad = a.defaultAddress === true;
+        const bd = b.defaultAddress === true;
+        if (ad && !bd) return -1;
+        if (!ad && bd) return 1;
+        return (Number(a.id) || 0) - (Number(b.id) || 0);
+    });
+}
+
+function addressOptionLabel(a) {
+    if (!a) return "";
+    const label = a.label != null && String(a.label).trim() !== "" ? String(a.label).trim() : null;
+    const name = a.recipientName != null && String(a.recipientName).trim() !== "" ? String(a.recipientName).trim() : "";
+    const head = label ? `${label} · ${name || "Address"}` : (name || `Address #${a.id}`);
+    return a.defaultAddress === true ? `${head} (default)` : head;
+}
+
+function populateSavedAddressSelect(addresses) {
+    savedAddressesList = addresses || [];
+    if (!savedAddressSelect) return;
+    savedAddressSelect.replaceChildren();
+    const optManual = document.createElement("option");
+    optManual.value = "";
+    optManual.textContent = "Type manually";
+    savedAddressSelect.appendChild(optManual);
+    savedAddressesList.forEach(a => {
+        const opt = document.createElement("option");
+        opt.value = String(a.id);
+        opt.textContent = addressOptionLabel(a);
+        savedAddressSelect.appendChild(opt);
+    });
+}
+
+function applySavedAddressById(idStr) {
+    if (!recipientInput || !phoneInput || !addressInput) return;
+    const id = Number(idStr);
+    const a = savedAddressesList.find(x => x.id === id);
+    if (!a) return;
+    recipientInput.value = a.recipientName || "";
+    phoneInput.value = a.phone || "";
+    addressInput.value = formatShippingAddressFromProfile(a);
+}
+
+function pickInitialSavedAddressId(list) {
+    if (!list || list.length === 0) return "";
+    const def = list.find(a => a.defaultAddress === true);
+    if (def) return String(def.id);
+    return String(list[0].id);
+}
+
+function applyProfileNamePhoneOnly() {
+    if (!recipientInput || !phoneInput || !checkoutProfileFallback) return;
+    recipientInput.value = checkoutProfileFallback.fullName || "";
+    phoneInput.value = checkoutProfileFallback.phone || "";
+}
+
+function onSavedAddressChange() {
+    if (!savedAddressSelect || !recipientInput || !phoneInput || !addressInput) return;
+    const v = savedAddressSelect.value;
+    if (!v) {
+        recipientInput.value = "";
+        phoneInput.value = "";
+        addressInput.value = "";
+        applyProfileNamePhoneOnly();
+        return;
+    }
+    applySavedAddressById(v);
+}
+
+async function initCheckoutShipping() {
+    const [profile, addresses] = await Promise.all([
+        apiGet("/api/me/profile"),
+        apiGet("/api/me/addresses")
+    ]);
+    checkoutProfileFallback = profile;
+    const sorted = sortAddressesForDisplay(addresses || []);
+    populateSavedAddressSelect(sorted);
+    if (!savedAddressSelect) {
+        if (profile) {
+            if (profile.fullName) recipientInput.value = profile.fullName;
+            if (profile.phone) phoneInput.value = profile.phone;
+        }
+        return;
+    }
+    const initial = pickInitialSavedAddressId(sorted);
+    savedAddressSelect.value = initial;
+    onSavedAddressChange();
 }
 
 // ===== LOAD SUMMARY =====
@@ -131,12 +244,19 @@ if (orderForm) {
         orderResult.className = "";
         orderResult.textContent = "Placing order...";
 
+        const phoneRaw = phoneInput.value;
+        if (!isValidVnPhone(phoneRaw)) {
+            orderResult.textContent =
+                "Số điện thoại không hợp lệ (VD: 09xxxxxxxx hoặc +84…).";
+            orderResult.className = "error";
+            return;
+        }
+
         try {
             const body = {
-                email: emailInput.value,
                 shippingAddress: addressInput.value,
                 recipientName: recipientInput.value,
-                phone: phoneInput.value,
+                phone: normalizeVnPhone(phoneRaw),
                 paymentMethod: paymentMethodSelect.value,
             };
 
@@ -169,6 +289,19 @@ document.addEventListener("DOMContentLoaded", async () => {
     await syncAuthFromServerSession(API_BASE);
     if (typeof updateShopHeaderAuth === "function") {
         updateShopHeaderAuth();
+    }
+    if (!getToken()) {
+        alert("Please login first!");
+        window.location.href = "login.html";
+        return;
+    }
+    if (savedAddressSelect) {
+        savedAddressSelect.addEventListener("change", onSavedAddressChange);
+    }
+    try {
+        await initCheckoutShipping();
+    } catch (e) {
+        console.warn("checkout shipping init", e);
     }
     loadCheckoutSummary();
 });

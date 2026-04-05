@@ -4,6 +4,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.List;
 
 @Repository
@@ -28,6 +29,29 @@ public class PaymentLogRepository {
                 paymentLinkId.trim()
         );
         return count != null && count > 0;
+    }
+
+    /**
+     * Orders tied to this PayOS payment link, before {@link #syncPaymentStatusByPaymentLinkId} runs.
+     */
+    public List<PayOsAffectedOrderRow> findOrdersLinkedToPayosPaymentLink(String paymentLinkId) {
+        if (paymentLinkId == null || paymentLinkId.isBlank()) {
+            return Collections.emptyList();
+        }
+        return jdbc.query(
+                """
+                        SELECT DISTINCT o.id, o.payment_method, o.payment_status
+                        FROM dbo.orders o
+                        INNER JOIN dbo.payment_logs pl ON pl.order_id = o.id
+                        WHERE pl.provider = 'PAYOS'
+                          AND pl.transaction_id = ?
+                          AND o.deleted_at IS NULL
+                        """,
+                (rs, i) -> new PayOsAffectedOrderRow(
+                        rs.getLong("id"),
+                        rs.getString("payment_method"),
+                        rs.getString("payment_status")),
+                paymentLinkId.trim());
     }
 
     public void insertPayOsLink(long orderId, String paymentLinkId, BigDecimal amount, int payosOrderCode) {

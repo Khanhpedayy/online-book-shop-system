@@ -98,16 +98,19 @@ async function loadProfile() {
     document.getElementById('pfEmail').value = data.email || '';
     document.getElementById('pfFullName').value = data.fullName || '';
     document.getElementById('pfPhone').value = data.phone || '';
-    document.getElementById('pfAvatar').value = data.avatarUrl || '';
 }
 
 async function saveProfile() {
     const msg = document.getElementById('pfMsg');
+    const phoneRaw = document.getElementById('pfPhone').value.trim();
+    if (phoneRaw !== '' && !isValidVnPhone(phoneRaw)) {
+        showMsg(msg, 'Số điện thoại không hợp lệ (VD: 09xxxxxxxx hoặc +84…).', false);
+        return;
+    }
     try {
         await apiPut('/api/me/profile', {
             fullName: document.getElementById('pfFullName').value,
-            phone: document.getElementById('pfPhone').value,
-            avatarUrl: document.getElementById('pfAvatar').value
+            phone: phoneRaw === '' ? '' : normalizeVnPhone(phoneRaw)
         });
         showMsg(msg, 'Đã lưu hồ sơ.', true);
     } catch (e) {
@@ -258,10 +261,15 @@ async function submitAddress() {
         showMsg(msg, 'Address line 1 is required.', false);
         return;
     }
+    const phoneRaw = document.getElementById('addrPhone').value.trim();
+    if (phoneRaw !== '' && !isValidVnPhone(phoneRaw)) {
+        showMsg(msg, 'Số điện thoại không hợp lệ (VD: 09xxxxxxxx).', false);
+        return;
+    }
     const body = {
         label: document.getElementById('addrLabel').value.trim(),
         recipientName,
-        phone: document.getElementById('addrPhone').value.trim(),
+        phone: phoneRaw === '' ? '' : normalizeVnPhone(phoneRaw),
         line1,
         line2: document.getElementById('addrLine2').value.trim(),
         city: document.getElementById('addrCity').value.trim(),

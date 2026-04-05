@@ -1,80 +1,247 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <body>
-<th:block th:fragment="head(title)">
+
+<head th:fragment="head(pageTitle)">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title th:text="${title}">Staff Workspace</title>
+    <title th:text="${pageTitle}">Staff Workspace</title>
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         :root {
-            --bg:#f6f8fb; --surface:#ffffff; --sidebar:#111827; --sidebar-muted:#9ca3af;
-            --sidebar-active:#1f2937; --text:#0f172a; --line:#e5e7eb; --chip:#eef2ff; --chip-text:#3730a3;
+            --bg: #f4f6f8;
+            --surface: #ffffff;
+            --border: #dfe3e8;
+            --sidebar: #0b1730;
+            --sidebar-2: #102042;
+            --text: #0b1730;
+            --muted: #64748b;
+            --primary: #2563eb;
         }
-        body{background:var(--bg);color:var(--text)}
-        .workspace{min-height:100vh;display:flex}
-        .workspace-sidebar{width:264px;min-height:100vh;background:var(--sidebar);padding:24px 16px;position:sticky;top:0}
-        .workspace-sidebar a{display:block;padding:12px 14px;border-radius:14px;color:var(--sidebar-muted);text-decoration:none;font-weight:600;margin-bottom:8px}
-        .workspace-sidebar a.active,.workspace-sidebar a:hover{background:var(--sidebar-active);color:#fff}
-        .workspace-main{flex:1;padding:24px}
-        .surface{background:var(--surface);border:1px solid var(--line);border-radius:20px;box-shadow:0 10px 30px rgba(15,23,42,.05)}
-        .stat-card{padding:20px}.stat-card .value{font-size:30px;font-weight:800}
-        .mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
-        .chip{display:inline-flex;align-items:center;padding:5px 10px;border-radius:999px;background:var(--chip);color:var(--chip-text);font-size:12px;font-weight:700}
-        .accordion-button{background:#fff;border-radius:20px!important;box-shadow:none}
-        .accordion-button:not(.collapsed){color:inherit;background:#fff;box-shadow:none}
-        .accordion-item{border:none;background:transparent}
-        .bulk-bar{position:sticky;bottom:16px;z-index:10}
-        .page-title{font-size:30px;font-weight:800;margin:0}
-        .subtle{color:#64748b}
-    </style>
-</th:block>
 
-<th:block th:fragment="sidebar(stage)">
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        .workspace {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .workspace-sidebar {
+            width: 235px;
+            background: linear-gradient(180deg, var(--sidebar), #081225);
+            color: #fff;
+            padding: 20px 16px;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+        }
+
+        .workspace-brand {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+
+        .workspace-subbrand {
+            font-size: 13px;
+            color: #b8c4d9;
+            margin-bottom: 14px;
+        }
+
+        .workspace-divider {
+            height: 1px;
+            background: rgba(255,255,255,.18);
+            margin: 10px 0 18px;
+        }
+
+        .workspace-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .workspace-nav a {
+            color: #dbe6ff;
+            text-decoration: none;
+            padding: 12px 14px;
+            border-radius: 14px;
+            display: block;
+            transition: .2s ease;
+        }
+
+        .workspace-nav a:hover,
+        .workspace-nav a.active {
+            background: rgba(255,255,255,.08);
+            color: #fff;
+        }
+
+        .workspace-main {
+            flex: 1;
+            padding: 22px 18px;
+        }
+
+        .surface {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, .04);
+        }
+
+        .page-title {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 800;
+        }
+
+        .subtle {
+            color: var(--muted);
+        }
+
+        .stat-card {
+            padding: 18px;
+            min-height: 94px;
+        }
+
+        .stat-card .value {
+            margin-top: 6px;
+            font-size: 18px;
+            font-weight: 800;
+        }
+
+        .mono {
+            font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        }
+
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 74px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+            background: #eef2ff;
+            color: #3730a3;
+        }
+
+        .workspace-toolbar {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+
+        .workspace-toolbar form {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            width: 100%;
+        }
+
+        .workspace-toolbar .form-control {
+            min-width: 260px;
+            max-width: 420px;
+        }
+    </style>
+</head>
+
+<th:block th:fragment="sidebar(active)">
     <aside class="workspace-sidebar">
-        <div class="mb-4 pb-2 border-bottom border-secondary-subtle">
-            <div class="text-white fw-bold fs-4">Staff Workspace</div>
-            <div class="small" style="color:var(--sidebar-muted)">State-based processing</div>
-        </div>
-        <nav>
-            <a th:href="@{/staff/workspace/dashboard}" th:classappend="${stage == 'dashboard'} ? 'active'">Dashboard</a>
-            <a th:href="@{/staff/workspace/confirmed}" th:classappend="${stage == 'confirmed'} ? 'active'">Confirmed Order</a>
-            <a th:href="@{/staff/workspace/allocate}" th:classappend="${stage == 'allocate'} ? 'active'">Allocate / Pick</a>
-            <a th:href="@{/staff/workspace/packing}" th:classappend="${stage == 'packing'} ? 'active'">Packing</a>
-            <a th:href="@{/staff/workspace/shipping}" th:classappend="${stage == 'shipping'} ? 'active'">Shipping</a>
-            <a th:href="@{/staff/workspace/delivery-return}" th:classappend="${stage == 'delivery-return'} ? 'active'">Delivery / Return</a>
+        <div class="workspace-brand">Staff Workspace</div>
+        <div class="workspace-subbrand">State-based processing</div>
+        <div class="workspace-divider"></div>
+
+        <nav class="workspace-nav">
+            <a th:href="@{/staff/workspace/dashboard}"
+               th:classappend="${active == 'dashboard'} ? ' active' : ''">
+                Dashboard
+            </a>
+
+            <a th:href="@{/staff/workspace/allocate}"
+               th:classappend="${active == 'allocate'} ? ' active' : ''">
+                Allocate / Pick
+            </a>
+
+            <a th:href="@{/staff/workspace/packing}"
+               th:classappend="${active == 'packing'} ? ' active' : ''">
+                Packing
+            </a>
+
+            <a th:href="@{/staff/workspace/shipping}"
+               th:classappend="${active == 'shipping'} ? ' active' : ''">
+                Shipping
+            </a>
+
+            <a th:href="@{/staff/workspace/delivery-return}"
+               th:classappend="${active == 'delivery-return'} ? ' active' : ''">
+                Delivery / Return
+            </a>
         </nav>
     </aside>
 </th:block>
 
 <th:block th:fragment="flash">
-    <div th:if="${successMsg}" class="alert alert-success" th:text="${successMsg}"></div>
-    <div th:if="${errorMsg}" class="alert alert-danger" th:text="${errorMsg}"></div>
+    <div th:if="${successMessage != null}" class="alert alert-success mb-3" th:text="${successMessage}">
+        Success
+    </div>
+    <div th:if="${errorMessage != null}" class="alert alert-danger mb-3" th:text="${errorMessage}">
+        Error
+    </div>
 </th:block>
 
-<th:block th:fragment="filterBar(title, subtitle)">
+<th:block th:fragment="allocateToolbar">
     <section class="surface p-4 mb-4">
-        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+        <div class="workspace-toolbar">
             <div>
-                <h1 class="page-title" th:text="${title}">Workspace</h1>
-                <div class="subtle" th:text="${subtitle}">Subtitle</div>
+                <h1 class="page-title mb-1">Allocate / Pick</h1>
+                <div class="subtle">Tìm đơn cần cấp phát và xử lý pick sách.</div>
             </div>
-            <form method="get" class="d-flex flex-wrap gap-2">
-                <input class="form-control" style="width:240px" name="q" placeholder="mã đơn / tên / sđt" th:value="${filter.q}">
-                <select class="form-select" style="width:180px" name="paymentStatus">
-                    <option value="">Tất cả thanh toán</option>
-                    <option value="PENDING" th:selected="${filter.paymentStatus == 'PENDING'}">PENDING</option>
-                    <option value="PAID" th:selected="${filter.paymentStatus == 'PAID'}">PAID</option>
-                    <option value="FAILED" th:selected="${filter.paymentStatus == 'FAILED'}">FAILED</option>
-                    <option value="REFUNDED" th:selected="${filter.paymentStatus == 'REFUNDED'}">REFUNDED</option>
-                </select>
-                <select class="form-select" style="width:180px" name="sort">
-                    <option value="placedAtDesc" th:selected="${filter.sort == null or filter.sort == '' or filter.sort == 'placedAtDesc'}">Mới nhất</option>
-                    <option value="placedAtAsc" th:selected="${filter.sort == 'placedAtAsc'}">Cũ nhất</option>
-                    <option value="totalDesc" th:selected="${filter.sort == 'totalDesc'}">Tổng tiền giảm dần</option>
-                    <option value="totalAsc" th:selected="${filter.sort == 'totalAsc'}">Tổng tiền tăng dần</option>
-                </select>
-                <button class="btn btn-primary">Lọc</button>
+
+            <form th:action="@{/staff/workspace/allocate}" method="get">
+                <input type="text"
+                       name="q"
+                       class="form-control"
+                       placeholder="Tìm theo mã đơn / khách hàng"
+                       th:value="${filter != null ? filter.q : ''}">
+                <button type="submit" class="btn btn-primary">Tìm</button>
+                <a th:href="@{/staff/workspace/allocate}" class="btn btn-outline-secondary">Xóa lọc</a>
+            </form>
+        </div>
+
+        <div th:if="${dbError != null}" class="alert alert-warning mb-0 mt-3">
+            Không tải được dữ liệu:
+            <span th:text="${dbError}">Database error</span>
+        </div>
+    </section>
+</th:block>
+
+<th:block th:fragment="filterBar(title, desc)">
+    <section class="surface p-4 mb-4">
+        <div class="workspace-toolbar">
+            <div>
+                <h1 class="page-title mb-1" th:text="${title}">Title</h1>
+                <div class="subtle" th:text="${desc}">Description</div>
+            </div>
+
+            <form th:action="@{/staff/workspace/allocate}" method="get">
+                <input type="text"
+                       name="q"
+                       class="form-control"
+                       placeholder="Tìm theo mã đơn / khách hàng"
+                       th:value="${filter != null ? filter.q : ''}">
+                <button type="submit" class="btn btn-primary">Tìm</button>
+                <a th:href="@{/staff/workspace/allocate}" class="btn btn-outline-secondary">Xóa lọc</a>
             </form>
         </div>
     </section>

@@ -158,15 +158,13 @@
                         <div class="mb-3"><label class="form-label">Tiền tố mã bản sao</label><input type="text"
                                 class="form-control" id="g_prefix" placeholder="VD: LOT001-"></div>
                         <div class="row g-3">
-                            <div class="col-md-6"><label class="form-label">Vị trí mặc định</label><input type="text"
-                                    class="form-control" id="g_defaultLocation" placeholder="VD: Kệ A1-01"></div>
-                            <div class="col-md-6"><label class="form-label">Mức độ tình trạng</label><select
-                                    class="form-select" id="g_conditionGrade">
-                                    <option value="NEW"> Mới (New)</option>
-                                    <option value="LIKE_NEW"> Như mới (Like New)</option>
-                                    <option value="GOOD"> Tốt (Good)</option>
-                                    <option value="FAIR"> Khá (Fair)</option>
-                                </select></div>
+                            <div class="col-md-12">
+                                <label class="form-label">Vị trí đặt(*) <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="g_defaultLocation"
+                                    placeholder="VD: Kệ A1-01" required
+                                    oninput="this.classList.remove('is-invalid')">
+                                <div class="invalid-feedback" id="g_locationFeedback">Vị trí không được để trống</div>
+                            </div>
                         </div>
                     </form>
                 </div>
@@ -212,8 +210,8 @@
             const locked = lots.filter(l => l.status === 'LOCKED').length;
             document.getElementById('kpiCards').innerHTML = `
         <div class="col-md-3"><div class="stats-card"><div class="stats-icon" style="background:#eff6ff;color:#3b82f6"><i class="bi bi-inbox"></i></div><div class="stats-label">Tổng số lô</div><div class="stats-value">${lots.length}</div></div></div>
-        <div class="col-md-3"><div class="stats-card"><div class="stats-icon" style="background:#ecfdf5;color:#059669"><i class="bi bi-check-circle"></i></div><div class="stats-label">SL Có sẵn</div><div class="stats-value" style="color:#059669">${avail}</div></div></div>
-        <div class="col-md-3"><div class="stats-card"><div class="stats-icon" style="background:#fef3c7;color:#f59e0b"><i class="bi bi-credit-card"></i></div><div class="stats-label">Giá trị tồn kho</div><div class="stats-value">${val.toLocaleString()}₫</div></div></div>
+        <div class="col-md-3"><div class="stats-card"><div class="stats-icon" style="background:#ecfdf5;color:#059669"><i class="bi bi-check-circle"></i></div><div class="stats-label">SL nhập hàng</div><div class="stats-value" style="color:#059669">${avail}</div></div></div>
+        <div class="col-md-3"><div class="stats-card"><div class="stats-icon" style="background:#fef3c7;color:#f59e0b"><i class="bi bi-credit-card"></i></div><div class="stats-label">Giá trị nhập hàng</div><div class="stats-value">${val.toLocaleString()}₫</div></div></div>
         <div class="col-md-3"><div class="stats-card"><div class="stats-icon" style="background:#fef2f2;color:#ef4444"><i class="bi bi-lock"></i></div><div class="stats-label">Lô hàng bị khóa</div><div class="stats-value" style="color:#ef4444">${locked}</div></div></div>`;
         }
 
@@ -307,10 +305,35 @@
 
         async function generateCopies() {
             if (!genLotId) return;
+            const locInput = document.getElementById('g_defaultLocation');
+            const loc = locInput.value.trim();
+
+            // 1. Bắt buộc nhập vị trí
+            if (!loc) {
+                locInput.classList.add('is-invalid');
+                document.getElementById('g_locationFeedback').textContent = 'Vị trí đặt không được để trống';
+                return;
+            }
+
+            // 2. Kiểm tra trùng vị trí với các bản sao đã có
+            try {
+                const existing = await api.get('/inventory/copies');
+                const duplicate = existing.find(c => c.location && c.location.trim().toLowerCase() === loc.toLowerCase());
+                if (duplicate) {
+                    locInput.classList.add('is-invalid');
+                    document.getElementById('g_locationFeedback').textContent =
+                        `Vị trí "​${loc}​" đã được sử dụng bởi bản sao ${duplicate.copyCode}. Vui lòng chọn vị trí khác.`;
+                    return;
+                }
+            } catch (e) {
+                showToast('Không thể kiểm tra vị trí: ' + (e.message || ''), 'warning');
+                return;
+            }
+
+            // 3. Tạo bản sao
             const data = {
                 prefix: document.getElementById('g_prefix').value.trim() || null,
-                defaultLocation: document.getElementById('g_defaultLocation').value.trim() || null,
-                conditionGrade: document.getElementById('g_conditionGrade').value,
+                defaultLocation: loc,
             };
             try {
                 await api.post(`/inventory/lots/${genLotId}/generate-copies`, data);

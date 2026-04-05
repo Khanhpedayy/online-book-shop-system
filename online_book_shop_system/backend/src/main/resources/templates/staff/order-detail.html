@@ -3,7 +3,7 @@
 <head th:replace="~{staff/workspace-fragments :: head('Staff Workspace - Order Detail')}"></head>
 <body>
 <div class="workspace">
-  <th:block th:replace="~{staff/workspace-fragments :: sidebar('dashboard')}"></th:block>
+  <th:block th:replace="~{staff/workspace-fragments :: sidebar('allocate')}"></th:block>
 
   <main class="workspace-main">
     <th:block th:replace="~{staff/workspace-fragments :: flash}"></th:block>
@@ -12,7 +12,7 @@
       <div class="d-flex flex-wrap justify-content-between align-items-start gap-3">
         <div>
           <div class="subtle mb-2">
-            <a th:href="@{/staff/workspace/dashboard}" class="text-decoration-none">Staff Workspace</a>
+            <a th:href="@{/staff/workspace/allocate}" class="text-decoration-none">Allocate / Pick</a>
             <span> / </span>
             <span>Order Detail</span>
           </div>
@@ -38,10 +38,27 @@
 
     <div class="row g-4">
       <div class="col-lg-8">
+
         <section class="surface p-4 mb-4">
-          <div class="d-flex justify-content-between align-items-center mb-3">
-            <h2 class="fs-4 mb-0">Danh sách sách trong đơn</h2>
-            <span class="chip" th:text="${#lists.size(order.items)} + ' items'">0 items</span>
+          <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+            <div>
+              <h2 class="fs-4 mb-1">Danh sách sách trong đơn</h2>
+              <div class="subtle">Hiển thị theo copy code cho staff thao tác ngoài kho. Nếu quantity &gt; 1 thì tách dòng để mỗi cuốn có 1 slot bind/pick riêng.</div>
+            </div>
+
+            <form method="post" th:action="@{/staff/orders/{id}/allocate-auto(id=${order.id})}">
+              <button type="submit" class="btn btn-primary">
+                Auto allocate
+              </button>
+            </form>
+          </div>
+
+          <div class="alert alert-info">
+            Nhánh xử lý:
+            <br>- Đã có <b>copy_id</b> → hiện <b>copy code</b>, staff chỉ cần <b>Xác nhận lấy</b>
+            <br>- Chưa có <b>copy_id</b> nhưng có <b>copy AVAILABLE</b> → staff chọn cuốn có sẵn
+            <br>- Không có <b>copy AVAILABLE</b> nhưng <b>lot còn hàng</b> → staff nhập <b>copy code</b>, chọn lot, hệ thống tạo mới copy rồi bind + pick
+            <br>- Nếu <b>quantity &gt; 1</b> → bấm <b>Tách dòng</b> để hiện đúng bấy nhiêu slot cho từng cuốn
           </div>
 
           <div class="table-responsive">
@@ -50,23 +67,158 @@
               <tr>
                 <th>Tên sách</th>
                 <th>SKU</th>
-                <th>Tình trạng</th>
                 <th>SL</th>
                 <th>Đơn giá</th>
-                <th>copyId</th>
+                <th>Copy code</th>
+                <th style="min-width: 460px;">Reserve / Pick</th>
               </tr>
               </thead>
               <tbody>
               <tr th:each="item : ${order.items}">
                 <td>
                   <div class="fw-semibold" th:text="${item.titleSnapshot}">Book title</div>
+                  <div class="small text-muted" th:text="${item.conditionSnapshot != null ? item.conditionSnapshot : '-'}">GOOD</div>
                 </td>
                 <td class="mono" th:text="${item.skuSnapshot}">SKU001</td>
-                <td th:text="${item.conditionSnapshot != null ? item.conditionSnapshot : '-'}">GOOD</td>
                 <td th:text="${item.quantity}">1</td>
                 <td th:text="${#numbers.formatDecimal(item.unitPrice, 0, 'COMMA', 0, 'POINT')} + ' VND'">100,000 VND</td>
-                <td class="mono" th:text="${item.copyId != null ? item.copyId : '-'}">12</td>
+
+                <td>
+                  <div th:if="${boundCopiesByItemId[item.id] != null}">
+                    <div class="mono fw-semibold" th:text="${boundCopiesByItemId[item.id].copyCode}">COPY-001</div>
+                    <div class="small text-muted"
+                         th:text="${(boundCopiesByItemId[item.id].lotCode != null ? boundCopiesByItemId[item.id].lotCode : '-') + ' | ' + (boundCopiesByItemId[item.id].location != null ? boundCopiesByItemId[item.id].location : '-')}">
+                      LOT-001 | A1-01
+                    </div>
+                  </div>
+                  <div th:if="${boundCopiesByItemId[item.id] == null}" class="text-muted">-</div>
+                </td>
+
+                <td>
+                  <!-- CHẶN TOÀN BỘ PICK KHI ĐÃ CÓ STOCK OUT -->
+                  <div th:if="${activeStockOut == null}">
+                  <div th:if="${item.quantity > 1}">
+                    <div class="small text-danger mb-2">
+                      Dòng này có quantity &gt; 1 nên chưa thể bind từng copy code riêng. Hãy tách dòng trước.
+                    </div>
+                    <form method="post"
+                          th:action="@{/staff/orders/{id}/split-item(id=${order.id})}">
+                      <input type="hidden" name="orderItemId" th:value="${item.id}">
+                      <button type="submit" class="btn btn-warning btn-sm">
+                        Tách dòng
+                      </button>
+                    </form>
+                  </div>
+
+                  <div th:if="${item.quantity == 1}">
+                    <!-- CASE 1: ĐÃ CÓ copy_id -->
+                    <div th:if="${item.copyId != null}">
+                      <div class="small text-success mb-2">
+                        Đã bind copy code:
+                        <span class="mono fw-semibold"
+                              th:text="${boundCopiesByItemId[item.id] != null ? boundCopiesByItemId[item.id].copyCode : '[không tải được copy code]'}">
+                          COPY-001
+                        </span>.
+                        Staff chỉ cần xác nhận đã lấy đúng cuốn này.
+                      </div>
+
+                      <form method="post"
+                            th:action="@{/staff/orders/{id}/pick-confirm(id=${order.id})}"
+                            class="d-inline-block me-2">
+                        <input type="hidden" name="orderItemId" th:value="${item.id}">
+                        <button type="submit" class="btn btn-success btn-sm">
+                          Xác nhận lấy
+                        </button>
+                      </form>
+
+                      <form method="post"
+                            th:action="@{/staff/orders/{id}/unpick(id=${order.id})}"
+                            class="d-inline-block">
+                        <input type="hidden" name="orderItemId" th:value="${item.id}">
+                        <button type="submit" class="btn btn-outline-secondary btn-sm">
+                          Bỏ pick
+                        </button>
+                      </form>
+                    </div>
+
+                    <!-- CASE 2: CHƯA CÓ copy_id + có copy AVAILABLE -->
+                    <div th:if="${item.copyId == null and availableCopiesByItemId[item.id] != null and !#lists.isEmpty(availableCopiesByItemId[item.id])}">
+                      <div class="small text-primary mb-2">
+                        Có copy khả dụng trong hệ thống. Staff chọn đúng cuốn theo copy code.
+                      </div>
+
+                      <form method="post"
+                            th:action="@{/staff/orders/{id}/pick-choose(id=${order.id})}"
+                            class="d-flex gap-2 mb-2">
+                        <input type="hidden" name="orderItemId" th:value="${item.id}">
+                        <select name="copyId" class="form-select form-select-sm">
+                          <option th:each="cp : ${availableCopiesByItemId[item.id]}"
+                                  th:value="${cp.id}"
+                                  th:text="${cp.copyCode + ' | ' + cp.lotCode + ' | ' + cp.location + ' | ' + cp.conditionGrade}">
+                            COPY001
+                          </option>
+                        </select>
+                        <button type="submit" class="btn btn-success btn-sm">
+                          Chọn và lấy
+                        </button>
+                      </form>
+                    </div>
+
+                    <!-- CASE 3: CHƯA CÓ copy_id + không có copy AVAILABLE nhưng lot còn hàng -->
+                    <div th:if="${item.copyId == null
+                                 and (availableCopiesByItemId[item.id] == null or #lists.isEmpty(availableCopiesByItemId[item.id]))
+                                 and availableLotsByItemId[item.id] != null
+                                 and !#lists.isEmpty(availableLotsByItemId[item.id])}">
+                      <div class="small text-warning mb-2">
+                        Không có copy AVAILABLE. Lot vẫn còn hàng, staff nhập copy code thực tế để tạo copy mới rồi pick.
+                      </div>
+
+                      <form method="post"
+                            th:action="@{/staff/orders/{id}/pick-create-from-lot(id=${order.id})}">
+                        <input type="hidden" name="orderItemId" th:value="${item.id}">
+
+                        <div class="mb-2">
+                          <select name="lotId" class="form-select form-select-sm">
+                            <option th:each="lot : ${availableLotsByItemId[item.id]}"
+                                    th:value="${lot.id}"
+                                    th:text="${lot.lotCode + ' | qty_available=' + lot.qtyAvailable + ' | ' + lot.conditionDefault + ' | ' + lot.warehouse}">
+                              LOT001
+                            </option>
+                          </select>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                          <input type="text"
+                                 name="copyCode"
+                                 class="form-control form-control-sm mono"
+                                 placeholder="Nhập / scan copy_code thực tế"
+                                 autocomplete="off">
+                          <button type="submit" class="btn btn-success btn-sm">
+                            Tạo copy + Pick
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+
+                    <!-- CASE 4: KHÔNG CÓ GÌ CẢ -->
+                    <div th:if="${item.copyId == null
+                                 and (availableCopiesByItemId[item.id] == null or #lists.isEmpty(availableCopiesByItemId[item.id]))
+                                 and (availableLotsByItemId[item.id] == null or #lists.isEmpty(availableLotsByItemId[item.id]))}">
+                      <div class="small text-danger">
+                        Không có copy AVAILABLE và lot cũng không còn qty_available để materialize copy.
+                      </div>
+                    </div>
+                  </div> <!-- end activeStockOut == null -->
+
+                  <!-- HIỂN THỊ KHI ĐÃ CÓ STOCK OUT -->
+                  <div th:if="${activeStockOut != null}">
+                    <div class="small text-muted">
+                      Đã có phiếu xuất kho → không thể sửa Reserve / Pick
+                    </div>
+                  </div>
+                </td>
               </tr>
+
               <tr th:if="${order.items == null or #lists.isEmpty(order.items)}">
                 <td colspan="6" class="text-center text-muted py-4">Không có item trong đơn.</td>
               </tr>
@@ -125,6 +277,53 @@
 
       <div class="col-lg-4">
         <section class="surface p-4 mb-4">
+          <h2 class="fs-4 mb-3">Phiếu xuất kho</h2>
+
+          <div th:if="${activeStockOut == null}">
+            <div class="alert alert-warning mb-3">
+              Chưa có phiếu xuất kho cho đơn này.
+            </div>
+            <form method="post" th:action="@{/staff/orders/{id}/create-stock-out(id=${order.id})}">
+              <button type="submit" class="btn btn-primary w-100">
+                Tạo phiếu xuất kho
+              </button>
+            </form>
+            <div class="small text-muted mt-2">
+              Điều kiện: tất cả dòng phải bind được <span class="mono">copy_id</span> trước khi tạo phiếu.
+            </div>
+          </div>
+
+          <div th:if="${activeStockOut != null}">
+            <div class="mb-2">
+              <div class="subtle">Mã phiếu</div>
+              <div class="fw-semibold mono" th:text="${activeStockOut.stockOutCode}">SO-001</div>
+            </div>
+
+            <div class="mb-2">
+              <div class="subtle">Trạng thái</div>
+              <div>
+                <span class="chip me-2" th:text="${activeStockOut.status}">CREATED</span>
+                <span class="badge text-bg-danger" th:if="${activeStockOut.hasException}">Có lệch tồn</span>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <div class="subtle">Printed at</div>
+              <div th:text="${activeStockOut.printedAt != null ? #temporals.format(activeStockOut.printedAt, 'dd/MM/yyyy HH:mm') : '-'}">-</div>
+            </div>
+
+            <div class="alert alert-danger py-2" th:if="${activeStockOut.hasException}">
+              Phiếu đang bị treo. Không được pack / ship cho tới khi manager xử lý.
+            </div>
+
+            <a class="btn btn-outline-primary w-100"
+               th:href="@{/staff/stock-outs/{id}/pick(id=${activeStockOut.id})}">
+              Vào màn pick theo phiếu
+            </a>
+          </div>
+        </section>
+
+        <section class="surface p-4 mb-4">
           <h2 class="fs-4 mb-3">Tổng tiền</h2>
 
           <div class="d-flex justify-content-between mb-2">
@@ -161,41 +360,6 @@
           <div class="mb-0">
             <div class="subtle">Tracking code</div>
             <div class="fw-semibold mono" th:text="${order.trackingCode != null and !#strings.isEmpty(order.trackingCode) ? order.trackingCode : '-'}">TRACK001</div>
-          </div>
-        </section>
-
-        <section class="surface p-4">
-          <h2 class="fs-4 mb-3">Timeline</h2>
-
-          <div class="d-flex flex-column gap-3">
-            <div>
-              <div class="subtle">Placed</div>
-              <div th:text="${order.placedAt != null ? #temporals.format(order.placedAt, 'dd/MM/yyyy HH:mm') : '-'}">-</div>
-            </div>
-            <div>
-              <div class="subtle">Confirmed</div>
-              <div th:text="${order.confirmedAt != null ? #temporals.format(order.confirmedAt, 'dd/MM/yyyy HH:mm') : '-'}">-</div>
-            </div>
-            <div>
-              <div class="subtle">Packed</div>
-              <div th:text="${order.packedAt != null ? #temporals.format(order.packedAt, 'dd/MM/yyyy HH:mm') : '-'}">-</div>
-            </div>
-            <div>
-              <div class="subtle">Shipped</div>
-              <div th:text="${order.shippedAt != null ? #temporals.format(order.shippedAt, 'dd/MM/yyyy HH:mm') : '-'}">-</div>
-            </div>
-            <div>
-              <div class="subtle">Delivered</div>
-              <div th:text="${order.deliveredAt != null ? #temporals.format(order.deliveredAt, 'dd/MM/yyyy HH:mm') : '-'}">-</div>
-            </div>
-            <div>
-              <div class="subtle">Completed</div>
-              <div th:text="${order.completedAt != null ? #temporals.format(order.completedAt, 'dd/MM/yyyy HH:mm') : '-'}">-</div>
-            </div>
-            <div>
-              <div class="subtle">Cancelled</div>
-              <div th:text="${order.cancelledAt != null ? #temporals.format(order.cancelledAt, 'dd/MM/yyyy HH:mm') : '-'}">-</div>
-            </div>
           </div>
         </section>
       </div>

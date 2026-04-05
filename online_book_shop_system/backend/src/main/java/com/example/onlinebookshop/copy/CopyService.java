@@ -29,25 +29,6 @@ public class CopyService {
         return lc;
     }
 
-    @Transactional
-    public CopyDTO changeCondition(Long id, ChangeConditionRequest req) {
-        if (req.getConditionGrade() == null || req.getConditionGrade().isBlank())
-            throw new IllegalArgumentException("Condition grade is required");
-        String validGrades = "NEW,LIKE_NEW,GOOD,FAIR,POOR";
-        if (!validGrades.contains(req.getConditionGrade()))
-            throw new IllegalArgumentException(
-                    "Invalid condition grade: " + req.getConditionGrade() + ". Must be one of: " + validGrades);
-
-        CopyDTO c = repo.findById(id);
-        if (c == null)
-            throw new RuntimeException("Copy not found: " + id);
-        String oldCondition = c.getConditionGrade();
-        repo.updateCondition(id, req.getConditionGrade(), req.getConditionNote());
-        repo.logTransaction("ADJUST", c.getVariantId(), c.getLotId(), id, 1,
-                null, null, "ADJUSTMENT", null, "COUNT_DIFF",
-                "Condition changed from " + oldCondition + " to " + req.getConditionGrade());
-        return repo.findById(id);
-    }
 
     @Transactional
     public CopyDTO moveLocation(Long id, MoveLocationRequest req) {

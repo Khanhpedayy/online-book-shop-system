@@ -1,5 +1,6 @@
 package com.example.onlinebookshop.Service;
 
+import com.example.onlinebookshop.Entity.BookInfo;
 import com.example.onlinebookshop.Entity.BookVariant;
 import com.example.onlinebookshop.Entity.CartItem;
 import com.example.onlinebookshop.Entity.User;
@@ -36,6 +37,36 @@ public class CartServiceImpl implements CartService {
                 .orElseThrow(() -> new RuntimeException("User not found: " + email));
     }
 
+    /**
+     * {@code books.stock_quantity} is per title; all variants of the same book share it.
+     */
+    private void assertCartBookQtyWithinStock(Long userId, BookInfo book, int newTotalQtyForThisBookInCart) {
+        if (book == null || book.getId() == null) {
+            return;
+        }
+        int available = book.getStockQuantity() != null ? book.getStockQuantity() : 0;
+        if (newTotalQtyForThisBookInCart > available) {
+            String title = book.getTitle() != null ? book.getTitle() : "sản phẩm này";
+            throw new IllegalArgumentException(String.format(
+                    "Không đủ tồn kho cho \"%s\": hiện còn %d, giỏ hàng của bạn cần %d.",
+                    title, available, newTotalQtyForThisBookInCart));
+        }
+    }
+
+    private int sumCartQtyForBook(Long userId, Long bookId) {
+        List<CartItem> cart = cartItemRepository.findByUser_IdWithVariantAndBook(userId);
+        int sum = 0;
+        for (CartItem ci : cart) {
+            if (ci.getVariant() == null || ci.getVariant().getBook() == null) {
+                continue;
+            }
+            if (bookId.equals(ci.getVariant().getBook().getId())) {
+                sum += ci.getQuantity();
+            }
+        }
+        return sum;
+    }
+
     @Override
     @Transactional(readOnly = true)
     public List<CartItem> getCart(Long userId) {
@@ -62,20 +93,30 @@ public class CartServiceImpl implements CartService {
         int qty = request.getQuantity() != null && request.getQuantity() > 0 ? request.getQuantity() : 1;
         Long copyId = request.getCopyId();
 
+        BookInfo book = variant.getBook();
+        if (book == null || book.getId() == null) {
+            throw new IllegalArgumentException("Book is not available: " + variant.getSku());
+        }
+
         Optional<CartItem> existing = cartItemRepository.findByUser_IdAndVariant_IdAndCopyId(userId, request.getVariantId(), copyId);
         if (existing.isPresent()) {
             CartItem item = existing.get();
-            item.setQuantity(item.getQuantity() + qty);
+            int prev = item.getQuantity();
+            int newLine = prev + qty;
+            int sumBook = sumCartQtyForBook(userId, book.getId());
+            assertCartBookQtyWithinStock(userId, book, sumBook - prev + newLine);
+            item.setQuantity(newLine);
             item.setUpdatedAt(LocalDateTime.now());
             return cartItemRepository.save(item);
-        } else {
-            CartItem item = new CartItem();
-            item.setUser(user);
-            item.setVariant(variant);
-            item.setCopyId(copyId);
-            item.setQuantity(qty);
-            return cartItemRepository.save(item);
         }
+        int sumBook = sumCartQtyForBook(userId, book.getId());
+        assertCartBookQtyWithinStock(userId, book, sumBook + qty);
+        CartItem item = new CartItem();
+        item.setUser(user);
+        item.setVariant(variant);
+        item.setCopyId(copyId);
+        item.setQuantity(qty);
+        return cartItemRepository.save(item);
     }
 
     @Override
@@ -94,6 +135,12 @@ public class CartServiceImpl implements CartService {
         if (qty <= 0) {
             cartItemRepository.delete(item);
             return null;
+        }
+        BookInfo book = item.getVariant() != null ? item.getVariant().getBook() : null;
+        if (book != null && book.getId() != null) {
+            int prev = item.getQuantity();
+            int sumBook = sumCartQtyForBook(userId, book.getId());
+            assertCartBookQtyWithinStock(userId, book, sumBook - prev + qty);
         }
         item.setQuantity(qty);
         item.setUpdatedAt(LocalDateTime.now());

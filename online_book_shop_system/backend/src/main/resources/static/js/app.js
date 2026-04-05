@@ -29,6 +29,16 @@ async function logout() {
 }
 
 /* ===== API ===== */
+async function readApiErrorMessage(res) {
+    const text = await res.text();
+    if (!text || !text.trim()) return res.statusText || "Request failed";
+    try {
+        const j = JSON.parse(text);
+        if (j && j.message) return String(j.message);
+    } catch (_) {}
+    return text;
+}
+
 async function apiGet(path) {
     const headers = {};
 
@@ -38,7 +48,7 @@ async function apiGet(path) {
 
     const resp = await fetch(API_BASE + path, { headers, credentials: 'include' });
 
-    if (!resp.ok) throw new Error(await resp.text());
+    if (!resp.ok) throw new Error(await readApiErrorMessage(resp));
     return resp.json();
 }
 
@@ -53,7 +63,7 @@ async function apiPost(path, body) {
         credentials: 'include',
         body: JSON.stringify(body)
     });
-    if (!resp.ok) throw new Error(await resp.text());
+    if (!resp.ok) throw new Error(await readApiErrorMessage(resp));
     return resp.json();
 }
 
