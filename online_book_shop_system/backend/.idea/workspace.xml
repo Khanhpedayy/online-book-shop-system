@@ -5,28 +5,27 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b0cef7af-9eae-4572-a7cc-fd78853d29dd" name="Changes" comment="final fix">
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/Config/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/Config/SecurityConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/Entity/BookInfo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/Entity/BookInfo.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/Entity/Order.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/Entity/Order.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/Repository/OrderRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/Repository/OrderRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/Config/DataInitializer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/Config/DataInitializer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/Repository/BookInfoRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/Repository/BookInfoRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/Service/CartServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/Service/CartServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/Service/CustomerAccountServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/Service/CustomerAccountServiceImpl.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/Service/OrderServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/Service/OrderServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/controller/OrderController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/controller/OrderController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/controller/ShippingQuoteController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/controller/ShippingQuoteController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/dto/CartItemDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/dto/CartItemDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/paymentlog/PaymentLogRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/paymentlog/PaymentLogRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/payos/PayOSReturnSyncController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/payos/PayOSReturnSyncController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/payos/PayOSWebhookService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/payos/PayOSWebhookService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/shipping/ShippingFeeService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/shipping/ShippingFeeService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/shipping/ShippingSettingsRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/shipping/ShippingSettingsRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/V6__orders_shipping_discount.sql" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/V6__orders_shipping_discount.sql" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/book.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/book.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/cart.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/cart.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/static/checkout.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/checkout.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/index.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/static/js/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/js/app.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/js/book.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/js/book.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/static/js/cart.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/js/cart.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/static/js/checkout.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/js/checkout.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/js/order-detail.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/js/order-detail.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/js/order-history.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/js/order-history.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/js/shop-header.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/js/shop-header.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/order-history.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/order-history.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/example/onlinebookshop/customer/OrderServiceTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/example/onlinebookshop/customer/OrderServiceTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/static/js/profile.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/js/profile.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/static/profile.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/profile.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -44,7 +43,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$/../.." value="book_management" />
+        <entry key="$PROJECT_DIR$/../.." value="main" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../.." />
@@ -73,34 +72,34 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
-    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
-    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
-    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
-    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
-    &quot;Spring Boot.OnlineBookShopApplication.executor&quot;: &quot;Run&quot;,
-    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;D:/SWP391_GRP6/online-book-shop-system/online_book_shop_system/online-book-shop-system/online_book_shop_system/backend/pom.xml&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "DefaultHtmlFileTemplate": "HTML File",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RequestMappingsPanelOrder0": "0",
+    "RequestMappingsPanelOrder1": "1",
+    "RequestMappingsPanelWidth0": "75",
+    "RequestMappingsPanelWidth1": "75",
+    "RunOnceActivity.MCP Project settings loaded": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "Spring Boot.OnlineBookShopApplication.executor": "Run",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "git-widget-placeholder": "Customer__Flow",
+    "junie.onboarding.icon.badge.shown": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "D:/SWP391_GRP6/online-book-shop-system/online_book_shop_system/online-book-shop-system/online_book_shop_system/backend/pom.xml",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "to.speed.mode.migration.done": "true",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="D:\SWP391_GRP6\online-book-shop-system\online_book_shop_system\online-book-shop-system\online_book_shop_system\backend\src\main\resources\static\js" />
@@ -158,7 +157,11 @@
       <workItem from="1774648697658" duration="1458000" />
       <workItem from="1774677366709" duration="4945000" />
       <workItem from="1775055711783" duration="563000" />
-      <workItem from="1775195153019" duration="2101000" />
+      <workItem from="1775195153019" duration="2911000" />
+      <workItem from="1775224262309" duration="3966000" />
+      <workItem from="1775289084707" duration="744000" />
+      <workItem from="1775290030103" duration="143000" />
+      <workItem from="1775379416189" duration="2473000" />
     </task>
     <task id="LOCAL-00001" summary="fix merge">
       <option name="closed" value="true" />
@@ -248,7 +251,31 @@
       <option name="project" value="LOCAL" />
       <updated>1774182431634</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="final fix">
+      <option name="closed" value="true" />
+      <created>1775199501299</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1775199501300</updated>
+    </task>
+    <task id="LOCAL-00013" summary="final fix">
+      <option name="closed" value="true" />
+      <created>1775199852670</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1775199852670</updated>
+    </task>
+    <task id="LOCAL-00014" summary="final fix">
+      <option name="closed" value="true" />
+      <created>1775228426507</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1775228426507</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -265,7 +292,7 @@
                   <entry key="branch">
                     <value>
                       <list>
-                        <option value="origin/book_management" />
+                        <option value="origin/Customer_Flow" />
                       </list>
                     </value>
                   </entry>
@@ -282,6 +309,7 @@
     <MESSAGE value="fix merging" />
     <MESSAGE value="fix backend logic" />
     <MESSAGE value="fix backend logic and cleaning UI" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix backend logic and cleaning UI" />
+    <MESSAGE value="final fix" />
+    <option name="LAST_COMMIT_MESSAGE" value="final fix" />
   </component>
 </project>

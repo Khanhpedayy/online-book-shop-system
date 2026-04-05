@@ -19,8 +19,10 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -78,6 +80,8 @@ public class OrderServiceImpl implements OrderService {
 
         BigDecimal subtotal = BigDecimal.ZERO;
         List<OrderItem> items = new ArrayList<>();
+        Map<Long, Integer> orderQtyByBookId = new HashMap<>();
+        Map<Long, BookInfo> bookByIdForStock = new HashMap<>();
 
         for (OrderItemRequest itemReq : request.getItems()) {
             BookVariant variant = variantRepository.findById(itemReq.getVariantId())
@@ -91,6 +95,10 @@ public class OrderServiceImpl implements OrderService {
             }
 
             int qty = itemReq.getQuantity() != null && itemReq.getQuantity() > 0 ? itemReq.getQuantity() : 1;
+            Long bookId = book.getId();
+            orderQtyByBookId.merge(bookId, qty, Integer::sum);
+            bookByIdForStock.put(bookId, book);
+
             BigDecimal unitPrice = variant.getSalePrice() != null ? variant.getSalePrice() : BigDecimal.ZERO;
             BigDecimal line = unitPrice.multiply(BigDecimal.valueOf(qty));
             subtotal = subtotal.add(line);
@@ -103,6 +111,18 @@ public class OrderServiceImpl implements OrderService {
             item.setUnitPrice(unitPrice);
             item.setQuantity(qty);
             items.add(item);
+        }
+
+        for (Map.Entry<Long, Integer> e : orderQtyByBookId.entrySet()) {
+            BookInfo b = bookByIdForStock.get(e.getKey());
+            int available = b.getStockQuantity() != null ? b.getStockQuantity() : 0;
+            int requested = e.getValue();
+            if (requested > available) {
+                String title = b.getTitle() != null ? b.getTitle() : "sản phẩm này";
+                throw new IllegalArgumentException(String.format(
+                        "Không đủ tồn kho cho \"%s\": hiện còn %d, đơn của bạn cần %d.",
+                        title, available, requested));
+            }
         }
 
         BigDecimal shippingFee = shippingFeeService.computeShippingFee(subtotal);

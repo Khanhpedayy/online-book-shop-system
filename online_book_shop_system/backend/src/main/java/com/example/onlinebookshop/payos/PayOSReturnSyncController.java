@@ -16,10 +16,14 @@ public class PayOSReturnSyncController {
 
     private final OrderService orderService;
     private final PaymentLogRepository paymentLogRepository;
+    private final PayOsPaymentSyncService payOsPaymentSyncService;
 
-    public PayOSReturnSyncController(OrderService orderService, PaymentLogRepository paymentLogRepository) {
+    public PayOSReturnSyncController(OrderService orderService,
+                                     PaymentLogRepository paymentLogRepository,
+                                     PayOsPaymentSyncService payOsPaymentSyncService) {
         this.orderService = orderService;
         this.paymentLogRepository = paymentLogRepository;
+        this.payOsPaymentSyncService = payOsPaymentSyncService;
     }
 
     /**
@@ -50,7 +54,7 @@ public class PayOSReturnSyncController {
         String target = request.getTargetStatus();
         String normalized = "PAID".equalsIgnoreCase(target) ? "PAID" : "UNPAID";
 
-        paymentLogRepository.syncPaymentStatusByPaymentLinkId(paymentLinkId, normalized);
+        payOsPaymentSyncService.syncPaymentStatusByPaymentLinkId(paymentLinkId, normalized);
 
         Order updated = orderService.getOrderDetailByEmail(orderId, auth.getName());
         return ResponseEntity.ok(Map.of("paymentStatus", updated.getPaymentStatus()));

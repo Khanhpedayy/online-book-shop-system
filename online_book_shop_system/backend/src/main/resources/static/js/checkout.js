@@ -25,6 +25,16 @@ let checkoutProfileFallback = null;
 function getToken() {
     return localStorage.getItem("token");
 }
+async function readApiErrorMessage(res) {
+    const text = await res.text();
+    if (!text || !text.trim()) return res.statusText || "Request failed";
+    try {
+        const j = JSON.parse(text);
+        if (j && j.message) return String(j.message);
+    } catch (_) { /* plain text */ }
+    return text;
+}
+
 async function apiGet(path) {
     const headers = {};
     const t = getToken();
@@ -33,7 +43,7 @@ async function apiGet(path) {
         headers,
         credentials: 'include'
     });
-    if (!res.ok) throw new Error(await res.text());
+    if (!res.ok) throw new Error(await readApiErrorMessage(res));
     return res.json();
 }
 
@@ -47,7 +57,7 @@ async function apiPost(path, body){
         credentials: 'include',
         body:JSON.stringify(body)
     });
-    if(!res.ok) throw new Error(await res.text());
+    if(!res.ok) throw new Error(await readApiErrorMessage(res));
     return res.json();
 }
 
