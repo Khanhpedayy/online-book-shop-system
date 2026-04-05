@@ -1,6 +1,7 @@
 package com.example.onlinebookshop.staff.service;
 
 import com.example.onlinebookshop.Entity.Order;
+import com.example.onlinebookshop.payos.PayOsPaymentSyncService;
 import com.example.onlinebookshop.staff.dto.AllocatePreviewRow;
 import com.example.onlinebookshop.staff.dto.OrderDetailView;
 import com.example.onlinebookshop.staff.dto.OrderFilter;
@@ -30,15 +31,18 @@ public class StaffOrderService {
     private final StaffOrderQueryRepository queryRepository;
     private final StaffAlertRepository alertRepository;
     private final StaffPackingRepository packingRepository;
+    private final PayOsPaymentSyncService payOsPaymentSyncService;
 
     public StaffOrderService(StaffOrderRepository staffOrderRepository,
                              StaffOrderQueryRepository queryRepository,
                              StaffAlertRepository alertRepository,
-                             StaffPackingRepository packingRepository) {
+                             StaffPackingRepository packingRepository,
+                             PayOsPaymentSyncService payOsPaymentSyncService) {
         this.staffOrderRepository = staffOrderRepository;
         this.queryRepository = queryRepository;
         this.alertRepository = alertRepository;
         this.packingRepository = packingRepository;
+        this.payOsPaymentSyncService = payOsPaymentSyncService;
     }
 
     public List<OrderListRow> getAll(OrderFilter filter) {
@@ -91,8 +95,11 @@ public class StaffOrderService {
         if (paymentStatus == null || paymentStatus.trim().isEmpty()) {
             throw new RuntimeException("paymentStatus is required");
         }
-        order.setPaymentStatus(paymentStatus.trim().toUpperCase());
-        staffOrderRepository.save(order);
+        String previous = order.getPaymentStatus();
+        String next = paymentStatus.trim().toUpperCase();
+        order.setPaymentStatus(next);
+        staffOrderRepository.saveAndFlush(order);
+        payOsPaymentSyncService.applyPayOsStockAfterManualPaymentUpdate(orderId, previous, next);
     }
 
     @Transactional

@@ -1,6 +1,7 @@
 package com.example.onlinebookshop.staff.service;
 
 import com.example.onlinebookshop.Entity.Order;
+import com.example.onlinebookshop.payos.PayOsPaymentSyncService;
 import com.example.onlinebookshop.staff.dto.OrderDetailView;
 import com.example.onlinebookshop.staff.dto.OrderFilter;
 import com.example.onlinebookshop.staff.dto.OrderListRow;
@@ -8,6 +9,7 @@ import com.example.onlinebookshop.staff.dto.StaffAlert;
 import com.example.onlinebookshop.staff.repo.StaffAlertRepository;
 import com.example.onlinebookshop.staff.repo.StaffOrderQueryRepository;
 import com.example.onlinebookshop.staff.repo.StaffOrderRepository;
+import com.example.onlinebookshop.staff.repo.StaffPackingRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,6 +32,8 @@ class StaffOrderServiceTest {
     @Mock private StaffOrderRepository orderRepo;
     @Mock private StaffOrderQueryRepository queryRepo;
     @Mock private StaffAlertRepository alertRepo;
+    @Mock private StaffPackingRepository packingRepo;
+    @Mock private PayOsPaymentSyncService payOsPaymentSyncService;
 
     @InjectMocks private StaffOrderService service;
 
@@ -88,6 +92,7 @@ class StaffOrderServiceTest {
 
         assertThrows(RuntimeException.class, () -> service.updatePaymentStatus(3L, " "));
         verify(orderRepo, never()).save(any());
+        verify(orderRepo, never()).saveAndFlush(any());
     }
 
     @Test

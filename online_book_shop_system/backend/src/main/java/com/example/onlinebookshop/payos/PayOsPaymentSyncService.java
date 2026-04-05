@@ -53,6 +53,24 @@ public class PayOsPaymentSyncService {
         }
     }
 
+    /**
+     * Staff (recheck) or any code path that sets {@code orders.payment_status} to PAID without going through PayOS sync.
+     */
+    @Transactional
+    public void applyPayOsStockAfterManualPaymentUpdate(Long orderId, String previousPaymentStatus, String newPaymentStatus) {
+        if (!"PAID".equalsIgnoreCase(newPaymentStatus != null ? newPaymentStatus.trim() : "")) {
+            return;
+        }
+        if (previousPaymentStatus != null && "PAID".equalsIgnoreCase(previousPaymentStatus.trim())) {
+            return;
+        }
+        Order order = orderRepository.findById(orderId).orElse(null);
+        if (order == null || order.getPaymentMethod() == null || !"PAYOS".equalsIgnoreCase(order.getPaymentMethod())) {
+            return;
+        }
+        deductStockForPaidPayOsOrder(orderId);
+    }
+
     private void deductStockForPaidPayOsOrder(long orderId) {
         Order order = orderRepository.findDetailById(orderId)
                 .orElseThrow(() -> new IllegalStateException("Order not found: " + orderId));
