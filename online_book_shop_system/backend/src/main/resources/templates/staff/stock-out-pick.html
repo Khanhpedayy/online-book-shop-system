@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{staff/workspace-fragments :: head('Staff Workspace - Pick Stock Out')}"></head>
+<body>
+<div class="workspace">
+  <th:block th:replace="~{staff/workspace-fragments :: sidebar('allocate')}"></th:block>
+
+  <main class="workspace-main">
+    <th:block th:replace="~{staff/workspace-fragments :: flash}"></th:block>
+
+    <section class="surface p-4 mb-4" th:with="progress=${totalItems > 0 ? (pickedItems * 100 / totalItems) : 0}">
+      <div class="d-flex flex-wrap justify-content-between align-items-start gap-3">
+        <div>
+          <div class="subtle mb-2">
+            <a th:href="@{/staff/orders/{id}(id=${stockOut.orderId})}" class="text-decoration-none">Order Detail</a>
+            <span> / </span>
+            <span>Pick Stock Out</span>
+          </div>
+          <h1 class="page-title mb-2">
+            <span class="mono" th:text="${stockOut.stockOutCode}">SO-001</span>
+          </h1>
+          <div class="d-flex flex-wrap gap-2">
+            <span class="chip" th:text="${stockOut.status}">PICKING</span>
+            <span class="chip">Order ID: <span class="mono ms-1" th:text="${stockOut.orderId}">1</span></span>
+            <span class="badge text-bg-danger" th:if="${stockOut.hasException}">Có lệch tồn</span>
+          </div>
+        </div>
+
+        <div class="text-md-end">
+          <div class="subtle">Tiến độ</div>
+          <div class="fw-semibold" th:text="${pickedItems + ' / ' + totalItems + ' dòng đã pick'}">0 / 0</div>
+          <div class="fw-semibold text-danger" th:if="${missingItems > 0}" th:text="${missingItems + ' dòng báo thiếu'}">1 dòng báo thiếu</div>
+        </div>
+      </div>
+
+      <div class="mt-3">
+        <div class="progress" style="height: 10px;">
+          <div class="progress-bar" role="progressbar"
+               th:style="'width:' + ${progress} + '%'"
+               th:attr="aria-valuenow=${progress},aria-valuemin=0,aria-valuemax=100"></div>
+        </div>
+      </div>
+
+      <div class="alert alert-danger mt-3 mb-0" th:if="${stockOut.hasException}">
+        Phiếu đang bị treo vì lệch tồn. Staff vẫn có thể pick tiếp phần còn lại, nhưng không được pack / ship.
+        Hàng đã pick phải đưa vào HOLD area.
+        <div class="mt-2" th:if="${stockOut.exceptionNote != null}" th:text="${stockOut.exceptionNote}"></div>
+      </div>
+    </section>
+
+    <section class="surface p-4">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+          <div class="fw-bold fs-5">Danh sách item cần pick</div>
+          <div class="subtle">Sắp xếp theo location để staff đi kho ít vòng.</div>
+        </div>
+        <a class="btn btn-outline-secondary"
+           th:href="@{/staff/orders/{id}(id=${stockOut.orderId})}">
+          Quay lại đơn hàng
+        </a>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table align-middle mb-0">
+          <thead>
+          <tr>
+            <th>Tên sách</th>
+            <th>SKU</th>
+            <th>Copy</th>
+            <th>Location</th>
+            <th>SL</th>
+            <th>Trạng thái</th>
+            <th style="width: 320px;">Thao tác</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr th:each="item : ${items}">
+            <td>
+              <div class="fw-semibold" th:text="${item.titleSnapshot}">Book title</div>
+              <div class="small text-danger mt-1"
+                   th:if="${item.missingReported and item.missingNote != null}"
+                   th:text="${item.missingNote}">
+                Không tìm thấy sách
+              </div>
+            </td>
+            <td class="mono" th:text="${item.skuSnapshot}">SKU001</td>
+            <td class="mono" th:text="${item.copyCodeSnapshot != null ? item.copyCodeSnapshot : '-'}">COPY001</td>
+            <td class="mono" th:text="${item.locationSnapshot != null ? item.locationSnapshot : '-'}">A1-01</td>
+            <td th:text="${item.quantity}">1</td>
+            <td>
+              <span class="badge text-bg-success" th:if="${item.pickedAt != null}">Đã lấy</span>
+              <span class="badge text-bg-danger" th:if="${item.missingReported}">Báo thiếu</span>
+              <span class="badge text-bg-secondary" th:if="${item.pickedAt == null and !item.missingReported}">Chưa pick</span>
+            </td>
+            <td>
+              <div class="d-flex flex-column gap-2">
+                <form method="post"
+                      th:action="@{/staff/stock-outs/{stockOutId}/pick/{itemId}(stockOutId=${stockOut.id}, itemId=${item.id})}">
+                  <button type="submit"
+                          class="btn btn-success btn-sm w-100"
+                          th:disabled="${item.pickedAt != null or item.missingReported}">
+                    Đã lấy
+                  </button>
+                </form>
+
+                <form method="post"
+                      th:action="@{/staff/stock-outs/{stockOutId}/missing/{itemId}(stockOutId=${stockOut.id}, itemId=${item.id})}">
+                  <div class="input-group input-group-sm">
+                    <input type="text"
+                           name="note"
+                           class="form-control"
+                           placeholder="Ghi chú thiếu hàng"
+                           th:value="${item.missingNote}">
+                    <button type="submit"
+                            class="btn btn-outline-danger"
+                            th:disabled="${item.pickedAt != null or item.missingReported}">
+                      Không tìm thấy
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </td>
+          </tr>
+
+          <tr th:if="${items == null or #lists.isEmpty(items)}">
+            <td colspan="7" class="text-center text-muted py-4">
+              Phiếu xuất chưa có dòng item.
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

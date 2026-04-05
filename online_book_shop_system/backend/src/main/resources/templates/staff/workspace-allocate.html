@@ -7,7 +7,7 @@
 
     <main class="workspace-main">
         <th:block th:replace="~{staff/workspace-fragments :: flash}"></th:block>
-        <th:block th:replace="~{staff/workspace-fragments :: filterBar('Allocate / Pick','Đơn CONFIRMED nhưng chưa allocate đủ sẽ nằm ở đây.')}"></th:block>
+        <th:block th:replace="~{staff/workspace-fragments :: filterBar('Allocate / Reserve','Đơn CONFIRMED sẽ được reserve copy ở màn này. Sau đó vào chi tiết đơn để tạo phiếu xuất.')}"></th:block>
 
         <div class="accordion" id="allocateAccordion">
             <div class="accordion-item mb-3" th:each="o : ${orders}">
@@ -48,19 +48,27 @@
                                         / picked <span th:text="${o.pickedCount}"></span>
                                         / total <span th:text="${o.itemCount}"></span>
                                     </div>
-                                    <div class="subtle mt-2">
-                                        Bấm Auto Allocate để xem trước danh sách cuốn sách sẽ được pick.
+
+                                    <div class="alert alert-success mt-3 mb-0"
+                                         th:if="${o.allocatedCount != null and o.itemCount != null and o.allocatedCount >= o.itemCount}">
+                                        Đơn đã allocate đủ. Vào chi tiết đơn để tạo phiếu xuất kho.
+                                    </div>
+
+                                    <div class="alert alert-warning mt-3 mb-0"
+                                         th:if="${o.allocatedCount == null or o.itemCount == null or o.allocatedCount < o.itemCount}">
+                                        Bấm Auto allocate để reserve copy theo FIFO.
                                     </div>
                                 </div>
 
                                 <div class="col-lg-4">
                                     <div class="d-grid gap-2">
-                                        <button class="btn btn-primary"
-                                                type="button"
-                                                data-bs-toggle="modal"
-                                                th:data-bs-target="${'#allocateModal-' + o.id}">
-                                            Auto Allocate
-                                        </button>
+                                        <form method="post" th:action="@{/staff/orders/{id}/allocate-auto(id=${o.id})}">
+                                            <bQtton class="btn btn-primary w-100"
+                                                    type="submit"
+                                                    th:disabled="${o.allocatedCount != null and o.itemCount != null and o.allocatedCount >= o.itemCount}">
+                                                Auto allocate
+                                            </bQtton>
+                                        </form>
 
                                         <a class="btn btn-outline-secondary"
                                            th:href="@{/staff/orders/{id}(id=${o.id})}">
@@ -72,78 +80,6 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Modal preview -->
-                <div class="modal fade" th:id="${'allocateModal-' + o.id}" tabindex="-1" aria-hidden="true">
-                    <div class="modal-dialog modal-lg modal-dialog-centered">
-                        <div class="modal-content" style="border-radius: 18px;">
-                            <div class="modal-header">
-                                <div>
-                                    <h5 class="modal-title mb-1">Xác nhận Auto Allocate / Pick</h5>
-                                    <div class="text-muted small">
-                                        Đơn <span class="mono" th:text="${o.orderCode}"></span>
-                                    </div>
-                                </div>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                            </div>
-
-                            <div class="modal-body">
-                                <div class="mb-3">
-                                    <div><b>Khách:</b> <span th:text="${o.shipName}"></span></div>
-                                    <div><b>SĐT:</b> <span th:text="${o.shipPhone}"></span></div>
-                                </div>
-
-                                <div class="table-responsive">
-                                    <table class="table align-middle">
-                                        <thead>
-                                        <tr>
-                                            <th>Tên sách</th>
-                                            <th>SKU</th>
-                                            <th>Mã cuốn</th>
-                                            <th>Vị trí</th>
-                                            <th>Tình trạng</th>
-                                        </tr>
-                                        </thead>
-                                        <tr th:each="p : ${o.previewItems}">
-                                            <td th:text="${p.titleSnapshot}">Book</td>
-                                            <td class="mono" th:text="${p.skuSnapshot}">SKU</td>
-                                            <td class="mono">
-        <span th:if="${p.stockStatus == 'OK' and p.sellMode == 'PER_COPY'}"
-              th:text="${p.copyCode}">COPY</span>
-                                                <span th:if="${p.stockStatus == 'OK' and p.sellMode == 'QUANTITY'}">Theo lô</span>
-                                                <span th:if="${p.stockStatus != 'OK'}" class="text-danger">Không đủ tồn</span>
-                                            </td>
-                                            <td th:text="${p.location != null ? p.location : '-'}">MAIN</td>
-                                            <td>
-        <span th:if="${p.sellMode == 'PER_COPY'}"
-              th:text="${p.conditionGrade != null ? p.conditionGrade : '-'}">NEW</span>
-                                                <span th:if="${p.sellMode == 'QUANTITY'}">QTY</span>
-                                            </td>
-                                        </tr>
-                                    </table>
-                                </div>
-
-                                <div class="alert alert-warning mb-0">
-                                    Sau khi xác nhận, hệ thống sẽ gán copy, đánh dấu picked và đơn sẽ chuyển sang màn Packing.
-                                </div>
-                            </div>
-
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                                    Hủy
-                                </button>
-
-                                <form method="post"
-                                      th:action="@{/staff/workspace/allocate/{id}/confirm-auto-pick(id=${o.id})}">
-                                    <button class="btn btn-primary" type="submit">
-                                        Xác nhận allocate + pick
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- End modal -->
             </div>
 
             <div th:if="${orders == null or #lists.isEmpty(orders)}" class="surface p-5 text-center text-muted">

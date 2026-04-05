@@ -720,3 +720,201 @@ CREATE TABLE review_reports (
 );
 CREATE INDEX IX_rr_review   ON review_reports(review_id);
 CREATE INDEX IX_rr_reporter ON review_reports(reporter_id);
+
+/* =========================================================
+   PATCH: Multi-order batch / wave picking cho staff
+   Dán block này vào CUỐI file db hiện tại, sau review_reports
+   SQL Server - idempotent, không dùng GO
+   ========================================================= */
+
+SET ANSI_NULLS ON;
+SET QUOTED_IDENTIFIER ON;
+
+IF OBJECT_ID('dbo.outbound_batches', 'U') IS NULL
+BEGIN
+CREATE TABLE dbo.outbound_batches (
+                                      id              BIGINT IDENTITY(1,1) PRIMARY KEY,
+                                      batch_code      VARCHAR(60)   NOT NULL,
+                                      status          VARCHAR(30)   NOT NULL DEFAULT 'CREATED',
+                                      note            NVARCHAR(500) NULL,
+                                      priority        VARCHAR(20)   NOT NULL DEFAULT 'NORMAL',
+                                      dominant_area   NVARCHAR(120) NULL,
+
+                                      has_exception   BIT           NOT NULL DEFAULT 0,
+                                      exception_note  NVARCHAR(500) NULL,
+
+                                      printed_at      DATETIME2(0)  NULL,
+                                      picked_by       BIGINT        NULL,
+                                      picked_at       DATETIME2(0)  NULL,
+                                      split_by        BIGINT        NULL,
+                                      split_at        DATETIME2(0)  NULL,
+
+                                      created_at      DATETIME2(0)  NOT NULL DEFAULT SYSUTCDATETIME(),
+                                      created_by      BIGINT        NULL,
+                                      updated_at      DATETIME2(0)  NULL,
+                                      updated_by      BIGINT        NULL,
+                                      deleted_at      DATETIME2(0)  NULL,
+                                      deleted_by      BIGINT        NULL,
+                                      row_version     ROWVERSION,
+
+                                      CONSTRAINT FK_outbound_batches_picked_by  FOREIGN KEY (picked_by)  REFERENCES users(id),
+                                      CONSTRAINT FK_outbound_batches_split_by   FOREIGN KEY (split_by)   REFERENCES users(id),
+                                      CONSTRAINT FK_outbound_batches_created_by FOREIGN KEY (created_by) REFERENCES users(id),
+                                      CONSTRAINT FK_outbound_batches_updated_by FOREIGN KEY (updated_by) REFERENCES users(id),
+                                      CONSTRAINT FK_outbound_batches_deleted_by FOREIGN KEY (deleted_by) REFERENCES users(id),
+
+                                      CONSTRAINT CK_outbound_batches_status CHECK (
+                                          status IN (
+                                                     'CREATED',
+                                                     'ALLOCATING',
+                                                     'ALLOCATED',
+                                                     'PRINTED',
+                                                     'PICKING',
+                                                     'PICKED',
+                                                     'SPLITTING',
+                                                     'SPLIT_DONE',
+                                                     'CANCELLED'
+                                              )
+                                          ),
+                                      CONSTRAINT CK_outbound_batches_priority CHECK (
+                                          priority IN ('LOW','NORMAL','HIGH','URGENT')
+                                          )
+);
+
+CREATE UNIQUE INDEX UX_outbound_batches_code
+    ON dbo.outbound_batches(batch_code)
+    WHERE deleted_at IS NULL;
+
+CREATE INDEX IX_outbound_batches_status
+    ON dbo.outbound_batches(status, created_at);
+
+CREATE INDEX IX_outbound_batches_exception
+    ON dbo.outbound_batches(has_exception, status, created_at);
+END;
+
+IF OBJECT_ID('dbo.outbound_batch_orders', 'U') IS NULL
+BEGIN
+CREATE TABLE dbo.outbound_batch_orders (
+                                           id                  BIGINT IDENTITY(1,1) PRIMARY KEY,
+                                           batch_id            BIGINT        NOT NULL,
+                                           order_id            BIGINT        NOT NULL,
+
+                                           status              VARCHAR(20)   NOT NULL DEFAULT 'IN_BATCH',
+                                           split_done          BIT           NOT NULL DEFAULT 0,
+                                           split_completed_at  DATETIME2(0)  NULL,
+                                           split_completed_by  BIGINT        NULL,
+
+                                           created_at          DATETIME2(0)  NOT NULL DEFAULT SYSUTCDATETIME(),
+                                           updated_at          DATETIME2(0)  NULL,
+                                           deleted_at          DATETIME2(0)  NULL,
+                                           row_version         ROWVERSION,
+
+                                           CONSTRAINT FK_outbound_batch_orders_batch FOREIGN KEY (batch_id) REFERENCES outbound_batches(id),
+                                           CONSTRAINT FK_outbound_batch_orders_order FOREIGN KEY (order_id) REFERENCES orders(id),
+                                           CONSTRAINT FK_outbound_batch_orders_split_by FOREIGN KEY (split_completed_by) REFERENCES users(id),
+
+                                           CONSTRAINT CK_outbound_batch_orders_status CHECK (
+                                               status IN (
+                                                          'IN_BATCH',
+                                                          'READY_TO_PACK',
+                                                          'PACKED',
+                                                          'SHIPPED',
+                                                          'DELIVERED',
+                                                          'COMPLETED',
+                                                          'CANCELLED'
+                                                   )
+                                               )
+);
+
+CREATE UNIQUE INDEX UX_outbound_batch_orders_batch_order
+    ON dbo.outbound_batch_orders(batch_id, order_id)
+    WHERE deleted_at IS NULL;
+
+CREATE UNIQUE INDEX UX_outbound_batch_orders_order_active
+    ON dbo.outbound_batch_orders(order_id)
+    WHERE deleted_at IS NULL
+        AND status <> 'CANCELLED';
+
+CREATE INDEX IX_outbound_batch_orders_batch
+    ON dbo.outbound_batch_orders(batch_id, status);
+END;
+
+IF OBJECT_ID('dbo.outbound_batch_items', 'U') IS NULL
+BEGIN
+CREATE TABLE dbo.outbound_batch_items (
+                                          id                  BIGINT IDENTITY(1,1) PRIMARY KEY,
+                                          batch_id            BIGINT         NOT NULL,
+                                          batch_order_id      BIGINT         NOT NULL,
+                                          order_id            BIGINT         NOT NULL,
+                                          order_item_id       BIGINT         NOT NULL,
+
+                                          variant_id          BIGINT         NOT NULL,
+                                          copy_id             BIGINT         NULL,
+                                          lot_id              BIGINT         NULL,
+
+                                          title_snapshot      NVARCHAR(255)  NOT NULL,
+                                          sku_snapshot        VARCHAR(80)    NOT NULL,
+                                          copy_code_snapshot  VARCHAR(80)    NULL,
+                                          location_snapshot   VARCHAR(80)    NULL,
+
+                                          quantity            INT            NOT NULL DEFAULT 1,
+
+                                          picked_by           BIGINT         NULL,
+                                          picked_at           DATETIME2(0)   NULL,
+
+                                          is_missing_reported BIT            NOT NULL DEFAULT 0,
+                                          missing_note        NVARCHAR(500)  NULL,
+
+                                          split_confirmed     BIT            NOT NULL DEFAULT 0,
+                                          split_confirmed_at  DATETIME2(0)   NULL,
+                                          split_confirmed_by  BIGINT         NULL,
+
+                                          created_at          DATETIME2(0)   NOT NULL DEFAULT SYSUTCDATETIME(),
+                                          updated_at          DATETIME2(0)   NULL,
+                                          deleted_at          DATETIME2(0)   NULL,
+                                          row_version         ROWVERSION,
+
+                                          CONSTRAINT FK_outbound_batch_items_batch       FOREIGN KEY (batch_id)       REFERENCES outbound_batches(id),
+                                          CONSTRAINT FK_outbound_batch_items_batch_order FOREIGN KEY (batch_order_id) REFERENCES outbound_batch_orders(id),
+                                          CONSTRAINT FK_outbound_batch_items_order       FOREIGN KEY (order_id)       REFERENCES orders(id),
+                                          CONSTRAINT FK_outbound_batch_items_order_item  FOREIGN KEY (order_item_id)  REFERENCES order_items(id),
+                                          CONSTRAINT FK_outbound_batch_items_variant     FOREIGN KEY (variant_id)     REFERENCES book_variants(id),
+                                          CONSTRAINT FK_outbound_batch_items_copy        FOREIGN KEY (copy_id)        REFERENCES copies(id),
+                                          CONSTRAINT FK_outbound_batch_items_lot         FOREIGN KEY (lot_id)         REFERENCES lots(id),
+                                          CONSTRAINT FK_outbound_batch_items_picked_by   FOREIGN KEY (picked_by)      REFERENCES users(id),
+                                          CONSTRAINT FK_outbound_batch_items_split_by    FOREIGN KEY (split_confirmed_by) REFERENCES users(id),
+
+                                          CONSTRAINT CK_outbound_batch_items_qty CHECK (quantity >= 1)
+);
+
+CREATE UNIQUE INDEX UX_outbound_batch_items_order_item_active
+    ON dbo.outbound_batch_items(order_item_id)
+    WHERE deleted_at IS NULL;
+
+CREATE INDEX IX_outbound_batch_items_batch
+    ON dbo.outbound_batch_items(batch_id);
+
+CREATE INDEX IX_outbound_batch_items_order
+    ON dbo.outbound_batch_items(order_id);
+
+CREATE INDEX IX_outbound_batch_items_location
+    ON dbo.outbound_batch_items(batch_id, location_snapshot, sku_snapshot);
+
+CREATE INDEX IX_outbound_batch_items_missing
+    ON dbo.outbound_batch_items(batch_id, is_missing_reported);
+END;
+
+IF NOT EXISTS (
+    SELECT 1
+    FROM dbo.settings
+    WHERE [group] = 'INVENTORY' AND [key] = 'BATCH_PICKING'
+)
+BEGIN
+INSERT INTO dbo.settings ([group], [key], value_json, description)
+VALUES (
+           'INVENTORY',
+           'BATCH_PICKING',
+           '{"maxOrdersPerBatch":20,"allowAutoReserveOnCreate":true,"suggestSameDistrict":true,"splitVerificationRequired":true}',
+           N'Rule batch picking / wave picking cho staff'
+       );
+END;

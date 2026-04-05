@@ -45,4 +45,13 @@ public interface StaffOrderRepository extends JpaRepository<Order, Long> {
             ORDER BY placed_at ASC
             """, nativeQuery = true)
     List<Order> findTodoTop10();
+
+    @Query(value = """
+            SELECT COUNT(*)
+            FROM dbo.[orders]
+            WHERE id = ?1
+              AND status = 'CONFIRMED'
+              AND deleted_at IS NULL
+            """, nativeQuery = true)
+    long countConfirmedById(Long orderId);
 }

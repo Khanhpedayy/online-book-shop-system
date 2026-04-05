@@ -1,74 +1,76 @@
 package com.example.onlinebookshop.staff.service;
 
-import com.example.onlinebookshop.Entity.Order;
-import com.example.onlinebookshop.staff.repo.StaffOrderRepository;
+import com.example.onlinebookshop.staff.repo.StaffFulfillmentRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class StaffDeliveryService {
 
-    private final StaffOrderRepository staffOrderRepository;
+    private final StaffFulfillmentRepository repo;
 
-    public StaffDeliveryService(StaffOrderRepository staffOrderRepository) {
-        this.staffOrderRepository = staffOrderRepository;
+    public StaffDeliveryService(StaffFulfillmentRepository repo) {
+        this.repo = repo;
+    }
+
+    public List<StaffFulfillmentRepository.ShippingQueueRow> getShippingQueue() {
+        return repo.findShippingQueue();
+    }
+
+    public StaffFulfillmentRepository.DeliveryDetailView getDeliveryDetail(long orderId) {
+        return repo.findDeliveryDetail(orderId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn giao hàng."));
     }
 
     @Transactional
-    public DeliveryOutcomeResult setDeliveryOutcome(long orderId, String outcome, String reason) {
-        Order order = staffOrderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("Order not found: " + orderId));
-
-        String status = safeUpper(order.getStatus());
-        String oc = safeUpper(outcome);
-
-        if (!status.equals("SHIPPED") && !status.equals("DELIVERED")) {
-            throw new RuntimeException("Order phải SHIPPED (hoặc DELIVERED) mới set delivery outcome. status=" + status);
+    public void startShipping(long orderId, Long actorUserId) {
+        if (!repo.canShip(orderId)) {
+            throw new RuntimeException("Đơn chưa đủ điều kiện bắt đầu giao. Phải là PACKED và phiếu phải PACKED, không có lỗi.");
         }
 
-        if (!oc.equals("DELIVERED") && !oc.equals("FAILED")) {
-            throw new RuntimeException("Outcome không hợp lệ. Chỉ nhận DELIVERED hoặc FAILED.");
-        }
+        long stockOutId = repo.findLatestStockOutIdByOrderId(orderId);
 
-        if (oc.equals("DELIVERED")) {
-            order.setDeliveredAt(LocalDateTime.now());
-            order.setStatus("DELIVERED");
-
-            if ("PAID".equals(safeUpper(order.getPaymentStatus()))) {
-                order.setCompletedAt(LocalDateTime.now());
-                order.setStatus("COMPLETED");
-                staffOrderRepository.save(order);
-                return new DeliveryOutcomeResult("Đã cập nhật DELIVERED và tự động chuyển COMPLETED vì đơn đã thanh toán.");
-            }
-
-            staffOrderRepository.save(order);
-            return new DeliveryOutcomeResult("Đã cập nhật kết quả giao hàng: DELIVERED.");
-        }
-
-        String rs = reason == null ? "" : reason.trim();
-        if (rs.isEmpty()) {
-            throw new RuntimeException("Khi chọn FAILED, bạn phải nhập lý do thất bại.");
-        }
-
-        String oldNote = order.getStaffNote() == null ? "" : order.getStaffNote().trim();
-        String append = "[DELIVERY FAILED] " + rs;
-
-        String merged = oldNote.isEmpty()
-                ? append
-                : oldNote + System.lineSeparator() + append;
-
-        order.setStaffNote(merged);
-        staffOrderRepository.save(order);
-
-        return new DeliveryOutcomeResult("Đã ghi nhận giao thất bại vào ghi chú nội bộ.");
+        repo.markOrderShipped(orderId, actorUserId);
+        repo.markCopiesShippedByStockOut(stockOutId);
+        repo.markStockOutOutForDelivery(stockOutId, actorUserId);
+        repo.insertInventoryOutByStockOut(stockOutId, orderId);
     }
 
-    private String safeUpper(String s) {
-        return s == null ? "" : s.trim().toUpperCase();
+    @Transactional
+    public void confirmDeliveredSuccess(long orderId, Long actorUserId) {
+        if (!repo.canDeliver(orderId)) {
+            throw new RuntimeException("Đơn chưa ở trạng thái đang giao.");
+        }
+
+        long stockOutId = repo.findLatestStockOutIdByOrderId(orderId);
+
+        repo.markOrderDeliveredSuccess(orderId);
+        repo.markOrderPaymentPaidIfNeeded(orderId);
+        repo.markCopiesSoldByStockOut(stockOutId);
+        repo.moveLotReservedToSoldByStockOut(stockOutId);
+        repo.markStockOutCompleted(stockOutId);
     }
 
-    public record DeliveryOutcomeResult(String message) {
+    @Transactional
+    public void confirmDeliveryFail(long orderId, boolean cancelOrder, boolean markReturned, String note) {
+        if (!repo.canDeliver(orderId)) {
+            throw new RuntimeException("Đơn chưa ở trạng thái đang giao.");
+        }
+
+        long stockOutId = repo.findLatestStockOutIdByOrderId(orderId);
+
+        repo.markCopiesReturnedOrAvailableByStockOut(stockOutId, markReturned);
+        repo.releaseLotReservedByStockOut(stockOutId);
+        repo.insertInventoryReturnByStockOut(stockOutId, orderId, note == null ? "Delivery failed" : note);
+
+        if (cancelOrder) {
+            repo.markOrderCancelled(orderId);
+            repo.markStockOutCancelled(stockOutId, note == null ? "Delivery failed and order cancelled" : note);
+        } else {
+            repo.markOrderConfirmedForRetry(orderId);
+            repo.markStockOutCancelled(stockOutId, note == null ? "Delivery failed, returned to warehouse" : note);
+        }
     }
 }

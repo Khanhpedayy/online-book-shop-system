@@ -52,7 +52,7 @@ public class StaffOrderQueryRepository {
         if (filter != null) {
             if (notBlank(filter.getStage())) {
                 switch (filter.getStage().trim().toLowerCase()) {
-                    case "confirmed" -> sql.append(" AND o.status = 'NEW' ");
+                    case "confirmed" -> sql.append(" AND o.status = 'CONFIRMED' ");
                     case "allocate" -> sql.append(" AND o.status = 'CONFIRMED' AND COALESCE(agg.allocated_count, 0) < COALESCE(agg.item_count, 0) ");
                     case "packing" -> sql.append(" AND o.status = 'CONFIRMED' AND COALESCE(agg.item_count, 0) > 0 AND COALESCE(agg.picked_count, 0) = COALESCE(agg.item_count, 0) ");
                     case "shipping" -> sql.append(" AND o.status = 'PACKED' ");
