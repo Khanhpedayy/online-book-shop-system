@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Phiếu lỗi — BookStore</title>
+
+    <!-- GIỮ STYLE CHUẨN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/app.css">
+</head>
+
+<body>
+<div id="app-layout">
+    <div id="sidebar-slot"></div>
+
+    <div class="main-area">
+        <div id="header-slot"></div>
+
+        <main class="content-area p-4">
+
+            <!-- HEADER -->
+            <div class="d-flex justify-content-between align-items-start mb-4">
+                <div>
+                    <h2 class="fw-bold mb-1">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        Phiếu xuất kho lỗi
+                    </h2>
+                    <p class="text-muted mb-0">Xử lý các phiếu có vấn đề</p>
+                </div>
+            </div>
+
+            <!-- WORKSPACE -->
+            <div class="row g-3">
+
+                <!-- LEFT: LIST -->
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h6 class="fw-bold mb-3">Danh sách phiếu lỗi</h6>
+
+                            <div id="stockList" class="list-group">
+                                <div class="text-muted">Đang tải...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RIGHT: DETAIL -->
+                <div class="col-md-8">
+                    <div class="card h-100">
+                        <div class="card-body">
+
+                            <h6 class="fw-bold mb-3">Chi tiết</h6>
+
+                            <div id="stockDetail" class="text-muted">
+                                Chọn phiếu để xem chi tiết
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </main>
+    </div>
+</div>
+
+<!-- SCRIPT CHUẨN -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../js/api.js"></script>
+<script src="../js/utils.js"></script>
+<script src="../js/layout.js"></script>
+
+<script>
+    let currentId = null;
+    let stockOuts = [];
+
+    async function init() {
+        loadStockOuts();
+    }
+
+    async function loadStockOuts() {
+        try {
+            stockOuts = await api.get('/manager/stock-outs');
+            console.log("DATA:", stockOuts);
+        } catch {
+            stockOuts = [];
+        }
+
+        const list = document.getElementById('stockList');
+
+        if (stockOuts.length === 0) {
+            list.innerHTML = `<div class="text-muted">Không có phiếu lỗi</div>`;
+            return;
+        }
+
+        list.innerHTML = stockOuts.map(s => `
+            <div class="list-group-item list-group-item-action"
+                 onclick="loadDetail(${s.id})"
+                 style="cursor:pointer">
+
+                <div class="fw-semibold">${s.stock_out_code}</div>
+                <small class="text-danger">${s.exception_note || 'Có lỗi'}</small>
+
+            </div>
+        `).join('');
+    }
+
+    async function loadDetail(id) {
+        currentId = id;
+
+        const data = await api.get(`/manager/stock-outs/${id}`);
+
+        document.getElementById('stockDetail').innerHTML = `
+            <div class="mb-3">
+                <h5>${data.stockOut.stock_out_code}</h5>
+                <div class="text-muted">${data.stockOut.exception_note || ''}</div>
+            </div>
+
+            <hr>
+
+            <h6 class="fw-bold">Danh sách sách</h6>
+
+            ${data.items.map(i => `
+                <div class="d-flex justify-content-between border-bottom py-2">
+                    <div>
+                        ${i.title_snapshot}
+                    </div>
+
+                    <div>
+                        ${i.is_missing_reported
+                            ? '<span class="badge bg-danger">Thiếu</span>'
+                            : '<span class="badge bg-success">OK</span>'}
+                    </div>
+                </div>
+            `).join('')}
+        `;
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+</script>
+
+</body>
+</html>

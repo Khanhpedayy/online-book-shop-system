@@ -92,9 +92,7 @@ function renderBooks(list = currentBooks) {
     books.forEach(b => {
         const price = b.salePrice ?? 0;
         const coverUrl = b.coverImageUrl || ('https://covers.openlibrary.org/b/isbn/' + (b.isbn || '0385533229') + '-M.jpg');
-        // BookVariantDTO uses `id` as variant id (there is no variantId field in JSON).
-        const variantId = b.id;
-        const bookId = b.bookId;
+        const variantId = b.variantId || b.id;
 
         booksContainer.innerHTML += `
         <div class="book">
@@ -105,7 +103,7 @@ function renderBooks(list = currentBooks) {
                 <div class="book-actions">
                     <input type="number" value="1" min="1" id="qty-${variantId}">
                     <button class="btn" onclick="addToCart(${variantId})">Add to Cart</button>
-                    <button class="btn btn-secondary" onclick="openBook(${b.id})">View</button>
+                    <button class="btn btn-secondary" onclick="openBook(${bookId})">View</button>
                 </div>
             </div>
         </div>`;
