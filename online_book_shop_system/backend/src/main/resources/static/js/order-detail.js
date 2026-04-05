@@ -176,9 +176,21 @@ function renderTimeline(status){
         return;
     }
 
-    const steps = ["NEW","CONFIRMED","SHIPPING","COMPLETED"];
-    const idx = steps.indexOf(s);
-    const activeIdx = idx >= 0 ? idx : 0;
+    /* Align with staff workflow: NEW → CONFIRMED → PACKED → SHIPPED → DELIVERED → COMPLETED */
+    const steps = [
+        { code: "NEW", label: "New" },
+        { code: "CONFIRMED", label: "Confirmed" },
+        { code: "PACKED", label: "Packed" },
+        { code: "SHIPPED", label: "Shipping" },
+        { code: "DELIVERED", label: "Delivered" },
+        { code: "COMPLETED", label: "Completed" }
+    ];
+    const orderCodes = steps.map(x => x.code);
+    let idx = orderCodes.indexOf(s);
+    if (idx < 0) {
+        idx = 0;
+    }
+    const activeIdx = idx;
 
     steps.forEach((step, i) => {
         const active = i <= activeIdx;
@@ -186,7 +198,7 @@ function renderTimeline(status){
         container.innerHTML += `
             <div class="step">
                 <div class="circle ${active ? "active" : ""}"></div>
-                <div>${step}</div>
+                <div>${step.label}</div>
             </div>
         `;
     });
