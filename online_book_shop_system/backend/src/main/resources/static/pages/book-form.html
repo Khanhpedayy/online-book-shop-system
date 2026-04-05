@@ -245,13 +245,6 @@
                                             <option value="HIDDEN">Ẩn</option>
                                         </select>
                                     </div>
-                                    <div class="col-md-3">
-                                        <label class="form-label">Chế độ bán</label>
-                                        <select class="form-select" id="f_sellMode">
-                                            <option value="PER_COPY">Theo bản sao</option>
-                                            <option value="PER_QUANTITY">Theo số lượng</option>
-                                        </select>
-                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -378,25 +371,6 @@
                                 </div>
                             </div>
                         </div>
-
-                        <!-- Tags -->
-                        <div class="card mb-4">
-                            <div class="card-body">
-                                <div class="section-title">
-                                    <i class="bi bi-tags"></i> Thẻ (Tags)
-                                </div>
-                                <div id="tagsList" class="d-flex flex-wrap gap-2 mb-2"></div>
-                                <div class="input-group">
-                                    <input type="text" class="form-control form-control-sm" id="tagInput"
-                                           placeholder="Nhập thẻ và nhấn Enter"
-                                           onkeydown="if(event.key==='Enter'){event.preventDefault();addTag()}">
-                                    <button type="button" class="btn btn-outline-secondary btn-sm"
-                                            onclick="addTag()">
-                                        <i class="bi bi-plus-lg"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
 
@@ -431,7 +405,6 @@
     let editingId = null;
     let categories = [];
     let images = []; // { url, isCover, altText, sortOrder, uploading? }
-    let tags = [];
     let quill = null;
 
     /* ========== INIT ========== */
@@ -494,8 +467,6 @@
             document.getElementById('f_publisherName').value = book.publisherName || '';
             document.getElementById('f_publicationYear').value = book.publicationYear || '';
             document.getElementById('f_language').value = book.language || 'vi';
-            document.getElementById('f_status').value = book.status || 'DRAFT';
-            document.getElementById('f_sellMode').value = book.sellMode || 'PER_COPY';
             document.getElementById('f_shortDescription').value = book.shortDescription || '';
             updateCharCount();
 
@@ -519,12 +490,6 @@
                 renderImageGallery();
             }
 
-            // Load tags
-            try {
-                const t = JSON.parse(book.tagsJson || '[]');
-                if (Array.isArray(t)) { tags = t; renderTags(); }
-            } catch { }
-
         } catch (e) {
             showToast('Không tải được dữ liệu sách', 'danger');
         }
@@ -542,31 +507,6 @@
     function updateCharCount() {
         document.getElementById('charCount').textContent =
             document.getElementById('f_shortDescription').value.length;
-    }
-
-    /* ========== TAGS ========== */
-    function addTag() {
-        const input = document.getElementById('tagInput');
-        const tag = input.value.trim();
-        if (tag && !tags.includes(tag)) {
-            tags.push(tag);
-            renderTags();
-        }
-        input.value = '';
-    }
-
-    function removeTag(idx) {
-        tags.splice(idx, 1);
-        renderTags();
-    }
-
-    function renderTags() {
-        document.getElementById('tagsList').innerHTML = tags.map((t, i) =>
-            `<span class="badge bg-primary d-flex align-items-center gap-1">
-                ${t}
-                <i class="bi bi-x" style="cursor:pointer" onclick="removeTag(${i})"></i>
-            </span>`
-        ).join('');
     }
 
     /* ========== IMAGE UPLOAD ========== */
@@ -793,10 +733,8 @@
             publicationYear: parseInt(document.getElementById('f_publicationYear').value) || null,
             language: document.getElementById('f_language').value,
             status: document.getElementById('f_status').value,
-            sellMode: document.getElementById('f_sellMode').value,
             shortDescription: document.getElementById('f_shortDescription').value.trim() || null,
             descriptionHtml: getDescriptionHtml() || null,
-            tagsJson: tags.length > 0 ? JSON.stringify(tags) : null,
             images: imageList.length > 0 ? imageList : undefined,
         };
 

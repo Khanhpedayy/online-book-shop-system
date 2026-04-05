@@ -62,14 +62,6 @@ class CopyTransactionDTO {
 
 /* ═══ Request ═══ */
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-class ChangeConditionRequest {
-    private String conditionGrade;
-    private String conditionNote;
-}
 
 @Getter
 @Setter

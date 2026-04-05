@@ -20,7 +20,7 @@ public class VariantPricingController {
         this.service = service;
     }
 
-    /* â•â•â• VARIANT CRUD â•â•â• */
+    /* ═══ VARIANT CRUD ═══ */
 
     @GetMapping
     @Operation(summary = "List variants", description = "Get all variants, optionally filter by bookId")
@@ -62,7 +62,7 @@ public class VariantPricingController {
         return ResponseEntity.ok(Map.of("message", "Variant deleted successfully"));
     }
 
-    /* â•â•â• PRICING â€” BASE PRICE â•â•â• */
+    /* ═══ PRICING — BASE PRICE ═══ */
 
     @PutMapping("/{id}/price")
     @Operation(summary = "Set base price", description = "Set standard selling price (listPrice + salePrice) at variant level")
@@ -70,15 +70,7 @@ public class VariantPricingController {
         return service.setBasePrice(id, req.getListPrice(), req.getSalePrice());
     }
 
-    /* â•â•â• PRICING â€” CONDITION PRICES â•â•â• */
-
-    @PutMapping("/{id}/condition-prices")
-    @Operation(summary = "Set price by condition", description = "Set pricing rules by condition tier (LIKE_NEW / GOOD / FAIR) as JSON")
-    public VariantDTO setConditionPrices(@PathVariable("id") Long id, @RequestBody SetConditionPricesRequest req) {
-        return service.setConditionPrices(id, req.getConditionPricesJson());
-    }
-
-    /* â•â•â• COPIES â€” LIST BY VARIANT (for per-copy pricing) â•â•â• */
+    /* ═══ COPIES — LIST BY VARIANT ═══ */
 
     @GetMapping("/{variantId}/copies")
     @Operation(summary = "List copies for per-copy pricing", description = "Get all copies of a variant with their pricing info")
@@ -86,7 +78,7 @@ public class VariantPricingController {
         return service.getCopiesByVariant(variantId);
     }
 
-    /* â•â•â• COPIES â€” OVERRIDE PRICE â•â•â• */
+    /* ═══ COPIES — OVERRIDE PRICE ═══ */
 
     @PutMapping("/copies/{copyId}/price-override")
     @Operation(summary = "Override price per copy", description = "Set a custom selling price for an individual copy. Pass null to clear.")
@@ -96,4 +88,3 @@ public class VariantPricingController {
         return ResponseEntity.ok(Map.of("message", "Price override saved"));
     }
 }
-

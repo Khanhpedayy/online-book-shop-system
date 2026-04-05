@@ -24,7 +24,7 @@ public class BookManagementRepository {
         String sql = """
                     SELECT b.id, b.isbn13, b.title, b.subtitle, b.slug,
                            b.publisher_name, b.publication_year, b.language,
-                           b.short_description, b.tags_json, b.status,
+                           b.short_description, b.status,
                            b.category_id, c.name AS category_name,
                            b.created_at,
                            (SELECT TOP 1 bi.url FROM book_images bi
@@ -47,7 +47,6 @@ public class BookManagementRepository {
             dto.setPublicationYear(rs.getObject("publication_year", Integer.class));
             dto.setLanguage(rs.getString("language"));
             dto.setShortDescription(rs.getString("short_description"));
-            dto.setTagsJson(rs.getString("tags_json"));
             dto.setStatus(rs.getString("status"));
             dto.setCategoryId(rs.getObject("category_id", Long.class));
             dto.setCategoryName(rs.getString("category_name"));
@@ -60,7 +59,7 @@ public class BookManagementRepository {
     public List<BookListItemDTO> searchBooksByKeyword(String keyword) {
         String sql = """
                 SELECT b.id, b.isbn13, b.title, b.subtitle, b.slug,
-                       b.publisher_name, b.publication_year, b.language, b.short_description, b.tags_json,
+                       b.publisher_name, b.publication_year, b.language, b.short_description,
                        c.name AS category_name, b.status, b.category_id, b.created_at, b.isbn10,
                        (SELECT TOP 1 bi.url FROM book_images bi
                         WHERE bi.book_id = b.id AND bi.is_cover = 1
@@ -84,7 +83,6 @@ public class BookManagementRepository {
             dto.setPublicationYear(rs.getObject("publication_year", Integer.class));
             dto.setLanguage(rs.getString("language"));
             dto.setShortDescription(rs.getString("short_description"));
-            dto.setTagsJson(rs.getString("tags_json"));
             dto.setStatus(rs.getString("status"));
             dto.setCategoryId(rs.getObject("category_id", Long.class));
             dto.setCategoryName(rs.getString("category_name"));
@@ -116,9 +114,6 @@ public class BookManagementRepository {
             d.setLanguage(rs.getString("language"));
             d.setShortDescription(rs.getString("short_description"));
             d.setDescriptionHtml(rs.getString("description_html"));
-            d.setTagsJson(rs.getString("tags_json"));
-            String rawSellMode = rs.getString("sell_mode");
-            d.setSellMode("QUANTITY".equals(rawSellMode) ? "PER_QUANTITY" : rawSellMode);
             d.setStatus(rs.getString("status"));
             d.setCategoryId(rs.getObject("category_id", Long.class));
             d.setCategoryName(rs.getString("category_name"));
@@ -212,9 +207,9 @@ public class BookManagementRepository {
         String sql = """
                     INSERT INTO books (category_id, isbn13, isbn10, title, subtitle, slug,
                                        publisher_name, publication_year, language,
-                                       short_description, description_html, tags_json,
-                                       sell_mode, status, created_at)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, SYSUTCDATETIME())
+                                       short_description, description_html,
+                                       status, created_at)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, SYSUTCDATETIME())
                 """;
         KeyHolder kh = new GeneratedKeyHolder();
         jdbc.update(conn -> {
@@ -230,9 +225,7 @@ public class BookManagementRepository {
             ps.setString(9, req.getLanguage() != null ? req.getLanguage() : "vi");
             ps.setString(10, req.getShortDescription());
             ps.setString(11, req.getDescriptionHtml());
-            ps.setString(12, req.getTagsJson());
-            ps.setString(13, req.getSellMode() != null ? req.getSellMode() : "PER_COPY");
-            ps.setString(14, req.getStatus() != null ? req.getStatus() : "DRAFT");
+            ps.setString(12, req.getStatus() != null ? req.getStatus() : "DRAFT");
             return ps;
         }, kh);
         return Objects.requireNonNull(kh.getKey()).longValue();
@@ -294,16 +287,16 @@ public class BookManagementRepository {
                     UPDATE books SET
                         isbn13 = ?, isbn10 = ?, title = ?, subtitle = ?,
                         publisher_name = ?, publication_year = ?, language = ?,
-                        short_description = ?, description_html = ?, tags_json = ?,
-                        sell_mode = COALESCE(?, sell_mode), status = COALESCE(?, status), category_id = ?,
+                        short_description = ?, description_html = ?,
+                        status = COALESCE(?, status), category_id = ?,
                         updated_at = SYSUTCDATETIME()
                     WHERE id = ? AND deleted_at IS NULL
                 """;
         jdbc.update(sql,
                 req.getIsbn13(), req.getIsbn10(), req.getTitle(), req.getSubtitle(),
                 req.getPublisherName(), req.getPublicationYear(), req.getLanguage(),
-                req.getShortDescription(), req.getDescriptionHtml(), req.getTagsJson(),
-                req.getSellMode(), req.getStatus(), req.getCategoryId(),
+                req.getShortDescription(), req.getDescriptionHtml(),
+                req.getStatus(), req.getCategoryId(),
                 id);
 
         // Replace images if provided

@@ -19,7 +19,6 @@ class BookListItemDTO {
     private Integer publicationYear;
     private String language;
     private String shortDescription;
-    private String tagsJson;
     private String status; // ACTIVE, HIDDEN, DRAFT
     private String categoryName;
     private Long categoryId;
@@ -43,8 +42,6 @@ class BookDetailDTO {
     private String language;
     private String shortDescription;
     private String descriptionHtml;
-    private String tagsJson;
-    private String sellMode;
     private String status;
     private Long categoryId;
     private String categoryName;
@@ -113,9 +110,7 @@ class CreateBookRequest {
     private String language;
     private String shortDescription;
     private String descriptionHtml;
-    private String tagsJson; // e.g. '["fiction","bestseller"]'
-    private String sellMode;
-    private String status;// PER_COPY or PER_QUANTITY
+    private String status; // ACTIVE, HIDDEN, DRAFT
     private Long categoryId;
 
     private List<AuthorInput> authors;
@@ -137,8 +132,6 @@ class UpdateBookRequest {
     private String language;
     private String shortDescription;
     private String descriptionHtml;
-    private String tagsJson;
-    private String sellMode;
     private String status; // ACTIVE, HIDDEN, DRAFT
     private Long categoryId;
 

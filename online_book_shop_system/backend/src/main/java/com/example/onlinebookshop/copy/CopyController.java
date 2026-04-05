@@ -40,11 +40,6 @@ public class CopyController {
         return service.getLifecycle(id);
     }
 
-    @PutMapping("/{id}/condition")
-    @Operation(summary = "Change condition", description = "Change condition for a specific copy after inspection/returns")
-    public CopyDTO changeCondition(@PathVariable("id") Long id, @RequestBody ChangeConditionRequest req) {
-        return service.changeCondition(id, req);
-    }
 
     @PutMapping("/{id}/location")
     @Operation(summary = "Move location / Put-away", description = "Move a copy to a different storage location/bin")
