@@ -4,19 +4,55 @@
 <body>
 <div class="workspace">
     <th:block th:replace="~{staff/workspace-fragments :: sidebar('dashboard')}"></th:block>
+
     <main class="workspace-main">
         <th:block th:replace="~{staff/workspace-fragments :: flash}"></th:block>
+
         <section class="surface p-4 mb-4">
             <h1 class="page-title">Dashboard</h1>
             <div class="subtle">Tổng quan theo công đoạn.</div>
+
+            <div th:if="${dbError != null}" class="alert alert-warning mt-3 mb-0">
+                Không tải được dữ liệu dashboard:
+                <span th:text="${dbError}">Database error</span>
+            </div>
         </section>
 
         <div class="row g-3 mb-4">
-            <div class="col-md-6 col-xl-3"><div class="surface stat-card"><div class="subtle">New Orders</div><div class="value" th:text="${stats.newOrders}">0</div></div></div>
-            <div class="col-md-6 col-xl-3"><div class="surface stat-card"><div class="subtle">Pending Payments</div><div class="value" th:text="${stats.pendingPayments}">0</div></div></div>
-            <div class="col-md-6 col-xl-3"><div class="surface stat-card"><div class="subtle">To Pack</div><div class="value" th:text="${stats.toPack}">0</div></div></div>
-            <div class="col-md-6 col-xl-3"><div class="surface stat-card"><div class="subtle">Shipped Today</div><div class="value" th:text="${stats.shippedToday}">0</div></div></div>
-            <div class="col-md-6 col-xl-3"><div class="surface stat-card"><div class="subtle">Overdue &gt; 24h</div><div class="value" th:text="${stats.overdue}">0</div></div></div>
+            <div class="col-md-6 col-xl-3">
+                <div class="surface stat-card">
+                    <div class="subtle">New Orders</div>
+                    <div class="value" th:text="${stats != null ? stats.newOrders : 0}">0</div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-xl-3">
+                <div class="surface stat-card">
+                    <div class="subtle">Pending Payments</div>
+                    <div class="value" th:text="${stats != null ? stats.pendingPayments : 0}">0</div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-xl-3">
+                <div class="surface stat-card">
+                    <div class="subtle">To Pack</div>
+                    <div class="value" th:text="${stats != null ? stats.toPack : 0}">0</div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-xl-3">
+                <div class="surface stat-card">
+                    <div class="subtle">Shipped Today</div>
+                    <div class="value" th:text="${stats != null ? stats.shippedToday : 0}">0</div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-xl-3">
+                <div class="surface stat-card">
+                    <div class="subtle">Overdue &gt; 24h</div>
+                    <div class="value" th:text="${stats != null ? stats.overdue : 0}">0</div>
+                </div>
+            </div>
         </div>
 
         <section class="surface p-4">
@@ -25,26 +61,50 @@
                     <div class="fw-bold fs-5">Ưu tiên xử lý</div>
                     <div class="subtle">Các đơn đang nằm ở đầu hàng chờ.</div>
                 </div>
-                <a class="btn btn-outline-primary" th:href="@{/staff/workspace/confirmed}">Đi tới Confirmed Order</a>
+                <a class="btn btn-outline-primary" th:href="@{/staff/workspace/confirmed}">
+                    Đi tới Confirmed Order
+                </a>
             </div>
+
             <div class="table-responsive">
                 <table class="table align-middle mb-0">
-                    <thead><tr><th>Order</th><th>Khách</th><th>Trạng thái</th><th>Đặt lúc</th><th></th></tr></thead>
+                    <thead>
+                    <tr>
+                        <th>Order</th>
+                        <th>Khách</th>
+                        <th>Trạng thái</th>
+                        <th>Đặt lúc</th>
+                        <th></th>
+                    </tr>
+                    </thead>
                     <tbody>
+                    <tr th:if="${todoOrders == null or #lists.isEmpty(todoOrders)}">
+                        <td colspan="5" class="text-center text-muted py-4">
+                            Không có đơn chờ.
+                        </td>
+                    </tr>
+
                     <tr th:each="o : ${todoOrders}">
                         <td class="mono" th:text="${o.orderCode}">ORD</td>
                         <td th:text="${o.shipName}">Customer</td>
-                        <td><span class="chip" th:text="${o.status}">NEW</span></td>
+                        <td>
+                            <span class="chip" th:text="${o.status}">NEW</span>
+                        </td>
                         <td th:text="${o.placedAt != null ? #temporals.format(o.placedAt, 'dd/MM/yyyy HH:mm') : '-'}">-</td>
-                        <td><a class="btn btn-sm btn-outline-secondary" th:href="@{/staff/orders/{id}(id=${o.id})}">Chi tiết</a></td>
+                        <td>
+                            <a class="btn btn-sm btn-outline-secondary"
+                               th:href="@{/staff/orders/{id}(id=${o.id})}">
+                                Chi tiết
+                            </a>
+                        </td>
                     </tr>
-                    <tr th:if="${todoOrders == null or #lists.isEmpty(todoOrders)}"><td colspan="5" class="text-center text-muted py-4">Không có đơn chờ.</td></tr>
                     </tbody>
                 </table>
             </div>
         </section>
     </main>
 </div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

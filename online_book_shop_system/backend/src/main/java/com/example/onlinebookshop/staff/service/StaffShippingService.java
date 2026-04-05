@@ -50,7 +50,7 @@ public class StaffShippingService {
 
         String c = carrier == null || carrier.trim().isEmpty() ? "Nhân viên giao hàng" : carrier.trim();
         String t = trackingCode == null || trackingCode.trim().isEmpty()
-                ? "SELF-" + orderId + "-" + System.currentTimeMillis() % 100000
+                ? null
                 : trackingCode.trim();
 
         var h = repo.getOrderHeader(orderId);

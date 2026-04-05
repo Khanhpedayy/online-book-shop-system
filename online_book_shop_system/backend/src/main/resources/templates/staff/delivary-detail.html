@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{staff/workspace-fragments :: head('Staff Workspace - Delivery Detail')}"></head>
+<body>
+<div class="workspace">
+  <th:block th:replace="~{staff/workspace-fragments :: sidebar('shipping')}"></th:block>
+
+  <main class="workspace-main">
+    <th:block th:replace="~{staff/workspace-fragments :: flash}"></th:block>
+
+    <section class="surface p-4 mb-4">
+      <div class="d-flex justify-content-between align-items-start gap-3">
+        <div>
+          <div class="subtle mb-2">
+            <a th:href="@{/staff/workspace/shipping}" class="text-decoration-none">Đơn chờ giao</a>
+            <span> / </span>
+            <span>Chi tiết giao hàng</span>
+          </div>
+          <h1 class="page-title mb-2" th:text="${view.orderCode}">ORD-001</h1>
+          <div class="d-flex gap-2 flex-wrap">
+            <span class="chip" th:text="${view.orderStatus}">PACKED</span>
+            <span class="chip" th:text="${view.paymentStatus}">PENDING</span>
+            <span class="chip" th:text="${view.stockOutCode}">SO-001</span>
+          </div>
+        </div>
+
+        <div class="d-flex gap-2">
+          <a class="btn btn-outline-secondary"
+             th:href="@{/staff/orders/{id}/delivery-note(id=${view.orderId})}"
+             target="_blank">In phiếu giao hàng</a>
+          <a class="btn btn-outline-secondary"
+             th:href="${'tel:' + view.shipPhone}">Gọi khách</a>
+        </div>
+      </div>
+    </section>
+
+    <div class="row g-4">
+      <div class="col-lg-8">
+        <section class="surface p-4 mb-4">
+          <h2 class="fs-4 mb-3">Thông tin giao hàng</h2>
+          <div><b>Khách:</b> <span th:text="${view.shipName}"></span></div>
+          <div><b>SĐT:</b> <span th:text="${view.shipPhone}"></span></div>
+          <div><b>Địa chỉ:</b> <span th:text="${view.fullAddress()}"></span></div>
+          <div class="mt-2"><b>Ghi chú khách:</b> <span th:text="${view.customerNote != null ? view.customerNote : '-'}"></span></div>
+        </section>
+
+        <section class="surface p-4">
+          <h2 class="fs-4 mb-3">Danh sách sách</h2>
+          <div class="table-responsive">
+            <table class="table align-middle mb-0">
+              <thead>
+              <tr>
+                <th>Tên sách</th>
+                <th>SKU</th>
+                <th>Copy code</th>
+                <th>SL</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr th:each="it : ${view.items}">
+                <td th:text="${it.titleSnapshot}">Tên sách</td>
+                <td class="mono" th:text="${it.skuSnapshot}">SKU</td>
+                <td class="mono" th:text="${it.copyCodeSnapshot}">CP-001</td>
+                <td th:text="${it.quantity}">1</td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+
+      <div class="col-lg-4">
+        <section class="surface p-4 mb-4">
+          <h2 class="fs-4 mb-3">Tiền cần thu</h2>
+          <div class="d-flex justify-content-between mb-2">
+            <span>Subtotal</span>
+            <span th:text="${#numbers.formatDecimal(view.subtotalAmount, 0, 'COMMA', 0, 'POINT')} + ' VND'">0</span>
+          </div>
+          <div class="d-flex justify-content-between mb-2">
+            <span>Shipping</span>
+            <span th:text="${#numbers.formatDecimal(view.shippingFee, 0, 'COMMA', 0, 'POINT')} + ' VND'">0</span>
+          </div>
+          <div class="d-flex justify-content-between mb-3">
+            <span>Discount</span>
+            <span th:text="${#numbers.formatDecimal(view.discountAmount, 0, 'COMMA', 0, 'POINT')} + ' VND'">0</span>
+          </div>
+          <hr>
+          <div class="d-flex justify-content-between fw-bold fs-5 mb-2">
+            <span>Total</span>
+            <span th:text="${#numbers.formatDecimal(view.totalAmount, 0, 'COMMA', 0, 'POINT')} + ' VND'">0</span>
+          </div>
+          <div class="d-flex justify-content-between text-danger fw-bold">
+            <span>COD cần thu</span>
+            <span th:text="${#numbers.formatDecimal(view.codDue(), 0, 'COMMA', 0, 'POINT')} + ' VND'">0</span>
+          </div>
+        </section>
+
+        <section class="surface p-4 mb-4">
+          <h2 class="fs-4 mb-3">Thao tác giao hàng</h2>
+
+          <form method="post"
+                th:action="@{/staff/delivery/orders/{id}/ship(id=${view.orderId})}"
+                class="mb-3">
+            <button type="submit" class="btn btn-primary w-100"
+                    th:disabled="${view.orderStatus == 'SHIPPED' or view.orderStatus == 'DELIVERED' or view.orderStatus == 'COMPLETED'}">
+              Bắt đầu giao
+            </button>
+          </form>
+
+          <form method="post"
+                th:action="@{/staff/delivery/orders/{id}/deliver(id=${view.orderId})}"
+                class="mb-3">
+            <button type="submit" class="btn btn-success w-100"
+                    th:disabled="${view.orderStatus != 'SHIPPED'}">
+              Xác nhận giao thành công
+            </button>
+          </form>
+
+          <form method="post"
+                th:action="@{/staff/delivery/orders/{id}/delivery-fail(id=${view.orderId})}">
+            <div class="mb-2">
+              <textarea name="note" class="form-control" rows="3" placeholder="Lý do giao thất bại / ghi chú"></textarea>
+            </div>
+            <div class="form-check mb-2">
+              <input class="form-check-input" type="checkbox" name="markReturned" id="markReturned" checked>
+              <label class="form-check-label" for="markReturned">Đánh dấu hàng trả về kho / RETURNED</label>
+            </div>
+            <div class="form-check mb-3">
+              <input class="form-check-input" type="checkbox" name="cancelOrder" id="cancelOrder">
+              <label class="form-check-label" for="cancelOrder">Hủy luôn đơn hàng</label>
+            </div>
+            <button type="submit" class="btn btn-outline-danger w-100"
+                    th:disabled="${view.orderStatus != 'SHIPPED'}">
+              Xác nhận giao thất bại
+            </button>
+          </form>
+        </section>
+      </div>
+    </div>
+  </main>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

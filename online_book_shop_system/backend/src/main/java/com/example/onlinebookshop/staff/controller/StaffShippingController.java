@@ -16,18 +16,18 @@ public class StaffShippingController {
         this.service = service;
     }
 
-    @GetMapping("/{orderId}/ship")
-    public String shipScreen(@PathVariable long orderId,
-                             Model model,
-                             RedirectAttributes ra) {
-        try {
-            model.addAttribute("v", service.getShippingView(orderId));
-            return "staff/ship";
-        } catch (Exception e) {
-            ra.addFlashAttribute("errorMsg", e.getMessage());
-            return "redirect:/staff/orders/" + orderId;
-        }
-    }
+//    @GetMapping("/{orderId}/ship")
+//    public String shipScreen(@PathVariable long orderId,
+//                             Model model,
+//                             RedirectAttributes ra) {
+//        try {
+//            model.addAttribute("v", service.getShippingView(orderId));
+//            return "staff/ship";
+//        } catch (Exception e) {
+//            ra.addFlashAttribute("errorMsg", e.getMessage());
+//            return "redirect:/staff/orders/" + orderId;
+//        }
+//    }
 
     @PostMapping("/{orderId}/ship/confirm")
     public String confirmShip(@PathVariable long orderId,
@@ -40,6 +40,19 @@ public class StaffShippingController {
         } catch (Exception e) {
             ra.addFlashAttribute("errorMsg", e.getMessage());
         }
-        return "redirect:/staff/orders/" + orderId + "/ship";
+        return "redirect:/staff/workspace/shipping";
+    }
+
+    @PostMapping("/{orderId}/ship")
+    public String shipOrder(@PathVariable long orderId,
+                            RedirectAttributes ra) {
+        try {
+            service.confirmShipped(orderId, "Nhân viên giao hàng", null);
+            ra.addFlashAttribute("successMsg", "Đã giao đơn thành công");
+        } catch (Exception e) {
+            ra.addFlashAttribute("errorMsg", e.getMessage());
+        }
+
+        return "redirect:/staff/orders"; // quay lại list
     }
 }

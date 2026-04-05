@@ -30,6 +30,13 @@ const Layout = {
             ],
         },
         {
+            title: 'Xử lý đơn',
+            items: [
+                { label: 'Xác nhận đơn', href: 'manager-confirm.html', icon: 'bi-check2-square' },
+                { label: 'Phiếu lỗi', href: 'manager-stockout-workspace.html', icon: 'bi-exclamation-triangle' },
+            ],
+        },
+        {
             title: 'Hoạt động Cửa hàng',
             items: [
                 { label: 'Bảng điều khiển', href: 'staff-dashboard.html', icon: 'bi-speedometer2' },
