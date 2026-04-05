@@ -12,9 +12,11 @@ import java.util.List;
 public class StaffShippingService {
 
     private final StaffShippingRepository repo;
+    private final StaffNotificationService notificationService;
 
-    public StaffShippingService(StaffShippingRepository repo) {
+    public StaffShippingService(StaffShippingRepository repo, StaffNotificationService notificationService) {
         this.repo = repo;
+        this.notificationService = notificationService;
     }
 
     public ShippingView getShippingView(long orderId) {
@@ -62,6 +64,9 @@ public class StaffShippingService {
 
         int r = repo.markShipped(orderId, c, t);
         if (r == 0) throw new IllegalStateException("Không update được SHIPPED (order có thể bị đổi trạng thái).");
+
+        // Gửi thông báo cho khách
+        notificationService.notifyOrderShipped(h.userId(), h.orderCode(), orderId);
     }
 
     public static class ShippingView {

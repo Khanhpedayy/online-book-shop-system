@@ -7,18 +7,12 @@
 
   <main class="workspace-main">
     <th:block th:replace="~{staff/workspace-fragments :: flash}"></th:block>
-    <th:block th:replace="~{staff/workspace-fragments :: filterBar('Delivery / Return','Theo dõi đơn đã ship và xử lý state cuối tại đây.')}"></th:block>
+    <th:block th:replace="~{staff/workspace-fragments :: filterBar('Delivery / Return','Theo dõi đơn đã ship và xử lý state cuối tại đây.', '/staff/workspace/delivery-return')}"></th:block>
 
-    <form method="post" th:action="@{/staff/workspace/delivery-return/bulk-deliver}">
       <div class="accordion" id="deliveryAccordion">
         <div class="accordion-item mb-3" th:each="o : ${orders}">
           <div class="surface">
             <h2 class="accordion-header d-flex align-items-center">
-              <div class="px-3" th:if="${o.status == 'SHIPPED'}">
-                <input class="form-check-input" type="checkbox" name="orderIds" th:value="${o.id}">
-              </div>
-              <div class="px-3" th:if="${o.status != 'SHIPPED'}" style="width:29px"></div>
-
               <button class="accordion-button collapsed" type="button"
                       data-bs-toggle="collapse"
                       th:data-bs-target="${'#d-' + o.id}">
@@ -33,14 +27,33 @@
 
                   <div class="d-flex flex-wrap gap-2">
                     <span class="chip" th:text="${o.status}">STATUS</span>
+
+                    <!-- SHIPPED: chưa giao -->
+                    <span class="chip" th:if="${o.status == 'SHIPPED'}">
+                      🚚 Chưa giao
+                    </span>
+
+                    <!-- COMPLETED: Completed at + time -->
+                    <span class="chip chip-success"
+                          th:if="${o.status == 'COMPLETED'}"
+                          th:text="${'✅ Completed ' + (o.completedAt != null ? #temporals.format(o.completedAt, 'dd/MM HH:mm') : '')}">
+                    </span>
+
+                    <!-- CANCELLED: Thất bại at + time -->
+                    <span class="chip chip-danger"
+                          th:if="${o.status == 'CANCELLED'}"
+                          th:text="${'❌ Thất bại ' + (o.cancelledAt != null ? #temporals.format(o.cancelledAt, 'dd/MM HH:mm') : '')}">
+                    </span>
+
+                    <!-- Other statuses: show shipped/delivered times -->
                     <span class="chip"
+                          th:if="${o.status != 'SHIPPED' and o.status != 'COMPLETED' and o.status != 'CANCELLED'}"
                           th:text="${o.shippedAt != null ? 'Ship ' + #temporals.format(o.shippedAt, 'dd/MM HH:mm') : 'Chưa ship'}">
-                                            Ship time
-                                        </span>
+                    </span>
                     <span class="chip"
+                          th:if="${o.status != 'SHIPPED' and o.status != 'COMPLETED' and o.status != 'CANCELLED'}"
                           th:text="${o.deliveredAt != null ? 'Delivered ' + #temporals.format(o.deliveredAt, 'dd/MM HH:mm') : 'Chưa giao'}">
-                                            Delivery time
-                                        </span>
+                    </span>
                   </div>
                 </div>
               </button>
@@ -68,6 +81,24 @@
                       Chi tiết đơn
                     </a>
 
+                    <!-- Actions for SHIPPED orders -->
+                    <div th:if="${o.status == 'SHIPPED'}" class="d-grid gap-2">
+                      <!-- Success: SHIPPED → COMPLETED -->
+                      <form th:action="@{/staff/workspace/delivery-return/{id}/success(id=${o.id})}" method="post">
+                        <button type="submit" class="btn btn-success w-100">
+                          ✅ Giao thành công
+                        </button>
+                      </form>
+
+                      <!-- Fail: SHIPPED → DELIVERY_FAILED -->
+                      <button type="button" class="btn btn-danger"
+                              data-bs-toggle="modal"
+                              th:data-bs-target="${'#failModal-' + o.id}">
+                        ❌ Giao thất bại
+                      </button>
+                    </div>
+
+                    <!-- Return intake for DELIVERED/COMPLETED -->
                     <button class="btn btn-outline-primary"
                             type="button"
                             data-bs-toggle="modal"
@@ -88,15 +119,8 @@
         </div>
       </div>
 
-      <div class="bulk-bar mt-3">
-        <div class="surface p-3 d-flex justify-content-between align-items-center">
-          <div>Chỉ đơn đang SHIPPED mới được chọn để chuyển sang DELIVERED.</div>
-          <button class="btn btn-primary" type="submit">Mark delivered selected</button>
-        </div>
-      </div>
-    </form>
-
     <th:block th:each="o : ${orders}">
+      <!-- Return intake modal -->
       <div class="modal fade" th:id="${'returnModal-' + o.id}" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
           <div class="modal-content" style="border-radius:18px;">
@@ -174,6 +198,42 @@ CP-000125"
           </div>
         </div>
       </div>
+
+      <!-- Giao thất bại modal -->
+      <div class="modal fade" th:id="${'failModal-' + o.id}" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content" style="border-radius:18px;">
+            <div class="modal-header">
+              <div>
+                <h5 class="modal-title mb-1">❌ Giao hàng thất bại</h5>
+                <div class="text-muted small">
+                  Đơn: <span class="mono" th:text="${o.orderCode}"></span>
+                </div>
+              </div>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form th:action="@{/staff/workspace/delivery-return/{id}/fail(id=${o.id})}" method="post">
+              <div class="modal-body">
+                <div class="mb-3">
+                  <label class="form-label fw-semibold">Lý do giao thất bại</label>
+                  <input class="form-control"
+                         name="reason"
+                         placeholder="Ví dụ: Khách không nhận, địa chỉ sai, không liên lạc được..."
+                         required>
+                </div>
+                <div class="alert alert-danger mb-0">
+                  Đơn hàng sẽ chuyển sang trạng thái <strong>CANCELLED</strong>.
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="submit" class="btn btn-danger">Xác nhận thất bại</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
     </th:block>
   </main>
 </div>

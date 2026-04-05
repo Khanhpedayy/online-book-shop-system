@@ -10,6 +10,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.Collections;
@@ -66,6 +67,7 @@ public class StaffWorkspaceController {
     @GetMapping("/staff/workspace/allocate")
     public String allocate(
             @RequestParam(name = "q", required = false, defaultValue = "") String q,
+            @RequestParam(name = "status", required = false, defaultValue = "") String status,
             Model model,
             Authentication authentication
     ) {
@@ -73,17 +75,24 @@ public class StaffWorkspaceController {
 
         Map<String, Object> filter = new LinkedHashMap<>();
         filter.put("q", q);
+        filter.put("status", status);
 
         model.addAttribute("role", "STAFF");
         model.addAttribute("username", username);
         model.addAttribute("filter", filter);
+        model.addAttribute("q", q);
+        model.addAttribute("status", status);
         model.addAttribute("dbError", null);
 
         try {
             OrderFilter orderFilter = new OrderFilter();
-            orderFilter.setQ(q);              // nếu class bạn có field này
-            orderFilter.setStage("allocate"); // 🔥 quan trọng
-            orderFilter.setStatus("CONFIRMED");
+            orderFilter.setQ(q);
+            orderFilter.setStage("allocate");
+            if (status != null && !status.isEmpty()) {
+                orderFilter.setStatus(status);
+            } else {
+                orderFilter.setStatus("CONFIRMED");
+            }
             model.addAttribute("orders", orderService.getAll(orderFilter));
 
         } catch (Exception ex) {
@@ -95,16 +104,27 @@ public class StaffWorkspaceController {
     }
 
     @GetMapping("/staff/workspace/delivery-return")
-    public String deliveryReturn(Model model, Authentication authentication) {
+    public String deliveryReturn(
+            @RequestParam(name = "q", required = false, defaultValue = "") String q,
+            @RequestParam(name = "status", required = false, defaultValue = "") String status,
+            Model model, Authentication authentication) {
 
         String username = authentication != null ? authentication.getName() : "STAFF";
 
         model.addAttribute("role", "STAFF");
         model.addAttribute("username", username);
+        model.addAttribute("q", q);
+        model.addAttribute("status", status);
 
         try {
             OrderFilter filter = new OrderFilter();
-            filter.setStage("delivery-return"); // 🔥 quan trọng
+            filter.setStage("delivery-return");
+            if (q != null && !q.trim().isEmpty()) {
+                filter.setQ(q.trim());
+            }
+            if (status != null && !status.trim().isEmpty()) {
+                filter.setStatus(status.trim());
+            }
 
             model.addAttribute("orders", orderService.getAll(filter));
 
@@ -113,7 +133,7 @@ public class StaffWorkspaceController {
             model.addAttribute("dbError", e.getMessage());
         }
 
-        return "staff/workspace-delivery-return"; // 👈 đúng tên file mày gửi
+        return "staff/workspace-delivery-return";
     }
     @PostMapping("/staff/workspace/delivery-return/create-return-intake")
     public String createReturnIntake(@RequestParam("orderId") Long orderId,
@@ -125,6 +145,28 @@ public class StaffWorkspaceController {
         try {
             orderService.createReturnIntakeMulti(orderId, copyCodes, reason, receivedConditionGrade, receivedConditionNote);
             ra.addFlashAttribute("successMessage", "Đã tạo return intake cho đơn " + orderId);
+        } catch (Exception e) {
+            ra.addFlashAttribute("errorMessage", e.getMessage());
+        }
+        return "redirect:/staff/workspace/delivery-return";
+    }
+
+    @PostMapping("/staff/workspace/delivery-return/{id}/success")
+    public String deliverSuccess(@PathVariable Long id, RedirectAttributes ra) {
+        try {
+            orderService.updateStatus(id, "COMPLETED");
+            ra.addFlashAttribute("successMessage", "Đã đánh dấu giao hàng thành công đơn " + id);
+        } catch (Exception e) {
+            ra.addFlashAttribute("errorMessage", e.getMessage());
+        }
+        return "redirect:/staff/workspace/delivery-return";
+    }
+
+    @PostMapping("/staff/workspace/delivery-return/{id}/fail")
+    public String deliverFail(@PathVariable Long id, @RequestParam("reason") String reason, RedirectAttributes ra) {
+        try {
+            orderService.markDeliveryFailed(id, reason);
+            ra.addFlashAttribute("successMessage", "Giao hàng thất bại đơn " + id);
         } catch (Exception e) {
             ra.addFlashAttribute("errorMessage", e.getMessage());
         }

@@ -19,8 +19,9 @@ public class StaffFulfillmentRepository {
         this.jdbc = jdbc;
     }
 
-    public List<PackingQueueRow> findPackingQueue() {
-        String sql = """
+    public List<PackingQueueRow> findPackingQueue(String q, String status) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("""
             SELECT
                 o.id AS order_id,
                 o.order_code,
@@ -49,25 +50,44 @@ public class StaffFulfillmentRepository {
             WHERE so.deleted_at IS NULL
               AND so.status = 'PICKED'
               AND so.has_exception = 0
-            ORDER BY so.id DESC
-            """;
+            """);
 
-        return jdbc.query(sql, (rs, rowNum) -> new PackingQueueRow(
+        if (q != null && !q.isBlank()) {
+            sql.append(" AND (o.order_code LIKE ? OR o.ship_name LIKE ? OR o.ship_phone LIKE ?) ");
+        }
+        if (status != null && !status.isBlank()) {
+            sql.append(" AND o.status = ? ");
+        }
+
+        sql.append(" ORDER BY so.id DESC ");
+
+        java.util.List<Object> args = new java.util.ArrayList<>();
+        if (q != null && !q.isBlank()) {
+            String search = "%" + q.trim() + "%";
+            args.add(search);
+            args.add(search);
+            args.add(search);
+        }
+        if (status != null && !status.isBlank()) {
+            args.add(status);
+        }
+
+        return jdbc.query(sql.toString(), (rs, rowNum) -> new PackingQueueRow(
                 rs.getLong("order_id"),
-                rs.getString("order_code"),
-                rs.getString("ship_name"),
-                rs.getString("ship_phone"),
+                java.util.Optional.ofNullable(rs.getString("order_code")).orElse(""),
+                java.util.Optional.ofNullable(rs.getString("ship_name")).orElse(""),
+                java.util.Optional.ofNullable(rs.getString("ship_phone")).orElse(""),
                 joinArea(rs.getString("ship_district"), rs.getString("ship_city")),
-                rs.getString("payment_status"),
+                java.util.Optional.ofNullable(rs.getString("payment_status")).orElse(""),
                 rs.getBigDecimal("total_amount"),
                 rs.getBigDecimal("shipping_fee"),
                 rs.getBigDecimal("discount_amount"),
                 rs.getLong("stock_out_id"),
-                rs.getString("stock_out_code"),
-                rs.getString("stock_out_status"),
+                java.util.Optional.ofNullable(rs.getString("stock_out_code")).orElse(""),
+                java.util.Optional.ofNullable(rs.getString("stock_out_status")).orElse(""),
                 rs.getBoolean("has_exception"),
                 rs.getInt("item_count")
-        ));
+        ), args.toArray());
     }
 
     public Optional<PackDetailView> findPackDetail(long orderId) {
@@ -250,8 +270,9 @@ public class StaffFulfillmentRepository {
         jdbc.update(sql, userId, stockOutId);
     }
 
-    public List<ShippingQueueRow> findShippingQueue() {
-        String sql = """
+    public List<ShippingQueueRow> findShippingQueue(String q, String status) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("""
             SELECT
                 o.id AS order_id,
                 o.order_code,
@@ -276,33 +297,49 @@ public class StaffFulfillmentRepository {
              AND so.deleted_at IS NULL
             WHERE o.deleted_at IS NULL
               AND o.status IN ('PACKED', 'SHIPPED')
+            """);
+
+        java.util.List<Object> args = new java.util.ArrayList<>();
+        if (q != null && !q.isBlank()) {
+            sql.append(" AND (o.order_code LIKE ? OR o.ship_name LIKE ? OR o.ship_phone LIKE ?) ");
+            String search = "%" + q.trim() + "%";
+            args.add(search);
+            args.add(search);
+            args.add(search);
+        }
+        if (status != null && !status.isBlank()) {
+            sql.append(" AND o.status = ? ");
+            args.add(status);
+        }
+
+        sql.append("""
             ORDER BY
                 CASE WHEN o.status = 'PACKED' THEN 0 ELSE 1 END,
                 o.packed_at DESC,
                 o.id DESC
-            """;
+            """);
 
-        return jdbc.query(sql, (rs, rowNum) -> new ShippingQueueRow(
+        return jdbc.query(sql.toString(), (rs, rowNum) -> new ShippingQueueRow(
                 rs.getLong("order_id"),
-                rs.getString("order_code"),
-                rs.getString("order_status"),
-                rs.getString("ship_name"),
-                rs.getString("ship_phone"),
+                java.util.Optional.ofNullable(rs.getString("order_code")).orElse(""),
+                java.util.Optional.ofNullable(rs.getString("order_status")).orElse(""),
+                java.util.Optional.ofNullable(rs.getString("ship_name")).orElse(""),
+                java.util.Optional.ofNullable(rs.getString("ship_phone")).orElse(""),
                 safeJoinAddress(
                         rs.getString("ship_line1"),
                         rs.getString("ship_district"),
                         rs.getString("ship_city")
                 ),
-                rs.getString("payment_status"),
+                java.util.Optional.ofNullable(rs.getString("payment_status")).orElse(""),
                 rs.getBigDecimal("total_amount"),
                 rs.getBigDecimal("shipping_fee"),
                 rs.getBigDecimal("discount_amount"),
                 toLocalDateTime(rs, "packed_at"),
-                rs.getString("carrier"),
+                java.util.Optional.ofNullable(rs.getString("carrier")).orElse(""),
                 rs.getLong("stock_out_id"),
-                rs.getString("stock_out_code"),
-                rs.getString("stock_out_status")
-        ));
+                java.util.Optional.ofNullable(rs.getString("stock_out_code")).orElse(""),
+                java.util.Optional.ofNullable(rs.getString("stock_out_status")).orElse("")
+        ), args.toArray());
     }
 
     public Optional<DeliveryDetailView> findDeliveryDetail(long orderId) {

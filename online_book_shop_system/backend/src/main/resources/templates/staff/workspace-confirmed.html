@@ -6,7 +6,7 @@
     <th:block th:replace="~{staff/workspace-fragments :: sidebar('confirmed')}"></th:block>
     <main class="workspace-main">
         <th:block th:replace="~{staff/workspace-fragments :: flash}"></th:block>
-        <th:block th:replace="~{staff/workspace-fragments :: filterBar('Confirmed Order','Chọn nhiều đơn NEW rồi confirm hàng loạt ngay trên cùng một màn hình.')}"></th:block>
+        <th:block th:replace="~{staff/workspace-fragments :: filterBar('Confirmed Order','Chọn nhiều đơn NEW rồi confirm hàng loạt ngay trên cùng một màn hình.', '/staff/workspace/confirmed')}"></th:block>
         <form method="post" th:action="@{/staff/workspace/confirmed/bulk-confirm}">
             <div class="accordion" id="confirmedAccordion">
                 <div class="accordion-item mb-3" th:each="o : ${orders}">

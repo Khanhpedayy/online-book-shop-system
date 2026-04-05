@@ -19,14 +19,24 @@ public class StaffDeliveryPageController {
     }
 
     @GetMapping("/staff/workspace/packing")
-    public String packingQueue(Model model) {
-        model.addAttribute("rows", packingService.getPackingQueue());
+    public String packingQueue(
+            @org.springframework.web.bind.annotation.RequestParam(name = "q", required = false, defaultValue = "") String q,
+            @org.springframework.web.bind.annotation.RequestParam(name = "status", required = false, defaultValue = "") String status,
+            Model model) {
+        model.addAttribute("rows", packingService.getPackingQueue(q, status));
+        model.addAttribute("q", q);
+        model.addAttribute("status", status);
         return "staff/workspace-packing";
     }
 
     @GetMapping("/staff/workspace/shipping")
-    public String shippingQueue(Model model) {
-        model.addAttribute("rows", deliveryService.getShippingQueue());
+    public String shippingQueue(
+            @org.springframework.web.bind.annotation.RequestParam(name = "q", required = false, defaultValue = "") String q,
+            @org.springframework.web.bind.annotation.RequestParam(name = "status", required = false, defaultValue = "") String status,
+            Model model) {
+        model.addAttribute("rows", deliveryService.getShippingQueue(q, status));
+        model.addAttribute("q", q);
+        model.addAttribute("status", status);
         return "staff/workspace-shipping";
     }
 

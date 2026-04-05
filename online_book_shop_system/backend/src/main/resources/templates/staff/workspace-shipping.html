@@ -7,14 +7,9 @@
 
     <main class="workspace-main">
         <th:block th:replace="~{staff/workspace-fragments :: flash}"></th:block>
+        <th:block th:replace="~{staff/workspace-fragments :: filterBar('Shipping','Giao đơn cho các đơn vị vận chuyển hoặc nhân viên giao hàng.', '/staff/workspace/shipping')}"></th:block>
 
-        <!-- HEADER -->
-        <section class="surface p-4 mb-4">
-            <h1 class="page-title mb-2">Đơn chờ giao</h1>
-            <div class="subtle">
-                Hiển thị các đơn PACKED hoặc SHIPPED. Nếu khách đã trả tiền thì COD cần thu = 0đ.
-            </div>
-        </section>
+
 
         <!-- TABLE -->
         <section class="surface p-4">
@@ -69,16 +64,7 @@
                             <!-- CHƯA SHIPPED -->
                             <div th:if="${r.orderStatus != 'SHIPPED'}">
                                 <form th:action="@{/staff/orders/{id}/ship/confirm(id=${r.orderId})}"
-                                      method="post"
-                                      class="d-flex gap-2">
-
-                                    <input type="text"
-                                           name="carrier"
-                                           class="form-control form-control-sm"
-                                           th:value="${r.carrier}"
-                                           placeholder="Nhập carrier"
-                                           required />
-
+                                      method="post">
                                     <button type="submit" class="btn btn-success btn-sm">
                                         Giao đơn
                                     </button>
@@ -92,11 +78,7 @@
                                 </div>
                             </div>
 
-                            <!-- CHI TIẾT -->
-                            <a class="btn btn-outline-secondary btn-sm mt-1"
-                               th:href="@{/staff/orders/{id}(id=${r.orderId})}">
-                                Chi tiết
-                            </a>
+
                         </td>
                     </tr>
 

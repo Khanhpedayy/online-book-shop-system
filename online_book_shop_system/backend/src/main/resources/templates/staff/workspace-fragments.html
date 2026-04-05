@@ -226,7 +226,7 @@
     </section>
 </th:block>
 
-<th:block th:fragment="filterBar(title, desc)">
+<th:block th:fragment="filterBar(title, desc, actionUrl)">
     <section class="surface p-4 mb-4">
         <div class="workspace-toolbar">
             <div>
@@ -234,14 +234,31 @@
                 <div class="subtle" th:text="${desc}">Description</div>
             </div>
 
-            <form th:action="@{/staff/workspace/allocate}" method="get">
+            <form th:action="${actionUrl}" method="get" class="d-flex gap-2 flex-wrap align-items-center">
                 <input type="text"
                        name="q"
                        class="form-control"
-                       placeholder="Tìm theo mã đơn / khách hàng"
-                       th:value="${filter != null ? filter.q : ''}">
+                       style="min-width: 300px;"
+                       placeholder="Tìm theo mã đơn / khách hàng / SĐT"
+                       th:value="${q != null ? q : (filter != null ? filter.q : '')}">
+
+                <select name="status" class="form-select" style="min-width:180px; max-width:220px;">
+                    <option value="">Tất cả trạng thái</option>
+                    <option th:if="${title == 'Allocate / Reserve'}" value="CONFIRMED" th:selected="${status == 'CONFIRMED'}">CONFIRMED</option>
+
+                    <option th:if="${title == 'Packing'}" value="PICKED" th:selected="${status == 'PICKED'}">PICKED</option>
+                    <option th:if="${title == 'Packing'}" value="PACKED" th:selected="${status == 'PACKED'}">PACKED</option>
+
+                    <option th:if="${title == 'Shipping'}" value="PACKED" th:selected="${status == 'PACKED'}">PACKED</option>
+                    <option th:if="${title == 'Shipping'}" value="SHIPPED" th:selected="${status == 'SHIPPED'}">SHIPPED</option>
+
+                    <option th:if="${title == 'Delivery / Return'}" value="SHIPPED" th:selected="${status == 'SHIPPED'}">SHIPPED</option>
+                    <option th:if="${title == 'Delivery / Return'}" value="COMPLETED" th:selected="${status == 'COMPLETED'}">COMPLETED</option>
+                    <option th:if="${title == 'Delivery / Return'}" value="CANCELLED" th:selected="${status == 'CANCELLED'}">CANCELLED / FAILED</option>
+                </select>
+
                 <button type="submit" class="btn btn-primary">Tìm</button>
-                <a th:href="@{/staff/workspace/allocate}" class="btn btn-outline-secondary">Xóa lọc</a>
+                <a th:href="${actionUrl}" class="btn btn-outline-secondary">Xóa lọc</a>
             </form>
         </div>
     </section>

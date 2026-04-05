@@ -5,10 +5,31 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="634e8fec-2e29-47dc-a295-d1d0284ed318" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.vscode/settings.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/service/StaffNotificationService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/controller/ManagerOrderController.java" beforeDir="false" afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/controller/ManagerOrderController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/controller/ShippingController.java" beforeDir="false" afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/controller/ShippingController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/controller/StaffDeliveryPageController.java" beforeDir="false" afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/controller/StaffDeliveryPageController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/controller/StaffShippingController.java" beforeDir="false" afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/controller/StaffShippingController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/controller/StaffWorkspaceController.java" beforeDir="false" afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/controller/StaffWorkspaceController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/dto/OrderListRow.java" beforeDir="false" afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/dto/OrderListRow.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/repo/StaffFulfillmentRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/repo/StaffFulfillmentRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/repo/StaffOrderQueryRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/repo/StaffOrderQueryRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/repo/StaffShippingRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/repo/StaffShippingRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/service/StaffDeliveryService.java" beforeDir="false" afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/service/StaffDeliveryService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/service/StaffOrderService.java" beforeDir="false" afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/service/StaffOrderService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/service/StaffPackingService.java" beforeDir="false" afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/service/StaffPackingService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/service/StaffShippingService.java" beforeDir="false" afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/service/StaffShippingService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/resources/templates/staff/order-detail.html" beforeDir="false" afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/resources/templates/staff/order-detail.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/resources/templates/staff/stock-out-pick.html" beforeDir="false" afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/resources/templates/staff/stock-out-pick.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/resources/templates/staff/workspace-allocate.html" beforeDir="false" afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/resources/templates/staff/workspace-allocate.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/resources/templates/staff/workspace-confirmed.html" beforeDir="false" afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/resources/templates/staff/workspace-confirmed.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/resources/templates/staff/workspace-delivery-return.html" beforeDir="false" afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/resources/templates/staff/workspace-delivery-return.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/resources/templates/staff/workspace-fragments.html" beforeDir="false" afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/resources/templates/staff/workspace-fragments.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/resources/templates/staff/workspace-packing.html" beforeDir="false" afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/resources/templates/staff/workspace-packing.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/resources/templates/staff/workspace-shipping.html" beforeDir="false" afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/resources/templates/staff/workspace-shipping.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -40,7 +61,7 @@
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;https://github.com/Khanhpedayy/online-book-shop-system.git&quot;,
-    &quot;accountId&quot;: &quot;7585d1b3-d615-4a0c-8689-e1376ed8f94e&quot;
+    &quot;accountId&quot;: &quot;11681038-3cce-462b-a45a-a794127db32a&quot;
   }
 }</component>
   <component name="McpProjectServerCommands">
@@ -55,31 +76,33 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
-    &quot;JUnit.StaffCustomerControllerTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.com.example.onlinebookshop.staff.controller in online-book-shop.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.com.example.onlinebookshop.staff.service in online-book-shop.executor&quot;: &quot;Run&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
-    &quot;Spring Boot.ManagerOnlineBookShopApplication.executor&quot;: &quot;Run&quot;,
-    &quot;Spring Boot.OnlineBookShopApplication.executor&quot;: &quot;Run&quot;,
-    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;Staff-change-UI&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/Hung Tien/OneDrive/Documents/GitHub/online-book-shop-system&quot;,
-    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "DefaultHtmlFileTemplate": "HTML File",
+    "JUnit.StaffCustomerControllerTest.executor": "Run",
+    "JUnit.com.example.onlinebookshop.staff.controller in online-book-shop.executor": "Run",
+    "JUnit.com.example.onlinebookshop.staff.service in online-book-shop.executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.MCP Project settings loaded": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "Spring Boot.ManagerOnlineBookShopApplication.executor": "Run",
+    "Spring Boot.OnlineBookShopApplication (1).executor": "Run",
+    "Spring Boot.OnlineBookShopApplication.executor": "Run",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "git-widget-placeholder": "Rebasing main",
+    "ignore.virus.scanning.warn.message": "true",
+    "junie.onboarding.icon.badge.shown": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Users/Hung Tien/OneDrive/Documents/GitHub/online-book-shop-system",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "to.speed.mode.migration.done": "true",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
-  <component name="RunManager" selected="Spring Boot.OnlineBookShopApplication">
+}]]></component>
+  <component name="RunManager" selected="Spring Boot.OnlineBookShopApplication (1)">
     <configuration name="StaffCustomerControllerTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="online-book-shop" />
       <extension name="coverage">
@@ -123,6 +146,20 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="OnlineBookShopApplication (1)" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" temporary="true" nameIsGenerated="true">
+      <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UnknownPolicyInFreeMode" />
+      <module name="online-book-shop (1)" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.example.onlinebookshop.OnlineBookShopApplication" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.example.onlinebookshop.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="OnlineBookShopApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" temporary="true" nameIsGenerated="true">
       <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UnknownPolicyInFreeMode" />
       <module name="online-book-shop" />
@@ -139,11 +176,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Spring Boot.OnlineBookShopApplication (1)" />
         <item itemvalue="Spring Boot.OnlineBookShopApplication" />
         <item itemvalue="JUnit.StaffCustomerControllerTest" />
         <item itemvalue="JUnit.com.example.onlinebookshop.staff.service in online-book-shop" />
         <item itemvalue="JUnit.com.example.onlinebookshop.staff.controller in online-book-shop" />
-        <item itemvalue="Spring Boot.OnlineBookShopApplication" />
       </list>
     </recent_temporary>
   </component>
@@ -167,5 +204,9 @@
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
   </component>
 </project>

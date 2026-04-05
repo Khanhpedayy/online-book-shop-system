@@ -7,11 +7,7 @@
 
     <main class="workspace-main">
         <th:block th:replace="~{staff/workspace-fragments :: flash}"></th:block>
-
-        <section class="surface p-4 mb-4">
-            <h1 class="page-title mb-2">Đơn chờ đóng gói</h1>
-            <div class="subtle">Nguồn dữ liệu: phiếu xuất đã PICKED, không có ngoại lệ.</div>
-        </section>
+        <th:block th:replace="~{staff/workspace-fragments :: filterBar('Packing','Danh sách đơn đã được pick đủ, chờ đóng gói.', '/staff/workspace/packing')}"></th:block>
 
         <section class="surface p-4">
             <div class="table-responsive">

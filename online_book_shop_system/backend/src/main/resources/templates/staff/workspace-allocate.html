@@ -7,7 +7,7 @@
 
     <main class="workspace-main">
         <th:block th:replace="~{staff/workspace-fragments :: flash}"></th:block>
-        <th:block th:replace="~{staff/workspace-fragments :: filterBar('Allocate / Reserve','Đơn CONFIRMED sẽ được reserve copy ở màn này. Sau đó vào chi tiết đơn để tạo phiếu xuất.')}"></th:block>
+        <th:block th:replace="~{staff/workspace-fragments :: filterBar('Allocate / Reserve','Đơn CONFIRMED sẽ được reserve copy ở màn này. Sau đó vào chi tiết đơn để tạo phiếu xuất.', '/staff/workspace/allocate')}"></th:block>
 
         <div class="accordion" id="allocateAccordion">
             <div class="accordion-item mb-3" th:each="o : ${orders}">
@@ -54,25 +54,25 @@
                                         Đơn đã allocate đủ. Vào chi tiết đơn để tạo phiếu xuất kho.
                                     </div>
 
-                                    <div class="alert alert-warning mt-3 mb-0"
-                                         th:if="${o.allocatedCount == null or o.itemCount == null or o.allocatedCount < o.itemCount}">
-                                        Bấm Auto allocate để reserve copy theo FIFO.
-                                    </div>
+<!--                                    <div class="alert alert-warning mt-3 mb-0"-->
+<!--                                         th:if="${o.allocatedCount == null or o.itemCount == null or o.allocatedCount < o.itemCount}">-->
+<!--                                        Bấm Auto allocate để reserve copy theo FIFO.-->
+<!--                                    </div>-->
                                 </div>
 
                                 <div class="col-lg-4">
                                     <div class="d-grid gap-2">
-                                        <form method="post" th:action="@{/staff/orders/{id}/allocate-auto(id=${o.id})}">
-                                            <bQtton class="btn btn-primary w-100"
-                                                    type="submit"
-                                                    th:disabled="${o.allocatedCount != null and o.itemCount != null and o.allocatedCount >= o.itemCount}">
-                                                Auto allocate
-                                            </bQtton>
-                                        </form>
+<!--                                        <form method="post" th:action="@{/staff/orders/{id}/allocate-auto(id=${o.id})}">-->
+<!--                                            <bQtton class="btn btn-primary w-100"-->
+<!--                                                    type="submit"-->
+<!--                                                    th:disabled="${o.allocatedCount != null and o.itemCount != null and o.allocatedCount >= o.itemCount}">-->
+<!--                                                Auto allocate-->
+<!--                                            </bQtton>-->
+<!--                                        </form>-->
 
                                         <a class="btn btn-outline-secondary"
                                            th:href="@{/staff/orders/{id}(id=${o.id})}">
-                                            Chi tiết đơn
+                                             Allocate
                                         </a>
                                     </div>
                                 </div>

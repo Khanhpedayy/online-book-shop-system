@@ -15,8 +15,8 @@ public class StaffPackingService {
         this.repo = repo;
     }
 
-    public List<StaffFulfillmentRepository.PackingQueueRow> getPackingQueue() {
-        return repo.findPackingQueue();
+    public List<StaffFulfillmentRepository.PackingQueueRow> getPackingQueue(String q, String status) {
+        return repo.findPackingQueue(q, status);
     }
 
     public StaffFulfillmentRepository.PackDetailView getPackDetail(long orderId) {

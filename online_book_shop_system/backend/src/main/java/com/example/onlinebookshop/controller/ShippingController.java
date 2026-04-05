@@ -1,9 +1,11 @@
-package com.example.onlinebookshop.Controller;
+package com.example.onlinebookshop.controller;
 
+import com.example.onlinebookshop.Repository.UserRepository;
 import com.example.onlinebookshop.Entity.Order;
 import com.example.onlinebookshop.Service.ShippingService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,9 +16,18 @@ import java.util.Map;
 public class ShippingController {
 
     private final ShippingService shippingService;
+    private final UserRepository userRepository;
 
-    public ShippingController(ShippingService shippingService) {
+    public ShippingController(ShippingService shippingService, UserRepository userRepository) {
         this.shippingService = shippingService;
+        this.userRepository = userRepository;
+    }
+
+    private Long getUserId(Authentication auth) {
+        if (auth == null) return null;
+        return userRepository.findByEmailAndDeletedAtIsNull(auth.getName())
+                .orElseThrow(() -> new RuntimeException("User not found"))
+                .getId();
     }
 
     /**
@@ -57,9 +68,10 @@ public class ShippingController {
      * Body: { "carrier": "Tên nhân viên" }
      */
     @PostMapping("/{id}/ship")
-    public ResponseEntity<?> shipOrder(@PathVariable Long id, @RequestBody Map<String, String> body) {
+    public ResponseEntity<?> shipOrder(@PathVariable Long id, @RequestBody Map<String, String> body, Authentication auth) {
         try {
-            String carrier = body.getOrDefault("carrier", "Nhân viên");
+            Long staffId = (auth != null) ? getUserId(auth) : null;
+            String carrier = (staffId != null) ? String.valueOf(staffId) : body.getOrDefault("carrier", "Nhân viên");
             Order order = shippingService.shipOrder(id, carrier);
             return ResponseEntity
                     .ok(Map.of("message", "Đơn hàng " + order.getOrderCode() + " đang được giao bởi " + carrier,

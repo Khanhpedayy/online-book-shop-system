@@ -77,7 +77,6 @@
               <tr th:each="item : ${order.items}">
                 <td>
                   <div class="fw-semibold" th:text="${item.titleSnapshot}">Book title</div>
-                  <div class="small text-muted" th:text="${item.conditionSnapshot != null ? item.conditionSnapshot : '-'}">GOOD</div>
                 </td>
                 <td class="mono" th:text="${item.skuSnapshot}">SKU001</td>
                 <td th:text="${item.quantity}">1</td>
@@ -154,7 +153,7 @@
                         <select name="copyId" class="form-select form-select-sm">
                           <option th:each="cp : ${availableCopiesByItemId[item.id]}"
                                   th:value="${cp.id}"
-                                  th:text="${cp.copyCode + ' | ' + cp.lotCode + ' | ' + cp.location + ' | ' + cp.conditionGrade}">
+                                  th:text="${cp.copyCode + ' | ' + cp.lotCode + ' | ' + cp.location}">
                             COPY001
                           </option>
                         </select>
@@ -352,14 +351,9 @@
         <section class="surface p-4 mb-4">
           <h2 class="fs-4 mb-3">Thông tin shipment</h2>
 
-          <div class="mb-3">
+          <div class="mb-0">
             <div class="subtle">Carrier</div>
             <div class="fw-semibold" th:text="${order.carrier != null and !#strings.isEmpty(order.carrier) ? order.carrier : '-'}">GHN</div>
-          </div>
-
-          <div class="mb-0">
-            <div class="subtle">Tracking code</div>
-            <div class="fw-semibold mono" th:text="${order.trackingCode != null and !#strings.isEmpty(order.trackingCode) ? order.trackingCode : '-'}">TRACK001</div>
           </div>
         </section>
       </div>

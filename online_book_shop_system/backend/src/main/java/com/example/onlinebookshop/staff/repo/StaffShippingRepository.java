@@ -19,6 +19,7 @@ public class StaffShippingRepository {
     public OrderHeader getOrderHeader(long orderId) {
         String sql = """
             SELECT TOP 1 o.id, o.order_code, o.status, o.payment_status,
+                         o.user_id,
                          o.ship_name, o.ship_phone,
                          o.ship_line1, o.ship_line2, o.ship_ward, o.ship_district, o.ship_city, o.ship_province,
                          o.carrier, o.tracking_code
@@ -31,6 +32,7 @@ public class StaffShippingRepository {
                         rs.getString("order_code"),
                         rs.getString("status"),
                         rs.getString("payment_status"),
+                        rs.getLong("user_id"),
                         rs.getString("ship_name"),
                         rs.getString("ship_phone"),
                         rs.getString("ship_line1"),
@@ -182,6 +184,7 @@ public class StaffShippingRepository {
             String orderCode,
             String status,
             String paymentStatus,
+            long userId,
             String shipName,
             String shipPhone,
             String shipLine1,

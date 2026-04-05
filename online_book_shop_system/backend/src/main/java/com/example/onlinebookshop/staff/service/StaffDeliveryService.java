@@ -15,8 +15,8 @@ public class StaffDeliveryService {
         this.repo = repo;
     }
 
-    public List<StaffFulfillmentRepository.ShippingQueueRow> getShippingQueue() {
-        return repo.findShippingQueue();
+    public List<StaffFulfillmentRepository.ShippingQueueRow> getShippingQueue(String q, String status) {
+        return repo.findShippingQueue(q, status);
     }
 
     public StaffFulfillmentRepository.DeliveryDetailView getDeliveryDetail(long orderId) {

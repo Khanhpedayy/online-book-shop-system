@@ -1,7 +1,6 @@
 package com.example.onlinebookshop.staff.service;
 
 import com.example.onlinebookshop.Entity.Order;
-import com.example.onlinebookshop.payos.PayOsPaymentSyncService;
 import com.example.onlinebookshop.staff.dto.AllocatePreviewRow;
 import com.example.onlinebookshop.staff.dto.OrderDetailView;
 import com.example.onlinebookshop.staff.dto.OrderFilter;
@@ -31,18 +30,18 @@ public class StaffOrderService {
     private final StaffOrderQueryRepository queryRepository;
     private final StaffAlertRepository alertRepository;
     private final StaffPackingRepository packingRepository;
-    private final PayOsPaymentSyncService payOsPaymentSyncService;
+    private final StaffNotificationService notificationService;
 
     public StaffOrderService(StaffOrderRepository staffOrderRepository,
                              StaffOrderQueryRepository queryRepository,
                              StaffAlertRepository alertRepository,
                              StaffPackingRepository packingRepository,
-                             PayOsPaymentSyncService payOsPaymentSyncService) {
+                             StaffNotificationService notificationService) {
         this.staffOrderRepository = staffOrderRepository;
         this.queryRepository = queryRepository;
         this.alertRepository = alertRepository;
         this.packingRepository = packingRepository;
-        this.payOsPaymentSyncService = payOsPaymentSyncService;
+        this.notificationService = notificationService;
     }
 
     public List<OrderListRow> getAll(OrderFilter filter) {
@@ -95,18 +94,25 @@ public class StaffOrderService {
         if (paymentStatus == null || paymentStatus.trim().isEmpty()) {
             throw new RuntimeException("paymentStatus is required");
         }
-        String previous = order.getPaymentStatus();
-        String next = paymentStatus.trim().toUpperCase();
-        order.setPaymentStatus(next);
-        staffOrderRepository.saveAndFlush(order);
-        payOsPaymentSyncService.applyPayOsStockAfterManualPaymentUpdate(orderId, previous, next);
+        order.setPaymentStatus(paymentStatus.trim().toUpperCase());
+        staffOrderRepository.save(order);
     }
 
     @Transactional
     public void updateStatus(Long id, String newStatus) {
         Order order = getById(id);
-        applyStatus(order, requireStatus(newStatus));
+        String ns = requireStatus(newStatus);
+        applyStatus(order, ns);
         staffOrderRepository.save(order);
+
+        // Gửi thông báo cho khách dựa trên trạng thái mới
+        if ("COMPLETED".equals(ns)) {
+            notificationService.notifyOrderCompleted(order.getUser().getId(), order.getOrderCode(), order.getId());
+        } else if ("CANCELLED".equals(ns)) {
+            notificationService.notifyOrderCancelled(order.getUser().getId(), order.getOrderCode(), order.getId(), null);
+        } else if ("SHIPPED".equals(ns)) {
+            notificationService.notifyOrderShipped(order.getUser().getId(), order.getOrderCode(), order.getId());
+        }
     }
 
     @Transactional
@@ -173,12 +179,45 @@ public class StaffOrderService {
             order.setCarrier(carrier.trim());
             applyStatus(order, "SHIPPED");
             staffOrderRepository.save(order);
+
+            // Gửi thông báo cho từng đơn trong lô
+            notificationService.notifyOrderShipped(order.getUser().getId(), order.getOrderCode(), order.getId());
         }
     }
 
     @Transactional
     public void bulkDeliver(List<Long> orderIds) {
-        mutateInBulk(orderIds, "SHIPPED", "DELIVERED");
+        for (Long orderId : validateIds(orderIds)) {
+            Order order = getById(orderId);
+            String current = normalized(order.getStatus());
+            if (!"SHIPPED".equals(current)) {
+                throw new RuntimeException("Chỉ xử lý được đơn SHIPPED. Đơn lỗi: " + order.getOrderCode());
+            }
+            applyStatus(order, "DELIVERED");
+            staffOrderRepository.save(order);
+            // Có thể thêm notify ở đây nếu cần, nhưng DELIVERED thường là trạng thái trung gian trước COMPLETED.
+            // Nếu user muốn thông báo DELIVERED (đã giao tới nhưng chưa hoàn tất), có thể thêm sau.
+        }
+    }
+
+    @Transactional
+    public void markDeliveryFailed(Long id, String reason) {
+        Order order = getById(id);
+        String current = normalized(order.getStatus());
+        if (!"SHIPPED".equals(current) && !"DELIVERED".equals(current)) {
+            throw new RuntimeException("Chỉ đơn đang giao mới có thể báo giao thất bại.");
+        }
+        
+        applyStatus(order, "CANCELLED");
+        
+        if (reason != null && !reason.trim().isEmpty()) {
+            String note = order.getStaffNote();
+            order.setStaffNote((note == null ? "" : note + "\n") + "[FAIL REASON] " + reason.trim());
+        }
+        staffOrderRepository.save(order);
+
+        // Gửi thông báo cho khách
+        notificationService.notifyOrderCancelled(order.getUser().getId(), order.getOrderCode(), order.getId(), reason);
     }
 
     @Transactional
@@ -381,7 +420,12 @@ public class StaffOrderService {
             }
             case "COMPLETED" -> {
                 order.setStatus("COMPLETED");
-                order.setCompletedAt(LocalDateTime.now());
+                if (order.getDeliveredAt() == null) {
+                    order.setDeliveredAt(LocalDateTime.now()); // set delivered_at khi COMPLETED
+                }
+                if (order.getCompletedAt() == null) {
+                    order.setCompletedAt(LocalDateTime.now());
+                }
             }
             case "CANCELLED" -> {
                 order.setStatus("CANCELLED");

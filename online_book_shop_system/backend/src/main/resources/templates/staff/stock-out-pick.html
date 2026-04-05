@@ -42,8 +42,7 @@
       </div>
 
       <div class="alert alert-danger mt-3 mb-0" th:if="${stockOut.hasException}">
-        Phiếu đang bị treo vì lệch tồn. Staff vẫn có thể pick tiếp phần còn lại, nhưng không được pack / ship.
-        Hàng đã pick phải đưa vào HOLD area.
+        Phiếu hiện đang bị tạm dừng do tồn kho không khớp. Nhân viên vẫn có thể lấy (pick) phần hàng còn lại, nhưng không được đóng gói (pack) hoặc giao (ship). Hàng đã lấy phải đưa vào khu vực HOLD.
         <div class="mt-2" th:if="${stockOut.exceptionNote != null}" th:text="${stockOut.exceptionNote}"></div>
       </div>
     </section>

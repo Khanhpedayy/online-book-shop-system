@@ -30,7 +30,7 @@ public class StaffOrderQueryRepository {
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT TOP (:limit) ")
                 .append("  o.id, o.order_code, o.status, o.payment_status, ")
-                .append("  o.ship_name, o.ship_phone, o.total_amount, o.placed_at, o.shipped_at, o.delivered_at, ")
+                .append("  o.ship_name, o.ship_phone, o.total_amount, o.placed_at, o.shipped_at, o.delivered_at, o.completed_at, o.cancelled_at, ")
                 .append("  COALESCE(agg.item_count, 0) AS item_count, ")
                 .append("  COALESCE(agg.allocated_count, 0) AS allocated_count, ")
                 .append("  COALESCE(agg.picked_count, 0) AS picked_count ")
@@ -56,7 +56,7 @@ public class StaffOrderQueryRepository {
                     case "allocate" -> sql.append(" AND o.status = 'CONFIRMED' AND COALESCE(agg.allocated_count, 0) < COALESCE(agg.item_count, 0) ");
                     case "packing" -> sql.append(" AND o.status = 'CONFIRMED' AND COALESCE(agg.item_count, 0) > 0 AND COALESCE(agg.picked_count, 0) = COALESCE(agg.item_count, 0) ");
                     case "shipping" -> sql.append(" AND o.status = 'PACKED' ");
-                    case "delivery-return" -> sql.append(" AND (o.status IN ('SHIPPED','DELIVERED','COMPLETED') OR o.shipped_at IS NOT NULL OR o.delivered_at IS NOT NULL) ");
+                    case "delivery-return" -> sql.append(" AND (o.status IN ('SHIPPED','COMPLETED','CANCELLED') OR o.shipped_at IS NOT NULL OR o.delivered_at IS NOT NULL) ");
                     default -> { }
                 }
             }
@@ -158,6 +158,8 @@ public class StaffOrderQueryRepository {
             o.setPlacedAt(rs.getTimestamp("placed_at") == null ? null : rs.getTimestamp("placed_at").toLocalDateTime());
             o.setShippedAt(rs.getTimestamp("shipped_at") == null ? null : rs.getTimestamp("shipped_at").toLocalDateTime());
             o.setDeliveredAt(rs.getTimestamp("delivered_at") == null ? null : rs.getTimestamp("delivered_at").toLocalDateTime());
+            o.setCompletedAt(rs.getTimestamp("completed_at") == null ? null : rs.getTimestamp("completed_at").toLocalDateTime());
+            o.setCancelledAt(rs.getTimestamp("cancelled_at") == null ? null : rs.getTimestamp("cancelled_at").toLocalDateTime());
             o.setItemCount(rs.getInt("item_count"));
             o.setAllocatedCount(rs.getInt("allocated_count"));
             o.setPickedCount(rs.getInt("picked_count"));
