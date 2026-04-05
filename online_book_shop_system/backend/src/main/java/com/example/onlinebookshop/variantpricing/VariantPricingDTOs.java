@@ -19,7 +19,6 @@ class VariantDTO {
     private String language;
     private Double listPrice;
     private Double salePrice;
-    private String conditionPricesJson; // {"LIKE_NEW":{"pct":10},"GOOD":{"pct":20},"FAIR":{"pct":35}}
     private Integer pageCount;
     private Integer weightGrams;
     private Integer widthMm;
@@ -93,14 +92,6 @@ class UpdateVariantRequest {
     private Integer heightMm;
     private Integer thicknessMm;
     private Boolean isActive;
-}
-
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-class SetConditionPricesRequest {
-    private String conditionPricesJson; // {"LIKE_NEW":{"pct":10},"GOOD":{"pct":20},"FAIR":{"pct":35}}
 }
 
 @Getter

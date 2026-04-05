@@ -18,7 +18,7 @@ public class VariantPricingRepository {
         this.jdbc = jdbc;
     }
 
-    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• VARIANT â€” LIST BY BOOK â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    /* ═══════════════════════ VARIANT — LIST BY BOOK ═══════════════════════ */
 
     public List<VariantDTO> findVariantsByBookId(Long bookId) {
         String sql = """
@@ -33,7 +33,7 @@ public class VariantPricingRepository {
         return jdbc.query(sql, (rs, rn) -> mapVariant(rs), bookId);
     }
 
-    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• VARIANT â€” LIST ALL â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    /* ═══════════════════════ VARIANT — LIST ALL ═══════════════════════ */
 
     public List<VariantDTO> findAllVariants() {
         String sql = """
@@ -48,7 +48,7 @@ public class VariantPricingRepository {
         return jdbc.query(sql, (rs, rn) -> mapVariant(rs));
     }
 
-    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• VARIANT â€” GET BY ID â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    /* ═══════════════════════ VARIANT — GET BY ID ═══════════════════════ */
 
     public VariantDTO findVariantById(Long id) {
         String sql = """
@@ -63,7 +63,7 @@ public class VariantPricingRepository {
         return list.isEmpty() ? null : list.get(0);
     }
 
-    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• VARIANT â€” GET BY SKU â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    /* ═══════════════════════ VARIANT — GET BY SKU ═══════════════════════ */
 
     public VariantDTO findVariantBySku(String sku) {
         String sql = """
@@ -78,7 +78,7 @@ public class VariantPricingRepository {
         return list.isEmpty() ? null : list.get(0);
     }
 
-    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• VARIANT â€” CREATE â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    /* ═══════════════════════ VARIANT — CREATE ═══════════════════════ */
 
     public Long insertVariant(CreateVariantRequest req) {
         String sql = """
@@ -108,7 +108,7 @@ public class VariantPricingRepository {
         return Objects.requireNonNull(kh.getKey()).longValue();
     }
 
-    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• VARIANT â€” UPDATE â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    /* ═══════════════════════ VARIANT — UPDATE ═══════════════════════ */
 
     public int updateVariant(Long id, UpdateVariantRequest req) {
         String sql = """
@@ -128,30 +128,21 @@ public class VariantPricingRepository {
                 id);
     }
 
-    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• VARIANT â€” SET BASE PRICE â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    /* ═══════════════════════ VARIANT — SET BASE PRICE ═══════════════════════ */
 
     public int setBasePrice(Long variantId, Double listPrice, Double salePrice) {
         String sql = "UPDATE book_variants SET list_price = ?, sale_price = ?, updated_at = SYSUTCDATETIME() WHERE id = ? AND deleted_at IS NULL";
         return jdbc.update(sql, listPrice, salePrice, variantId);
     }
 
-    /*
-     * â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• VARIANT â€” SET CONDITION PRICES â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-     */
-
-    public int setConditionPrices(Long variantId, String conditionPricesJson) {
-        String sql = "UPDATE book_variants SET condition_prices_json = ?, updated_at = SYSUTCDATETIME() WHERE id = ? AND deleted_at IS NULL";
-        return jdbc.update(sql, conditionPricesJson, variantId);
-    }
-
-    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• VARIANT â€” SOFT DELETE â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    /* ═══════════════════════ VARIANT — SOFT DELETE ═══════════════════════ */
 
     public int softDeleteVariant(Long id) {
         String sql = "UPDATE book_variants SET deleted_at = SYSUTCDATETIME() WHERE id = ? AND deleted_at IS NULL";
         return jdbc.update(sql, id);
     }
 
-    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• COPIES â€” LIST BY VARIANT â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    /* ═══════════════════════ COPIES — LIST BY VARIANT ═══════════════════════ */
 
     public List<CopyPricingDTO> findCopiesByVariantId(Long variantId) {
         String sql = """
@@ -186,14 +177,14 @@ public class VariantPricingRepository {
         }, variantId);
     }
 
-    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• COPY â€” OVERRIDE PRICE â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    /* ═══════════════════════ COPY — OVERRIDE PRICE ═══════════════════════ */
 
     public int overrideCopyPrice(Long copyId, Double sellPriceOverride) {
         String sql = "UPDATE copies SET sell_price_override = ?, updated_at = SYSUTCDATETIME() WHERE id = ? AND deleted_at IS NULL";
         return jdbc.update(sql, sellPriceOverride, copyId);
     }
 
-    /* â•â•â• Helper â•â•â• */
+    /* ═══ Helper ═══ */
 
     private VariantDTO mapVariant(java.sql.ResultSet rs) throws java.sql.SQLException {
         VariantDTO dto = new VariantDTO();
@@ -206,7 +197,6 @@ public class VariantPricingRepository {
         dto.setLanguage(rs.getString("language"));
         dto.setListPrice(rs.getDouble("list_price"));
         dto.setSalePrice(rs.getDouble("sale_price"));
-        dto.setConditionPricesJson(rs.getString("condition_prices_json"));
         dto.setPageCount(rs.getObject("page_count", Integer.class));
         dto.setWeightGrams(rs.getObject("weight_grams", Integer.class));
         dto.setWidthMm(rs.getObject("width_mm", Integer.class));
@@ -220,4 +210,3 @@ public class VariantPricingRepository {
         return dto;
     }
 }
-

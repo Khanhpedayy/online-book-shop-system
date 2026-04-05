@@ -147,8 +147,6 @@
                             <option value="">Chọn loại</option>
                             <option value="IMPORT">📦 Nhập hàng</option>
                             <option value="EXPORT">📤 Xuất hàng</option>
-                            <option value="DAMAGE">💔 Hư hỏng</option>
-                            <option value="RETURN">🔄 Trả hàng</option>
                         </select>
                     </div>
                     <div class="mb-3">
@@ -260,8 +258,8 @@
                 tbody.innerHTML = '<tr><td colspan="8" class="text-center py-5 text-muted">Chưa có lịch sử điều chỉnh</td></tr>';
                 return;
             }
-            const typeLabels = { IMPORT: '📦 Nhập', EXPORT: '📤 Xuất', SET: '✏️ Đặt', DAMAGE: '💔 Hư hỏng', RETURN: '🔄 Trả' };
-            const typeColors = { IMPORT: 'success', EXPORT: 'danger', SET: 'primary', DAMAGE: 'warning', RETURN: 'info' };
+            const typeLabels = { IMPORT: '📦 Nhập', EXPORT: '📤 Xuất', SET: '✏️ Đặt' };
+            const typeColors = { IMPORT: 'success', EXPORT: 'danger', SET: 'primary' };
             tbody.innerHTML = adjustments.map(a => `<tr>
                 <td class="small">${a.createdAt ? new Date(a.createdAt).toLocaleString('vi-VN') : '—'}</td>
                 <td class="fw-semibold">${a.bookTitle}</td>
@@ -325,7 +323,7 @@
             };
             try {
                 await api.post(`/management/stock/${editingBookId}/adjust`, payload);
-                const typeLabels = { IMPORT: 'Nhập hàng', EXPORT: 'Xuất hàng', DAMAGE: 'Ghi hư hỏng', RETURN: 'Trả hàng' };
+                const typeLabels = { IMPORT: 'Nhập hàng', EXPORT: 'Xuất hàng' };
                 showToast(`${typeLabels[type] || type} thành công: ${qty} cuốn`, 'success');
                 bootstrap.Modal.getInstance(document.getElementById('adjustModal')).hide();
                 stockItems = await api.get('/management/stock');

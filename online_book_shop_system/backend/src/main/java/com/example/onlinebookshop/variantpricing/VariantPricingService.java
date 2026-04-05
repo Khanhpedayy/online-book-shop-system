@@ -14,7 +14,7 @@ public class VariantPricingService {
         this.repo = repo;
     }
 
-    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• VARIANT CRUD â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    /* ═══════════════════════ VARIANT CRUD ═══════════════════════ */
 
     public List<VariantDTO> getVariantsByBook(Long bookId) {
         return repo.findVariantsByBookId(bookId);
@@ -41,13 +41,13 @@ public class VariantPricingService {
     @Transactional
     public VariantDTO createVariant(CreateVariantRequest req) {
         if (req.getBookId() == null)
-            throw new IllegalArgumentException("Thiếu thông tin sách (bookId)");
+            throw new IllegalArgumentException("Thi\u1ebfu th\u00f4ng tin s\u00e1ch (bookId)");
         if (req.getSku() == null || req.getSku().isBlank())
-            throw new IllegalArgumentException("Thiếu mã SKU");
+            throw new IllegalArgumentException("Thi\u1ebfu m\u00e3 SKU");
         if (req.getListPrice() == null)
-            throw new IllegalArgumentException("Thiếu Giá niêm yết (list_price)");
+            throw new IllegalArgumentException("Thi\u1ebfu Gi\u00e1 ni\u00eam y\u1ebft (list_price)");
         if (req.getSalePrice() == null)
-            throw new IllegalArgumentException("Thiếu Giá bán (sale_price)");
+            throw new IllegalArgumentException("Thi\u1ebfu Gi\u00e1 b\u00e1n (sale_price)");
         Long id = repo.insertVariant(req);
         return repo.findVariantById(id);
     }
@@ -55,9 +55,9 @@ public class VariantPricingService {
     @Transactional
     public VariantDTO updateVariant(Long id, UpdateVariantRequest req) {
         if (req.getListPrice() == null)
-            throw new IllegalArgumentException("Thiếu Giá niêm yết (list_price)");
+            throw new IllegalArgumentException("Thi\u1ebfu Gi\u00e1 ni\u00eam y\u1ebft (list_price)");
         if (req.getSalePrice() == null)
-            throw new IllegalArgumentException("Thiếu Giá bán (sale_price)");
+            throw new IllegalArgumentException("Thi\u1ebfu Gi\u00e1 b\u00e1n (sale_price)");
         getVariantById(id); // ensure exists
         int rows = repo.updateVariant(id, req);
         if (rows == 0)
@@ -71,7 +71,7 @@ public class VariantPricingService {
             throw new RuntimeException("Variant not found with id: " + id);
     }
 
-    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• PRICING â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    /* ═══════════════════════ PRICING ═══════════════════════ */
 
     @Transactional
     public VariantDTO setBasePrice(Long variantId, Double listPrice, Double salePrice) {
@@ -84,14 +84,7 @@ public class VariantPricingService {
         return repo.findVariantById(variantId);
     }
 
-    @Transactional
-    public VariantDTO setConditionPrices(Long variantId, String conditionPricesJson) {
-        getVariantById(variantId);
-        repo.setConditionPrices(variantId, conditionPricesJson);
-        return repo.findVariantById(variantId);
-    }
-
-    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• PER-COPY PRICING â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    /* ═══════════════════════ PER-COPY PRICING ═══════════════════════ */
 
     public List<CopyPricingDTO> getCopiesByVariant(Long variantId) {
         return repo.findCopiesByVariantId(variantId);
@@ -104,4 +97,3 @@ public class VariantPricingService {
             throw new RuntimeException("Copy not found with id: " + copyId);
     }
 }
-

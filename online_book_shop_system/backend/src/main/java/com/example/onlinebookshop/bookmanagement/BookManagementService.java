@@ -61,27 +61,6 @@ public class BookManagementService {
         req.setIsbn13(sanitizeIsbn(req.getIsbn13(), 13, "ISBN-13"));
         req.setIsbn10(sanitizeIsbn(req.getIsbn10(), 10, "ISBN-10"));
 
-        // validate frontend value
-        if (req.getSellMode() != null && !req.getSellMode().isBlank() &&
-                !req.getSellMode().equals("PER_COPY") &&
-                !req.getSellMode().equals("PER_QUANTITY")) {
-
-            throw new IllegalArgumentException(
-                    "Invalid sell mode: " + req.getSellMode() + ". Must be PER_COPY or PER_QUANTITY.");
-        }
-
-        if (req.getStatus() != null && !req.getStatus().isBlank() &&
-                !req.getStatus().equals("ACTIVE") &&
-                !req.getStatus().equals("HIDDEN") &&
-                !req.getStatus().equals("DRAFT")) {
-            throw new IllegalArgumentException(
-                    "Invalid status: " + req.getStatus() + ". Must be ACTIVE, HIDDEN, or DRAFT.");
-        }
-
-        // ===== MAP FRONTEND -> DATABASE =====
-        if ("PER_QUANTITY".equals(req.getSellMode())) {
-            req.setSellMode("QUANTITY");
-        }
 
         Long bookId = repo.insertBook(req);
 
@@ -122,19 +101,6 @@ public class BookManagementService {
         // Sanitize ISBNs (strip dashes/spaces, validate length)
         req.setIsbn13(sanitizeIsbn(req.getIsbn13(), 13, "ISBN-13"));
         req.setIsbn10(sanitizeIsbn(req.getIsbn10(), 10, "ISBN-10"));
-
-        if (req.getSellMode() != null && !req.getSellMode().isBlank() &&
-                !req.getSellMode().equals("PER_COPY") &&
-                !req.getSellMode().equals("PER_QUANTITY")) {
-
-            throw new IllegalArgumentException(
-                    "Invalid sell mode: " + req.getSellMode() + ". Must be PER_COPY or PER_QUANTITY.");
-        }
-
-        // ===== MAP FRONTEND -> DATABASE =====
-        if ("PER_QUANTITY".equals(req.getSellMode())) {
-            req.setSellMode("QUANTITY");
-        }
 
         if (req.getImages() != null) {
             List<ImageInput> validImages = req.getImages().stream()
