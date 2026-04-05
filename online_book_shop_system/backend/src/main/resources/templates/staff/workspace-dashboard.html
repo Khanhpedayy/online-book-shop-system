@@ -9,8 +9,19 @@
         <th:block th:replace="~{staff/workspace-fragments :: flash}"></th:block>
 
         <section class="surface p-4 mb-4">
-            <h1 class="page-title">Dashboard</h1>
-            <div class="subtle">Tổng quan theo công đoạn.</div>
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="page-title mb-1">Dashboard</h1>
+                    <div class="subtle">Tổng quan theo công đoạn.</div>
+                </div>
+
+                <!-- NÚT LOGOUT -->
+                <form th:action="@{/logout}" method="post">
+                    <button class="btn btn-outline-danger">
+                        Đăng xuất
+                    </button>
+                </form>
+            </div>
 
             <div th:if="${dbError != null}" class="alert alert-warning mt-3 mb-0">
                 Không tải được dữ liệu dashboard:

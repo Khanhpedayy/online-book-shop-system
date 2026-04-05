@@ -95,6 +95,8 @@
                 </td>
 
                 <td>
+                  <!-- CHẶN TOÀN BỘ PICK KHI ĐÃ CÓ STOCK OUT -->
+                  <div th:if="${activeStockOut == null}">
                   <div th:if="${item.quantity > 1}">
                     <div class="small text-danger mb-2">
                       Dòng này có quantity &gt; 1 nên chưa thể bind từng copy code riêng. Hãy tách dòng trước.
@@ -205,6 +207,13 @@
                       <div class="small text-danger">
                         Không có copy AVAILABLE và lot cũng không còn qty_available để materialize copy.
                       </div>
+                    </div>
+                  </div> <!-- end activeStockOut == null -->
+
+                  <!-- HIỂN THỊ KHI ĐÃ CÓ STOCK OUT -->
+                  <div th:if="${activeStockOut != null}">
+                    <div class="small text-muted">
+                      Đã có phiếu xuất kho → không thể sửa Reserve / Pick
                     </div>
                   </div>
                 </td>

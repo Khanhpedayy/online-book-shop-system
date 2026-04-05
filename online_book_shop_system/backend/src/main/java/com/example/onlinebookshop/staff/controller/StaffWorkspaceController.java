@@ -1,6 +1,7 @@
 package com.example.onlinebookshop.staff.controller;
 
 import com.example.onlinebookshop.staff.dto.OrderFilter;
+import com.example.onlinebookshop.staff.dto.OrderListRow;
 import com.example.onlinebookshop.staff.service.StaffDashboardStats;
 import com.example.onlinebookshop.staff.service.StaffOrderService;
 import org.springframework.security.core.Authentication;
@@ -13,6 +14,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -41,10 +43,14 @@ public class StaffWorkspaceController {
                 model.addAttribute("stats", stats);
             }
 
-            var todoOrders = orderService.getTodoList();
-            if (todoOrders != null) {
-                model.addAttribute("todoOrders", todoOrders);
-            }
+            // 🔥 FIX Ở ĐÂY
+            OrderFilter filter = new OrderFilter();
+            filter.setStage("confirmed"); // chỉ lấy CONFIRMED
+
+            List<OrderListRow> todoOrders = orderService.getAll(filter);
+
+            model.addAttribute("todoOrders", todoOrders);
+
         } catch (Exception ex) {
             model.addAttribute("dbError", ex.getMessage());
         }
@@ -77,7 +83,7 @@ public class StaffWorkspaceController {
             OrderFilter orderFilter = new OrderFilter();
             orderFilter.setQ(q);              // nếu class bạn có field này
             orderFilter.setStage("allocate"); // 🔥 quan trọng
-
+            orderFilter.setStatus("CONFIRMED");
             model.addAttribute("orders", orderService.getAll(orderFilter));
 
         } catch (Exception ex) {
