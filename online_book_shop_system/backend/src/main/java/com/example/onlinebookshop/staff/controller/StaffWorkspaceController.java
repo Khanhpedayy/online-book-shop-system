@@ -7,7 +7,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -15,6 +17,7 @@ import java.util.Map;
 
 @Controller
 public class StaffWorkspaceController {
+
 
     private final StaffOrderService orderService;
 
@@ -105,5 +108,20 @@ public class StaffWorkspaceController {
         }
 
         return "staff/workspace-delivery-return"; // 👈 đúng tên file mày gửi
+    }
+    @PostMapping("/staff/workspace/delivery-return/create-return-intake")
+    public String createReturnIntake(@RequestParam("orderId") Long orderId,
+                                     @RequestParam("copyCodes") String copyCodes,
+                                     @RequestParam(value = "reason", required = false) String reason,
+                                     @RequestParam(value = "receivedConditionGrade", required = false) String receivedConditionGrade,
+                                     @RequestParam(value = "receivedConditionNote", required = false) String receivedConditionNote,
+                                     RedirectAttributes ra) {
+        try {
+            orderService.createReturnIntakeMulti(orderId, copyCodes, reason, receivedConditionGrade, receivedConditionNote);
+            ra.addFlashAttribute("successMessage", "Đã tạo return intake cho đơn " + orderId);
+        } catch (Exception e) {
+            ra.addFlashAttribute("errorMessage", e.getMessage());
+        }
+        return "redirect:/staff/workspace/delivery-return";
     }
 }

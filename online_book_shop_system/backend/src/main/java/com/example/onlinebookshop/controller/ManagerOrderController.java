@@ -129,4 +129,52 @@ public class ManagerOrderController {
                 "success", true
         );
     }
+
+//    @GetMapping
+//    public List<Map<String, Object>> getStockOuts() {
+//        return jdbc.queryForList("""
+//            SELECT
+//                id,
+//                stock_out_code,
+//                exception_note
+//            FROM stock_outs
+//            WHERE has_exception = 1
+//              AND deleted_at IS NULL
+//            ORDER BY created_at DESC
+//        """);
+//    }
+//
+//    /**
+//     * GET: chi tiết phiếu lỗi
+//     */
+//    @GetMapping("/{id}")
+//    public Map<String, Object> getStockOutDetail(@PathVariable Long id) {
+//
+//        // header
+//        Map<String, Object> stockOut = jdbc.queryForMap("""
+//            SELECT
+//                id,
+//                stock_out_code,
+//                exception_note,
+//                status
+//            FROM stock_outs
+//            WHERE id = ?
+//        """, id);
+//
+//        // items
+//        List<Map<String, Object>> items = jdbc.queryForList("""
+//            SELECT
+//                id,
+//                title_snapshot,
+//                is_missing_reported
+//            FROM stock_out_items
+//            WHERE stock_out_id = ?
+//              AND deleted_at IS NULL
+//        """, id);
+//
+//        return Map.of(
+//                "stockOut", stockOut,
+//                "items", items
+//        );
+//    }
 }

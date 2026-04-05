@@ -918,3 +918,138 @@ VALUES (
            N'Rule batch picking / wave picking cho staff'
        );
 END;
+
+/* =========================================================
+   UPDATE: Thêm bảng phiếu xuất kho cho flow staff xử lý kho
+   SQL Server
+   Chạy file này SAU khi đã chạy databasebansach.sql
+   ========================================================= */
+
+SET ANSI_NULLS ON;
+SET QUOTED_IDENTIFIER ON;
+
+
+/* ===================== STOCK OUTS ===================== */
+
+CREATE TABLE stock_outs (
+                            id             BIGINT IDENTITY(1,1) PRIMARY KEY,
+                            stock_out_code VARCHAR(60)   NOT NULL,
+                            order_id       BIGINT        NOT NULL,
+
+                            status         VARCHAR(30)   NOT NULL DEFAULT 'CREATED',
+                            printed_at     DATETIME2(0)  NULL,
+
+                            picked_by      BIGINT        NULL,
+                            picked_at      DATETIME2(0)  NULL,
+                            packed_by      BIGINT        NULL,
+                            packed_at      DATETIME2(0)  NULL,
+                            delivered_by   BIGINT        NULL,
+                            delivered_at   DATETIME2(0)  NULL,
+
+                            has_exception  BIT           NOT NULL DEFAULT 0,
+                            exception_note NVARCHAR(500) NULL,
+
+                            note           NVARCHAR(500) NULL,
+
+                            created_at     DATETIME2(0)  NOT NULL DEFAULT SYSUTCDATETIME(),
+                            created_by     BIGINT        NULL,
+                            updated_at     DATETIME2(0)  NULL,
+                            updated_by     BIGINT        NULL,
+                            deleted_at     DATETIME2(0)  NULL,
+                            deleted_by     BIGINT        NULL,
+                            row_version    ROWVERSION,
+
+                            CONSTRAINT FK_stock_outs_order        FOREIGN KEY (order_id)     REFERENCES orders(id),
+                            CONSTRAINT FK_stock_outs_picked_by    FOREIGN KEY (picked_by)    REFERENCES users(id),
+                            CONSTRAINT FK_stock_outs_packed_by    FOREIGN KEY (packed_by)    REFERENCES users(id),
+                            CONSTRAINT FK_stock_outs_delivered_by FOREIGN KEY (delivered_by) REFERENCES users(id),
+                            CONSTRAINT FK_stock_outs_created_by   FOREIGN KEY (created_by)   REFERENCES users(id),
+                            CONSTRAINT FK_stock_outs_updated_by   FOREIGN KEY (updated_by)   REFERENCES users(id),
+                            CONSTRAINT FK_stock_outs_deleted_by   FOREIGN KEY (deleted_by)   REFERENCES users(id),
+
+                            CONSTRAINT CK_stock_outs_status CHECK (
+                                status IN (
+                                           'CREATED',
+                                           'PRINTED',
+                                           'PICKING',
+                                           'PICKED',
+                                           'PACKED',
+                                           'OUT_FOR_DELIVERY',
+                                           'COMPLETED',
+                                           'CANCELLED'
+                                    )
+                                )
+);
+
+CREATE UNIQUE INDEX UX_stock_outs_code
+    ON stock_outs(stock_out_code)
+    WHERE deleted_at IS NULL;
+
+CREATE UNIQUE INDEX UX_stock_outs_order_active
+    ON stock_outs(order_id)
+    WHERE deleted_at IS NULL
+    AND status <> 'CANCELLED';
+
+CREATE INDEX IX_stock_outs_status
+    ON stock_outs(status, created_at);
+
+CREATE INDEX IX_stock_outs_exception
+    ON stock_outs(has_exception, status, created_at);
+
+
+/* ===================== STOCK OUT ITEMS ===================== */
+
+CREATE TABLE stock_out_items (
+                                 id                  BIGINT IDENTITY(1,1) PRIMARY KEY,
+                                 stock_out_id        BIGINT         NOT NULL,
+                                 order_item_id       BIGINT         NOT NULL,
+                                 variant_id          BIGINT         NOT NULL,
+                                 copy_id             BIGINT         NULL,
+                                 lot_id              BIGINT         NULL,
+
+                                 title_snapshot      NVARCHAR(255)  NOT NULL,
+                                 sku_snapshot        VARCHAR(80)    NOT NULL,
+                                 copy_code_snapshot  VARCHAR(80)    NULL,
+                                 location_snapshot   VARCHAR(80)    NULL,
+
+                                 quantity            INT            NOT NULL DEFAULT 1,
+
+                                 picked_by           BIGINT         NULL,
+                                 picked_at           DATETIME2(0)   NULL,
+
+                                 is_missing_reported BIT            NOT NULL DEFAULT 0,
+                                 missing_note        NVARCHAR(500)  NULL,
+
+                                 note                NVARCHAR(500)  NULL,
+
+                                 created_at          DATETIME2(0)   NOT NULL DEFAULT SYSUTCDATETIME(),
+                                 updated_at          DATETIME2(0)   NULL,
+                                 deleted_at          DATETIME2(0)   NULL,
+                                 row_version         ROWVERSION,
+
+                                 CONSTRAINT FK_stock_out_items_stock_out   FOREIGN KEY (stock_out_id)  REFERENCES stock_outs(id),
+                                 CONSTRAINT FK_stock_out_items_order_item  FOREIGN KEY (order_item_id) REFERENCES order_items(id),
+                                 CONSTRAINT FK_stock_out_items_variant     FOREIGN KEY (variant_id)    REFERENCES book_variants(id),
+                                 CONSTRAINT FK_stock_out_items_copy        FOREIGN KEY (copy_id)       REFERENCES copies(id),
+                                 CONSTRAINT FK_stock_out_items_lot         FOREIGN KEY (lot_id)        REFERENCES lots(id),
+                                 CONSTRAINT FK_stock_out_items_picked_by   FOREIGN KEY (picked_by)     REFERENCES users(id),
+
+                                 CONSTRAINT CK_stock_out_items_qty CHECK (quantity >= 1)
+);
+
+CREATE INDEX IX_stock_out_items_stock_out
+    ON stock_out_items(stock_out_id);
+
+CREATE INDEX IX_stock_out_items_order_item
+    ON stock_out_items(order_item_id);
+
+CREATE INDEX IX_stock_out_items_copy
+    ON stock_out_items(copy_id)
+    WHERE deleted_at IS NULL;
+
+CREATE INDEX IX_stock_out_items_missing
+    ON stock_out_items(is_missing_reported, stock_out_id);
+
+CREATE UNIQUE INDEX UX_stock_out_items_order_item_active
+    ON stock_out_items(order_item_id)
+    WHERE deleted_at IS NULL;

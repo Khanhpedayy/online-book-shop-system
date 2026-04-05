@@ -5,68 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="634e8fec-2e29-47dc-a295-d1d0284ed318" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/controller/ManagerOrderController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/controller/StaffStockOutController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/repo/StaffFulfillmentRepository.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/repo/StockOutItemRepository.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/repo/StockOutRepository.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/service/StockOutService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/resources/static/pages/manager-confirm.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/resources/static/pages/manager-stockout-workspace.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/resources/templates/staff/delivary-detail.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/resources/templates/staff/delivery-note.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/resources/templates/staff/pack-detail.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/resources/templates/staff/stock-out-pick.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/controller/ManagerStockOutController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/controller/StaffDashboardController.java" beforeDir="false" afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/controller/StaffDashboardController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/controller/StaffDeliveryController.java" beforeDir="false" afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/controller/StaffDeliveryController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/controller/StaffDeliveryPageController.java" beforeDir="false" afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/controller/StaffDeliveryPageController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/controller/StaffOrderController.java" beforeDir="false" afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/controller/StaffOrderController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/controller/StaffPackingController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/controller/StaffPickListController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/controller/StaffPickingController.java" beforeDir="false" afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/controller/StaffPickingController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/controller/StaffShippingController.java" beforeDir="false" afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/controller/StaffShippingController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/controller/ManagerOrderController.java" beforeDir="false" afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/controller/ManagerOrderController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/controller/StaffWorkspaceController.java" beforeDir="false" afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/controller/StaffWorkspaceController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/dto/PickListItemRow.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/dto/PickListView.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/repo/StaffOrderQueryRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/repo/StaffOrderQueryRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/repo/StaffOrderRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/repo/StaffOrderRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/repo/StaffPickListRepository.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/repo/StaffPickingRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/repo/StaffPickingRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/service/StaffDeliveryService.java" beforeDir="false" afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/service/StaffDeliveryService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/service/StaffPackingService.java" beforeDir="false" afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/service/StaffPackingService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/service/StaffPickListService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/service/StaffPickingService.java" beforeDir="false" afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/service/StaffPickingService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/service/StaffShippingService.java" beforeDir="false" afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/service/StaffShippingService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/resources/static/js/layout.js" beforeDir="false" afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/resources/static/js/layout.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/resources/templates/staff/order-detail.html" beforeDir="false" afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/resources/templates/staff/order-detail.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/resources/templates/staff/workspace-allocate.html" beforeDir="false" afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/resources/templates/staff/workspace-allocate.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/resources/templates/staff/workspace-dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/resources/templates/staff/workspace-dashboard.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/resources/templates/staff/workspace-delivery-return.html" beforeDir="false" afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/resources/templates/staff/workspace-delivery-return.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/resources/templates/staff/workspace-fragments.html" beforeDir="false" afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/resources/templates/staff/workspace-fragments.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/resources/templates/staff/workspace-packing.html" beforeDir="false" afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/resources/templates/staff/workspace-packing.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/resources/templates/staff/workspace-shipping.html" beforeDir="false" afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/resources/templates/staff/workspace-shipping.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/test/java/com/example/onlinebookshop/customer/BookControllerIntegrationTest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/test/java/com/example/onlinebookshop/staff/controller/StaffCustomerControllerTest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/test/java/com/example/onlinebookshop/staff/controller/StaffDashboardControllerTest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/test/java/com/example/onlinebookshop/staff/controller/StaffDeliveryControllerTest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/test/java/com/example/onlinebookshop/staff/controller/StaffIncidentControllerTest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/test/java/com/example/onlinebookshop/staff/controller/StaffOrderControllerTest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/test/java/com/example/onlinebookshop/staff/controller/StaffPackingControllerTest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/test/java/com/example/onlinebookshop/staff/controller/StaffPaymentControllerTest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/test/java/com/example/onlinebookshop/staff/controller/StaffPickListControllerTest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/test/java/com/example/onlinebookshop/staff/controller/StaffPickingControllerTest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/test/java/com/example/onlinebookshop/staff/controller/StaffReturnControllerTest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/test/java/com/example/onlinebookshop/staff/controller/StaffShippingControllerTest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/test/java/com/example/onlinebookshop/staff/service/StaffDeliveryServiceTest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/test/java/com/example/onlinebookshop/staff/service/StaffOrderServiceTest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/test/java/com/example/onlinebookshop/staff/service/StaffPackingServiceTest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/test/java/com/example/onlinebookshop/staff/service/StaffPickListServiceTest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/test/java/com/example/onlinebookshop/staff/service/StaffPickingServiceTest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/test/java/com/example/onlinebookshop/staff/service/StaffReturnServiceTest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/test/java/com/example/onlinebookshop/staff/service/StaffShippingServiceTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/dto/OrderItemRow.java" beforeDir="false" afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/dto/OrderItemRow.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/resources/static/pages/manager-stockout-workspace.html" beforeDir="false" afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/resources/static/pages/manager-stockout-workspace.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/online_book_shop_system/database/databasebansach.sql" beforeDir="false" afterPath="$PROJECT_DIR$/online_book_shop_system/database/databasebansach.sql" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -77,8 +21,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Class" />
         <option value="HTML File" />
+        <option value="Class" />
       </list>
     </option>
   </component>

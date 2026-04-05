@@ -35,4 +35,8 @@ public class OrderItemRow {
 
     public Long getCopyId() { return copyId; }
     public void setCopyId(Long copyId) { this.copyId = copyId; }
+
+    public Long getOrderItemId() {
+        return this.id;
+    }
 }
