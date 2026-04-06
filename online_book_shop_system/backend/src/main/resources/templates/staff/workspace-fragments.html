@@ -159,7 +159,7 @@
 <th:block th:fragment="sidebar(active)">
     <aside class="workspace-sidebar">
         <div class="workspace-brand">Staff Workspace</div>
-        <div class="workspace-subbrand">State-based processing</div>
+        <div class="workspace-subbrand" th:text="${username}">Staff Name</div>
         <div class="workspace-divider"></div>
 
         <nav class="workspace-nav">
@@ -185,7 +185,7 @@
 
             <a th:href="@{/staff/workspace/delivery-return}"
                th:classappend="${active == 'delivery-return'} ? ' active' : ''">
-                Delivery / Return
+                Delivery
             </a>
         </nav>
     </aside>

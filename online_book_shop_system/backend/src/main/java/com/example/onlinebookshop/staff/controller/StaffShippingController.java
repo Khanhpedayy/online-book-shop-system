@@ -20,11 +20,10 @@ public class StaffShippingController {
         this.userRepository = userRepository;
     }
 
-    private Long getUserId(Authentication auth) {
+    private com.example.onlinebookshop.Entity.User getUser(Authentication auth) {
         if (auth == null) return null;
         return userRepository.findByEmailAndDeletedAtIsNull(auth.getName())
-                .orElseThrow(() -> new RuntimeException("User not found"))
-                .getId();
+                .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
 //    @GetMapping("/{orderId}/ship")
@@ -47,9 +46,12 @@ public class StaffShippingController {
                               Authentication auth,
                               RedirectAttributes ra) {
         try {
+            com.example.onlinebookshop.Entity.User staff = getUser(auth);
             if (carrier == null || carrier.trim().isEmpty()) {
-                Long staffId = (auth != null) ? getUserId(auth) : null;
-                carrier = (staffId != null) ? String.valueOf(staffId) : "Nhân viên giao hàng";
+                carrier = (staff != null) ? staff.getFullName() : "Nhân viên giao hàng";
+                if (trackingCode == null || trackingCode.trim().isEmpty()) {
+                    trackingCode = (staff != null) ? String.valueOf(staff.getId()) : null;
+                }
             }
             service.confirmShipped(orderId, carrier, trackingCode);
             ra.addFlashAttribute("successMsg", "Đã xác nhận SHIPPED thành công.");
@@ -64,9 +66,11 @@ public class StaffShippingController {
                             Authentication auth,
                             RedirectAttributes ra) {
         try {
-            Long staffId = (auth != null) ? getUserId(auth) : null;
-            String shippedBy = (staffId != null) ? String.valueOf(staffId) : "Nhân viên giao hàng";
-            service.confirmShipped(orderId, shippedBy, null);
+            com.example.onlinebookshop.Entity.User staff = getUser(auth);
+            String carrier = (staff != null) ? staff.getFullName() : "Nhân viên giao hàng";
+            String trackingCode = (staff != null) ? String.valueOf(staff.getId()) : null;
+            
+            service.confirmShipped(orderId, carrier, trackingCode);
             ra.addFlashAttribute("successMsg", "Đã giao đơn thành công");
         } catch (Exception e) {
             ra.addFlashAttribute("errorMsg", e.getMessage());

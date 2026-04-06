@@ -875,3 +875,4 @@ CREATE INDEX IX_stock_out_items_missing
 CREATE UNIQUE INDEX UX_stock_out_items_order_item_active
     ON stock_out_items(order_item_id)
     WHERE deleted_at IS NULL;
+
