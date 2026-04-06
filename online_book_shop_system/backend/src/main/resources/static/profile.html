@@ -127,7 +127,56 @@
         <button type="button" class="btn btn-secondary" id="btnAddrCancel" style="margin-left:8px;">Cancel edit</button>
         <div class="msg" id="addrMsg"></div>
     </section>
+
+    <!-- ===== VÍ ẢO ===== -->
+    <section id="walletSection" style="display:none;">
+        <h2>💰 Ví ảo</h2>
+
+        <!-- Số dư -->
+        <div style="display:flex;align-items:center;gap:16px;margin-bottom:18px;padding:16px;background:linear-gradient(135deg,#6366f1,#4f46e5);border-radius:12px;color:#fff;">
+            <div>
+                <div style="font-size:0.85rem;opacity:0.8;margin-bottom:2px;">Số dư hiện tại</div>
+                <div id="walletBalance" style="font-size:1.8rem;font-weight:700;">—</div>
+            </div>
+            <div style="margin-left:auto;font-size:2rem;">🏦</div>
+        </div>
+
+        <!-- Thông báo nếu đang có pending -->
+        <div id="walletPendingAlert" style="display:none;padding:12px 14px;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;color:#92400e;margin-bottom:16px;font-size:0.9rem;">
+            ⏳ Bạn đang có <strong>1 yêu cầu rút tiền đang chờ xử lý</strong>. Không thể tạo yêu cầu mới cho đến khi admin xử lý xong.
+        </div>
+
+        <!-- Trạng thái withdrawal hiện tại -->
+        <div id="walletCurrentWithdrawal" style="display:none;padding:14px;border:1px solid var(--shop-border);border-radius:10px;margin-bottom:18px;background:#f8fafc;">
+            <div style="font-size:0.88rem;color:#555;margin-bottom:6px;">Yêu cầu rút tiền gần nhất</div>
+            <div id="walletWithdrawalDetail" style="font-size:0.95rem;"></div>
+        </div>
+
+        <!-- Form rút tiền -->
+        <div id="walletForm">
+            <h3 style="font-size:1rem;margin-bottom:12px;">Yêu cầu rút tiền</h3>
+            <label for="wdAmount">Số tiền muốn rút (VND)</label>
+            <input type="number" id="wdAmount" min="1000" step="1000" placeholder="VD: 150000" style="max-width:240px;">
+            <label for="wdBank">Tên ngân hàng</label>
+            <input type="text" id="wdBank" placeholder="VD: Vietcombank, MBBank…" style="max-width:320px;">
+            <label for="wdAccNo">Số tài khoản</label>
+            <input type="text" id="wdAccNo" placeholder="VD: 123456789" style="max-width:280px;">
+            <label for="wdAccName">Tên chủ tài khoản</label>
+            <input type="text" id="wdAccName" placeholder="NGUYEN VAN A" style="max-width:320px;">
+            <button type="button" class="btn" id="btnWithdraw" style="margin-top:6px;">Gửi yêu cầu rút tiền</button>
+            <div class="msg" id="wdMsg"></div>
+        </div>
+
+        <!-- Lịch sử giao dịch ví -->
+        <div style="margin-top:24px;">
+            <h3 style="font-size:1rem;margin-bottom:10px;">Lịch sử giao dịch ví</h3>
+            <div id="walletTxList">
+                <p style="color:#888;font-size:0.9rem;">Chưa có giao dịch nào.</p>
+            </div>
+        </div>
+    </section>
 </main>
+
 
 <footer class="shop-footer">© Online Book Shop</footer>
 

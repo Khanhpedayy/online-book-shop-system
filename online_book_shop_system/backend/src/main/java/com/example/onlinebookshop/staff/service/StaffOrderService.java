@@ -12,6 +12,8 @@ import com.example.onlinebookshop.staff.repo.StaffAlertRepository;
 import com.example.onlinebookshop.staff.repo.StaffOrderQueryRepository;
 import com.example.onlinebookshop.staff.repo.StaffOrderRepository;
 import com.example.onlinebookshop.staff.repo.StaffPackingRepository;
+import com.example.onlinebookshop.wallet.CodWalletService;
+import com.example.onlinebookshop.wallet.WalletService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +36,8 @@ public class StaffOrderService {
     private final PayOsPaymentSyncService payOsPaymentSyncService;
     private final StaffNotificationService notificationService;
     private final StaffPickingService pickingService;
+    private final WalletService walletService;
+    private final CodWalletService codWalletService;
 
     public StaffOrderService(StaffOrderRepository staffOrderRepository,
                              StaffOrderQueryRepository queryRepository,
@@ -41,7 +45,9 @@ public class StaffOrderService {
                              StaffPackingRepository packingRepository,
                              PayOsPaymentSyncService payOsPaymentSyncService,
                              StaffNotificationService notificationService,
-                             StaffPickingService pickingService) {
+                             StaffPickingService pickingService,
+                             WalletService walletService,
+                             CodWalletService codWalletService) {
         this.staffOrderRepository = staffOrderRepository;
         this.queryRepository = queryRepository;
         this.alertRepository = alertRepository;
@@ -49,6 +55,8 @@ public class StaffOrderService {
         this.payOsPaymentSyncService = payOsPaymentSyncService;
         this.notificationService = notificationService;
         this.pickingService = pickingService;
+        this.walletService = walletService;
+        this.codWalletService = codWalletService;
     }
 
     public List<OrderListRow> getAll(OrderFilter filter) {
@@ -110,12 +118,50 @@ public class StaffOrderService {
 
     @Transactional
     public void updateStatus(Long id, String newStatus) {
+        updateStatus(id, newStatus, null);
+    }
+
+    /**
+     * Đánh dấu giao thành công với staffId (dùng cho COD wallet credit).
+     */
+    @Transactional
+    public void updateStatus(Long id, String newStatus, Long staffId) {
         Order order = getById(id);
         String ns = requireStatus(newStatus);
         applyStatus(order, ns);
+
+        // COD: tự động set PAID + credit ví shipper
+        if ("COMPLETED".equals(ns) && "COD".equalsIgnoreCase(order.getPaymentMethod())
+                && !"PAID".equalsIgnoreCase(order.getPaymentStatus())) {
+            order.setPaymentStatus("PAID");
+            
+            // Ưu tiên lấy ID shipper từ carrier (ví dụ carrier="3")
+            Long actualShipperId = staffId;
+            if (order.getCarrier() != null && order.getCarrier().matches("\\d+")) {
+                actualShipperId = Long.parseLong(order.getCarrier());
+            }
+
+            if (actualShipperId != null) {
+                try {
+                    codWalletService.creditShipperWallet(
+                            actualShipperId,
+                            order.getTotalAmount(),
+                            order.getId(),
+                            order.getOrderCode()
+                    );
+                } catch (Exception e) {
+                    org.slf4j.LoggerFactory.getLogger(StaffOrderService.class)
+                            .error("[COD-WALLET] Failed to credit shipper wallet: {}", e.getMessage());
+                }
+            } else {
+                org.slf4j.LoggerFactory.getLogger(StaffOrderService.class)
+                        .warn("[COD-WALLET] Could not resolve shipper ID for order {}", order.getId());
+            }
+        }
+
         staffOrderRepository.save(order);
 
-        // Gửi thông báo cho khách dựa trên trạng thái mới
+        // Thông báo cho khách
         if ("COMPLETED".equals(ns)) {
             notificationService.notifyOrderCompleted(order.getUser().getId(), order.getOrderCode(), order.getId());
         } else if ("CANCELLED".equals(ns)) {
@@ -217,17 +263,34 @@ public class StaffOrderService {
         if (!"SHIPPED".equals(current) && !"DELIVERED".equals(current)) {
             throw new RuntimeException("Chỉ đơn đang giao mới có thể báo giao thất bại.");
         }
-        
-        applyStatus(order, "CANCELLED");
-        
+
+        // Đổi sang trạng thái DELIVERY_FAILED
+        applyStatus(order, "DELIVERY_FAILED");
+
         if (reason != null && !reason.trim().isEmpty()) {
             String note = order.getStaffNote();
             order.setStaffNote((note == null ? "" : note + "\n") + "[FAIL REASON] " + reason.trim());
         }
         staffOrderRepository.save(order);
 
-        // Tự động hoàn kho (trả sách về trạng thái AVAILABLE)
+        // Tự động hoàn kho
         pickingService.releaseAllCopies(id);
+
+        // Hoàn tiền vào ví nếu đơn đã được thanh toán
+        if ("PAID".equalsIgnoreCase(order.getPaymentStatus())) {
+            try {
+                walletService.creditOnDeliveryFailed(
+                        order.getUser().getId(),
+                        order.getTotalAmount(),
+                        order.getId(),
+                        order.getOrderCode()
+                );
+            } catch (Exception e) {
+                // Không để lỗi ví block transaction chính, chỉ log
+                org.slf4j.LoggerFactory.getLogger(StaffOrderService.class)
+                        .error("[WALLET] Failed to credit wallet for orderId={}: {}", id, e.getMessage());
+            }
+        }
 
         // Gửi thông báo cho khách
         notificationService.notifyOrderCancelled(order.getUser().getId(), order.getOrderCode(), order.getId(), reason);
@@ -439,6 +502,10 @@ public class StaffOrderService {
                 if (order.getCompletedAt() == null) {
                     order.setCompletedAt(LocalDateTime.now());
                 }
+            }
+            case "DELIVERY_FAILED" -> {
+                order.setStatus("DELIVERY_FAILED");
+                order.setCancelledAt(LocalDateTime.now());
             }
             case "CANCELLED" -> {
                 order.setStatus("CANCELLED");

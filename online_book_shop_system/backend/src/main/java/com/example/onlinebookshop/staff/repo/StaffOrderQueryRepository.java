@@ -56,7 +56,7 @@ public class StaffOrderQueryRepository {
                     case "allocate" -> sql.append(" AND o.status = 'CONFIRMED' AND COALESCE(agg.allocated_count, 0) < COALESCE(agg.item_count, 0) ");
                     case "packing" -> sql.append(" AND o.status = 'CONFIRMED' AND COALESCE(agg.item_count, 0) > 0 AND COALESCE(agg.picked_count, 0) = COALESCE(agg.item_count, 0) ");
                     case "shipping" -> sql.append(" AND o.status = 'PACKED' ");
-                    case "delivery-return" -> sql.append(" AND (o.status IN ('SHIPPED','COMPLETED','CANCELLED') OR o.shipped_at IS NOT NULL OR o.delivered_at IS NOT NULL) ");
+                    case "delivery-return" -> sql.append(" AND (o.status IN ('SHIPPED','COMPLETED','CANCELLED','DELIVERY_FAILED') OR o.shipped_at IS NOT NULL OR o.delivered_at IS NOT NULL) ");
                     default -> { }
                 }
             }

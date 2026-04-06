@@ -252,9 +252,10 @@
                     <option th:if="${title == 'Shipping'}" value="PACKED" th:selected="${status == 'PACKED'}">PACKED</option>
                     <option th:if="${title == 'Shipping'}" value="SHIPPED" th:selected="${status == 'SHIPPED'}">SHIPPED</option>
 
-                    <option th:if="${title == 'Delivery / Return'}" value="SHIPPED" th:selected="${status == 'SHIPPED'}">SHIPPED</option>
-                    <option th:if="${title == 'Delivery / Return'}" value="COMPLETED" th:selected="${status == 'COMPLETED'}">COMPLETED</option>
-                    <option th:if="${title == 'Delivery / Return'}" value="CANCELLED" th:selected="${status == 'CANCELLED'}">CANCELLED / FAILED</option>
+                    <option th:if="${title == 'Delivery / Return'}" value="SHIPPED"          th:selected="${status == 'SHIPPED'}">SHIPPED — Đang giao</option>
+                    <option th:if="${title == 'Delivery / Return'}" value="COMPLETED"        th:selected="${status == 'COMPLETED'}">COMPLETED — Thành công</option>
+                    <option th:if="${title == 'Delivery / Return'}" value="DELIVERY_FAILED"  th:selected="${status == 'DELIVERY_FAILED'}">DELIVERY_FAILED — Giao thất bại</option>
+                    <option th:if="${title == 'Delivery / Return'}" value="CANCELLED"        th:selected="${status == 'CANCELLED'}">CANCELLED — Đã hủy</option>
                 </select>
 
                 <button type="submit" class="btn btn-primary">Tìm</button>

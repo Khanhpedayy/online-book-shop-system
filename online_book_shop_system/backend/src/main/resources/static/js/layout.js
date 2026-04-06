@@ -48,6 +48,8 @@ const Layout = {
             title: 'Hệ thống',
             items: [
                 { label: 'Báo cáo', href: 'reports.html', icon: 'bi-bar-chart' },
+                { label: 'Support Tickets', href: 'support-tickets.html', icon: 'bi-headset' },
+                { label: 'Yêu cầu rút tiền', href: 'withdrawals.html', icon: 'bi-cash-coin' },
             ],
         },
     ],

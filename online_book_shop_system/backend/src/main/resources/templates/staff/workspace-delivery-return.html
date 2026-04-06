@@ -39,19 +39,25 @@
                           th:text="${'✅ Completed ' + (o.completedAt != null ? #temporals.format(o.completedAt, 'dd/MM HH:mm') : '')}">
                     </span>
 
-                    <!-- CANCELLED: Thất bại at + time -->
+                    <!-- CANCELLED: Thất bại (hủy thủ công) -->
                     <span class="chip chip-danger"
                           th:if="${o.status == 'CANCELLED'}"
+                          th:text="${'❌ Huỷ ' + (o.cancelledAt != null ? #temporals.format(o.cancelledAt, 'dd/MM HH:mm') : '')}">
+                    </span>
+
+                    <!-- DELIVERY_FAILED: Giao thất bại -->
+                    <span class="chip chip-danger"
+                          th:if="${o.status == 'DELIVERY_FAILED'}"
                           th:text="${'❌ Thất bại ' + (o.cancelledAt != null ? #temporals.format(o.cancelledAt, 'dd/MM HH:mm') : '')}">
                     </span>
 
                     <!-- Other statuses: show shipped/delivered times -->
                     <span class="chip"
-                          th:if="${o.status != 'SHIPPED' and o.status != 'COMPLETED' and o.status != 'CANCELLED'}"
+                          th:if="${o.status != 'SHIPPED' and o.status != 'COMPLETED' and o.status != 'CANCELLED' and o.status != 'DELIVERY_FAILED'}"
                           th:text="${o.shippedAt != null ? 'Ship ' + #temporals.format(o.shippedAt, 'dd/MM HH:mm') : 'Chưa ship'}">
                     </span>
                     <span class="chip"
-                          th:if="${o.status != 'SHIPPED' and o.status != 'COMPLETED' and o.status != 'CANCELLED'}"
+                          th:if="${o.status != 'SHIPPED' and o.status != 'COMPLETED' and o.status != 'CANCELLED' and o.status != 'DELIVERY_FAILED'}"
                           th:text="${o.deliveredAt != null ? 'Delivered ' + #temporals.format(o.deliveredAt, 'dd/MM HH:mm') : 'Chưa giao'}">
                     </span>
                   </div>
@@ -222,7 +228,8 @@ CP-000125"
                          required>
                 </div>
                 <div class="alert alert-danger mb-0">
-                  Đơn hàng sẽ chuyển sang trạng thái <strong>CANCELLED</strong>.
+                  Đơn hàng sẽ chuyển sang trạng thái <strong>DELIVERY_FAILED</strong>.
+                  <br><small class="text-muted">Nếu đơn đã thanh toán, tiền sẽ được hoàn tự động vào ví ảo của khách (trừ 10.000đ phí ship).</small>
                 </div>
               </div>
               <div class="modal-footer">

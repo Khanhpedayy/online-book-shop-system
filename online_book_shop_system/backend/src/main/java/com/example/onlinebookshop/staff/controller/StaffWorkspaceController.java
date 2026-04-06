@@ -1,5 +1,6 @@
 package com.example.onlinebookshop.staff.controller;
 
+import com.example.onlinebookshop.Repository.UserRepository;
 import com.example.onlinebookshop.staff.dto.OrderFilter;
 import com.example.onlinebookshop.staff.dto.OrderListRow;
 import com.example.onlinebookshop.staff.service.StaffDashboardStats;
@@ -23,9 +24,17 @@ public class StaffWorkspaceController {
 
 
     private final StaffOrderService orderService;
+    private final UserRepository userRepository;
 
-    public StaffWorkspaceController(StaffOrderService orderService) {
+    public StaffWorkspaceController(StaffOrderService orderService, UserRepository userRepository) {
         this.orderService = orderService;
+        this.userRepository = userRepository;
+    }
+
+    private Long resolveStaffId(Authentication authentication) {
+        if (authentication == null || authentication.getName() == null) return null;
+        return userRepository.findByEmailAndDeletedAtIsNull(authentication.getName())
+                .map(u -> u.getId()).orElse(null);
     }
 
     @GetMapping("/staff/workspace/dashboard")
@@ -152,9 +161,12 @@ public class StaffWorkspaceController {
     }
 
     @PostMapping("/staff/workspace/delivery-return/{id}/success")
-    public String deliverSuccess(@PathVariable Long id, RedirectAttributes ra) {
+    public String deliverSuccess(@PathVariable Long id,
+                                 Authentication authentication,
+                                 RedirectAttributes ra) {
         try {
-            orderService.updateStatus(id, "COMPLETED");
+            Long staffId = resolveStaffId(authentication);
+            orderService.updateStatus(id, "COMPLETED", staffId);
             ra.addFlashAttribute("successMessage", "Đã đánh dấu giao hàng thành công đơn " + id);
         } catch (Exception e) {
             ra.addFlashAttribute("errorMessage", e.getMessage());

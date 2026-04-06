@@ -483,6 +483,18 @@ function switchPage(page) {
         const nav = document.getElementById('navSupport');
         if (nav) nav.classList.add('active');
         loadSupportTickets();
+    } else if (page === 'withdrawals') {
+        const p = document.getElementById('pageWithdrawals');
+        if (p) p.style.display = '';
+        const nav = document.getElementById('navWithdrawals');
+        if (nav) nav.classList.add('active');
+        loadWithdrawals();
+    } else if (page === 'codDeposits') {
+        const p = document.getElementById('pageCodDeposits');
+        if (p) p.style.display = '';
+        const nav = document.getElementById('navCodDeposits');
+        if (nav) nav.classList.add('active');
+        loadCodDeposits();
     }
 }
 

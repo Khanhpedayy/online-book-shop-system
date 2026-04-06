@@ -299,6 +299,7 @@ async function init() {
     try {
         await loadProfile();
         await refreshAddresses();
+        await loadWallet();
     } catch (e) {
         document.getElementById('pfMsg').textContent = e.message || 'Không tải được hồ sơ';
         document.getElementById('pfMsg').style.color = '#c00';
@@ -307,6 +308,113 @@ async function init() {
     document.getElementById('btnChangePw').addEventListener('click', () => changePassword());
     document.getElementById('btnAddrSubmit').addEventListener('click', () => submitAddress());
     document.getElementById('btnAddrCancel').addEventListener('click', () => clearAddrForm());
+    document.getElementById('btnWithdraw').addEventListener('click', () => submitWithdrawal());
+}
+
+// ─── VÍ ẢO ─────────────────────────────────────────────────────────
+
+function formatVnd(amount) {
+    if (amount == null) return '0₫';
+    return new Intl.NumberFormat('vi-VN').format(Math.round(Number(amount))) + '₫';
+}
+
+async function loadWallet() {
+    try {
+        const data = await apiGet('/api/wallet/me');
+        renderWallet(data);
+        document.getElementById('walletSection').style.display = '';
+    } catch (e) {
+        // Nếu lỗi 401/403 thì không hiện section ví
+        console.warn('[wallet] loadWallet error:', e.message);
+    }
+}
+
+function renderWallet(data) {
+    // Số dư
+    document.getElementById('walletBalance').textContent = formatVnd(data.balance);
+
+    // Pending alert
+    const pendingAlert = document.getElementById('walletPendingAlert');
+    pendingAlert.style.display = data.hasPendingWithdrawal ? '' : 'none';
+
+    // Disable form nếu có pending
+    const wdForm = document.getElementById('walletForm');
+    const inputs = wdForm.querySelectorAll('input, button');
+    inputs.forEach(el => el.disabled = data.hasPendingWithdrawal);
+
+    // Withdrawal gần nhất
+    const withdrawals = data.withdrawals || [];
+    const latestWd = withdrawals[0];
+    const wdSection = document.getElementById('walletCurrentWithdrawal');
+    const wdDetail = document.getElementById('walletWithdrawalDetail');
+    if (latestWd) {
+        wdSection.style.display = '';
+        const statusLabel = { PENDING: '⏳ Đang chờ xử lý', APPROVED: '✅ Đã duyệt', REJECTED: '❌ Đã từ chối' };
+        const statusColors = { PENDING: '#d97706', APPROVED: '#16a34a', REJECTED: '#dc2626' };
+        const st = latestWd.status || 'PENDING';
+        wdDetail.innerHTML = `
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+                <div>
+                    <div style="font-weight:600;">${latestWd.requestCode}</div>
+                    <div style="color:#555;font-size:0.85rem;">Số tiền: <strong>${formatVnd(latestWd.amount)}</strong></div>
+                    <div style="color:#555;font-size:0.85rem;">${latestWd.bankName} — ${latestWd.bankAccountNumber}</div>
+                    ${latestWd.adminNote ? `<div style="color:#888;font-size:0.82rem;margin-top:4px;">Ghi chú: ${escapeHtml(latestWd.adminNote)}</div>` : ''}
+                </div>
+                <span style="font-weight:600;color:${statusColors[st]}">${statusLabel[st] || st}</span>
+            </div>
+        `;
+    } else {
+        wdSection.style.display = 'none';
+    }
+
+    // Lịch sử giao dịch
+    const txList = document.getElementById('walletTxList');
+    const txs = data.transactions || [];
+    if (!txs.length) {
+        txList.innerHTML = '<p style="color:#888;font-size:0.9rem;">Chưa có giao dịch nào.</p>';
+    } else {
+        txList.innerHTML = txs.map(tx => {
+            const isCredit = tx.type === 'CREDIT';
+            return `
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f1f5f9;">
+                    <div>
+                        <div style="font-size:0.9rem;color:#374151;">${escapeHtml(tx.note || tx.refType || '')}</div>
+                        <div style="font-size:0.78rem;color:#9ca3af;">
+                            ${tx.createdAt ? new Date(tx.createdAt).toLocaleString('vi-VN') : ''}
+                        </div>
+                    </div>
+                    <div style="font-weight:700;color:${isCredit ? '#16a34a' : '#dc2626'};">
+                        ${isCredit ? '+' : '-'}${formatVnd(tx.amount)}
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+}
+
+async function submitWithdrawal() {
+    const msg = document.getElementById('wdMsg');
+    const amount = Number(document.getElementById('wdAmount').value) || 0;
+    const bankName = document.getElementById('wdBank').value.trim();
+    const bankAccountNumber = document.getElementById('wdAccNo').value.trim();
+    const bankAccountName = document.getElementById('wdAccName').value.trim();
+
+    if (amount <= 0) { showMsg(msg, 'Vui lòng nhập số tiền hợp lệ.', false); return; }
+    if (!bankName) { showMsg(msg, 'Vui lòng nhập tên ngân hàng.', false); return; }
+    if (!bankAccountNumber) { showMsg(msg, 'Vui lòng nhập số tài khoản.', false); return; }
+    if (!bankAccountName) { showMsg(msg, 'Vui lòng nhập tên chủ tài khoản.', false); return; }
+
+    try {
+        await apiPost('/api/wallet/withdrawal', {
+            amount, bankName, bankAccountNumber, bankAccountName
+        });
+        showMsg(msg, '✅ Gửi yêu cầu rút tiền thành công! Admin sẽ xem xét trong thời gian sớm nhất.', true);
+        // Reload wallet
+        await loadWallet();
+    } catch (e) {
+        showMsg(msg, e.message || 'Lỗi không xác định.', false);
+    }
 }
 
 document.addEventListener('DOMContentLoaded', init);
+

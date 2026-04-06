@@ -1,5 +1,7 @@
 package com.example.onlinebookshop.payos;
 
+import com.example.onlinebookshop.wallet.CodDepositRepository;
+import com.example.onlinebookshop.wallet.CodWalletService;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -8,9 +10,15 @@ import java.util.Map;
 public class PayOSWebhookService {
 
     private final PayOsPaymentSyncService payOsPaymentSyncService;
+    private final CodDepositRepository codDepositRepository;
+    private final CodWalletService codWalletService;
 
-    public PayOSWebhookService(PayOsPaymentSyncService payOsPaymentSyncService) {
+    public PayOSWebhookService(PayOsPaymentSyncService payOsPaymentSyncService,
+                               CodDepositRepository codDepositRepository,
+                               CodWalletService codWalletService) {
         this.payOsPaymentSyncService = payOsPaymentSyncService;
+        this.codDepositRepository    = codDepositRepository;
+        this.codWalletService        = codWalletService;
     }
 
     public void applyPaymentResult(Map<String, Object> data, String paymentSignatureStatus) {
@@ -18,21 +26,22 @@ public class PayOSWebhookService {
             throw new IllegalArgumentException("Webhook data is missing");
         }
 
-        // From payOS docs: data.paymentLinkId
         Object paymentLinkIdObj = data.get("paymentLinkId");
         String paymentLinkId = paymentLinkIdObj != null ? paymentLinkIdObj.toString() : null;
         if (paymentLinkId == null || paymentLinkId.isBlank()) {
             throw new IllegalArgumentException("paymentLinkId is missing in webhook payload");
         }
 
-        // Normalize to our order/payment statuses.
-        String status = paymentSignatureStatus;
-        if (status == null || status.isBlank()) {
-            status = "UNPAID";
-        }
+        String status = (paymentSignatureStatus == null || paymentSignatureStatus.isBlank())
+                ? "UNPAID" : paymentSignatureStatus;
 
-        // PAID => orders.payment_status = PAID and payment_logs.status = PAID; then reduce book stock once
-        payOsPaymentSyncService.syncPaymentStatusByPaymentLinkId(paymentLinkId, status);
+        // ─── Route: COD deposit hay customer order? ────────────────────
+        if ("PAID".equals(status) && codDepositRepository.existsByPayosLinkId(paymentLinkId)) {
+            // Shipper vừa nộp tiền COD qua PayOS
+            codWalletService.handleDepositPaid(paymentLinkId);
+        } else {
+            // Luồng cũ: customer thanh toán đơn hàng
+            payOsPaymentSyncService.syncPaymentStatusByPaymentLinkId(paymentLinkId, status);
+        }
     }
 }
-
