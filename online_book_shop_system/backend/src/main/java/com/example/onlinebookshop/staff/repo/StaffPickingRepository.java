@@ -474,6 +474,55 @@ public class StaffPickingRepository {
         return jdbc.update(sql, new MapSqlParameterSource("copyId", copyId));
     }
 
+    public int releaseLotCountersByOrderId(long orderId) {
+        String sql = """
+            UPDATE l
+            SET l.qty_available = l.qty_available + 1,
+                l.qty_reserved = CASE WHEN l.qty_reserved > 0 THEN l.qty_reserved - 1 ELSE 0 END,
+                l.updated_at = GETDATE()
+            FROM dbo.lots l
+            JOIN dbo.copies c ON c.lot_id = l.id
+            JOIN dbo.order_items oi ON oi.copy_id = c.id
+            WHERE oi.order_id = :orderId
+              AND oi.deleted_at IS NULL
+              AND oi.copy_id IS NOT NULL
+            """;
+
+        return jdbc.update(sql, new MapSqlParameterSource("orderId", orderId));
+    }
+
+    public int releaseAllCopiesByOrderId(long orderId) {
+        String sql = """
+            UPDATE c
+            SET c.status = 'AVAILABLE',
+                c.reserved_at = NULL,
+                c.reserve_expires_at = NULL,
+                c.updated_at = GETDATE()
+            FROM dbo.copies c
+            JOIN dbo.order_items oi ON oi.copy_id = c.id
+            WHERE oi.order_id = :orderId
+              AND oi.deleted_at IS NULL
+              AND c.deleted_at IS NULL
+            """;
+
+        return jdbc.update(sql, new MapSqlParameterSource("orderId", orderId));
+    }
+
+    public int clearAllPicksByOrderId(long orderId) {
+        String sql = """
+            UPDATE dbo.order_items
+            SET copy_id = NULL,
+                pick_method = NULL,
+                picked_by = NULL,
+                picked_at = NULL,
+                updated_at = GETDATE()
+            WHERE order_id = :orderId
+              AND deleted_at IS NULL
+            """;
+
+        return jdbc.update(sql, new MapSqlParameterSource("orderId", orderId));
+    }
+
     public Long createReservedCopyFromLot(long lotId, long variantId, String copyCode) {
         String sql = """
             INSERT INTO dbo.copies (

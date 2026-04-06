@@ -46,11 +46,6 @@
               <div class="subtle">Hiển thị theo copy code cho staff thao tác ngoài kho. Nếu quantity &gt; 1 thì tách dòng để mỗi cuốn có 1 slot bind/pick riêng.</div>
             </div>
 
-            <form method="post" th:action="@{/staff/orders/{id}/allocate-auto(id=${order.id})}">
-              <button type="submit" class="btn btn-primary">
-                Auto allocate
-              </button>
-            </form>
           </div>
 
           <div class="alert alert-info">
@@ -121,14 +116,22 @@
                         Staff chỉ cần xác nhận đã lấy đúng cuốn này.
                       </div>
 
-                      <form method="post"
-                            th:action="@{/staff/orders/{id}/pick-confirm(id=${order.id})}"
-                            class="d-inline-block me-2">
-                        <input type="hidden" name="orderItemId" th:value="${item.id}">
-                        <button type="submit" class="btn btn-success btn-sm">
-                          Xác nhận lấy
-                        </button>
-                      </form>
+                      <div th:if="${item.pickedAt == null}">
+                        <form method="post"
+                              th:action="@{/staff/orders/{id}/pick-confirm(id=${order.id})}"
+                              class="d-inline-block me-2">
+                          <input type="hidden" name="orderItemId" th:value="${item.id}">
+                          <button type="submit" class="btn btn-success btn-sm">
+                            Xác nhận lấy
+                          </button>
+                        </form>
+                      </div>
+
+                      <div th:if="${item.pickedAt != null}" class="d-inline-block me-2">
+                        <span class="badge text-bg-success">
+                          <i class="bi bi-check-circle-fill me-1"></i> Đã lấy hàng
+                        </span>
+                      </div>
 
                       <form method="post"
                             th:action="@{/staff/orders/{id}/unpick(id=${order.id})}"

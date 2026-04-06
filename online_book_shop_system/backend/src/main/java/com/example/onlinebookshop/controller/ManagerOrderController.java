@@ -1,5 +1,6 @@
 package com.example.onlinebookshop.controller;
 
+import com.example.onlinebookshop.staff.service.StaffNotificationService;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,9 +12,11 @@ import java.util.Map;
 public class ManagerOrderController {
 
     private final JdbcTemplate jdbc;
+    private final StaffNotificationService notificationService;
 
-    public ManagerOrderController(JdbcTemplate jdbc) {
+    public ManagerOrderController(JdbcTemplate jdbc, StaffNotificationService notificationService) {
         this.jdbc = jdbc;
+        this.notificationService = notificationService;
     }
 
     /**
@@ -104,14 +107,25 @@ public class ManagerOrderController {
     }
 
     /**
-     * PUT: cancel đơn (optional)
+     * PUT: cancel đơn (với notification)
      */
     @PutMapping("/{id}/cancel")
     public Map<String, Object> cancelOrder(
             @PathVariable Long id,
             @RequestParam(required = false) String reason
     ) {
+        // 1. Lấy thông tin user và order_code trước khi cập nhật
+        Map<String, Object> orderData;
+        try {
+            orderData = jdbc.queryForMap("SELECT user_id, order_code FROM orders WHERE id = ?", id);
+        } catch (Exception e) {
+            throw new RuntimeException("Order not found: " + id);
+        }
 
+        long userId = ((Number) orderData.get("user_id")).longValue();
+        String orderCode = (String) orderData.get("order_code");
+
+        // 2. Cập nhật trạng thái
         int updated = jdbc.update("""
             UPDATE orders
             SET 
@@ -122,11 +136,20 @@ public class ManagerOrderController {
         """, reason, id);
 
         if (updated == 0) {
-            throw new RuntimeException("Order not found or cannot cancel");
+            throw new RuntimeException("Order cannot be cancelled (maybe not in NEW status)");
+        }
+
+        // 3. Gửi thông báo cho khách hàng
+        try {
+            notificationService.notifyOrderCancelled(userId, orderCode, id, reason);
+        } catch (Exception e) {
+            // Log error but don't fail the request if notification fails
+            System.err.println("Failed to send notification for cancelled order " + id + ": " + e.getMessage());
         }
 
         return Map.of(
-                "success", true
+                "success", true,
+                "message", "Order cancelled and customer notified"
         );
     }
 

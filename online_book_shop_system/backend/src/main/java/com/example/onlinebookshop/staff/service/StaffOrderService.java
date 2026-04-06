@@ -1,6 +1,7 @@
 package com.example.onlinebookshop.staff.service;
 
 import com.example.onlinebookshop.Entity.Order;
+import com.example.onlinebookshop.payos.PayOsPaymentSyncService;
 import com.example.onlinebookshop.staff.dto.AllocatePreviewRow;
 import com.example.onlinebookshop.staff.dto.OrderDetailView;
 import com.example.onlinebookshop.staff.dto.OrderFilter;
@@ -30,18 +31,24 @@ public class StaffOrderService {
     private final StaffOrderQueryRepository queryRepository;
     private final StaffAlertRepository alertRepository;
     private final StaffPackingRepository packingRepository;
+    private final PayOsPaymentSyncService payOsPaymentSyncService;
     private final StaffNotificationService notificationService;
+    private final StaffPickingService pickingService;
 
     public StaffOrderService(StaffOrderRepository staffOrderRepository,
                              StaffOrderQueryRepository queryRepository,
                              StaffAlertRepository alertRepository,
                              StaffPackingRepository packingRepository,
-                             StaffNotificationService notificationService) {
+                             PayOsPaymentSyncService payOsPaymentSyncService,
+                             StaffNotificationService notificationService,
+                             StaffPickingService pickingService) {
         this.staffOrderRepository = staffOrderRepository;
         this.queryRepository = queryRepository;
         this.alertRepository = alertRepository;
         this.packingRepository = packingRepository;
+        this.payOsPaymentSyncService = payOsPaymentSyncService;
         this.notificationService = notificationService;
+        this.pickingService = pickingService;
     }
 
     public List<OrderListRow> getAll(OrderFilter filter) {
@@ -94,8 +101,11 @@ public class StaffOrderService {
         if (paymentStatus == null || paymentStatus.trim().isEmpty()) {
             throw new RuntimeException("paymentStatus is required");
         }
-        order.setPaymentStatus(paymentStatus.trim().toUpperCase());
-        staffOrderRepository.save(order);
+        String previous = order.getPaymentStatus();
+        String next = paymentStatus.trim().toUpperCase();
+        order.setPaymentStatus(next);
+        staffOrderRepository.saveAndFlush(order);
+        payOsPaymentSyncService.applyPayOsStockAfterManualPaymentUpdate(orderId, previous, next);
     }
 
     @Transactional
@@ -215,6 +225,9 @@ public class StaffOrderService {
             order.setStaffNote((note == null ? "" : note + "\n") + "[FAIL REASON] " + reason.trim());
         }
         staffOrderRepository.save(order);
+
+        // Tự động hoàn kho (trả sách về trạng thái AVAILABLE)
+        pickingService.releaseAllCopies(id);
 
         // Gửi thông báo cho khách
         notificationService.notifyOrderCancelled(order.getUser().getId(), order.getOrderCode(), order.getId(), reason);

@@ -132,7 +132,8 @@ public class StaffOrderQueryRepository {
                   oi.condition_snapshot,
                   oi.quantity,
                   oi.unit_price,
-                  oi.copy_id
+                  oi.copy_id,
+                  oi.picked_at
                 FROM dbo.order_items oi
                 WHERE oi.deleted_at IS NULL AND oi.order_id = :orderId
                 ORDER BY oi.id ASC
@@ -214,6 +215,10 @@ public class StaffOrderQueryRepository {
             i.setUnitPrice(rs.getBigDecimal("unit_price"));
             Object copyId = rs.getObject("copy_id");
             i.setCopyId(copyId == null ? null : ((Number) copyId).longValue());
+
+            java.sql.Timestamp pickedAt = rs.getTimestamp("picked_at");
+            i.setPickedAt(pickedAt == null ? null : pickedAt.toLocalDateTime());
+
             return i;
         };
     }

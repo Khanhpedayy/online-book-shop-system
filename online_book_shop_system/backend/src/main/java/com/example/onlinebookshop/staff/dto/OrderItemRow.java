@@ -14,6 +14,7 @@ public class OrderItemRow {
     private Integer quantity;
     private BigDecimal unitPrice;
     private Long copyId;
+    private java.time.LocalDateTime pickedAt;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -35,6 +36,9 @@ public class OrderItemRow {
 
     public Long getCopyId() { return copyId; }
     public void setCopyId(Long copyId) { this.copyId = copyId; }
+
+    public java.time.LocalDateTime getPickedAt() { return pickedAt; }
+    public void setPickedAt(java.time.LocalDateTime pickedAt) { this.pickedAt = pickedAt; }
 
     public Long getOrderItemId() {
         return this.id;

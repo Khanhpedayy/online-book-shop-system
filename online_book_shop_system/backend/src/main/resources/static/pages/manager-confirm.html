@@ -55,9 +55,14 @@
                                 Chọn đơn để xem
                             </div>
 
-                            <button class="btn btn-primary mt-3" onclick="confirmOrder()">
-                                Confirm
-                            </button>
+                            <div class="mt-3 d-flex gap-2">
+                                <button class="btn btn-primary" onclick="confirmOrder()">
+                                    Confirm
+                                </button>
+                                <button class="btn btn-outline-danger" onclick="cancelOrder()">
+                                    Hủy đơn
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -123,6 +128,32 @@
 
         loadOrders();
         document.getElementById('orderDetail').innerHTML = 'Chọn đơn...';
+    }
+
+    async function cancelOrder() {
+        if (!currentId) return;
+
+        // Bấm xác nhận lần 1
+        const ok = confirm("Bạn có chắc chắn muốn HỦY đơn hàng này?");
+        if (!ok) return;
+
+        // Nhập lý do
+        const reason = prompt("Vui lòng nhập lý do hủy đơn:");
+        if (reason === null) return; // Bấm cancel ở prompt
+
+        if (!reason.trim()) {
+            alert("Lý do không được để trống.");
+            return;
+        }
+
+        try {
+            await api.put(`/manager/orders/${currentId}/cancel?reason=${encodeURIComponent(reason.trim())}`);
+            showToast('Đã hủy đơn và thông báo cho khách', 'success');
+            loadOrders();
+            document.getElementById('orderDetail').innerHTML = 'Chọn đơn...';
+        } catch (e) {
+            showToast('Lỗi khi hủy đơn: ' + e.message, 'danger');
+        }
     }
 
     document.addEventListener('DOMContentLoaded', init);

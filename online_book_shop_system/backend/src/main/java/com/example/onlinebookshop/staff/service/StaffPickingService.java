@@ -251,6 +251,16 @@ public class StaffPickingService {
         repo.releaseLotCountersByCopy(item.copyId());
     }
 
+    @Transactional
+    public void releaseAllCopies(long orderId) {
+        // 1. Release lot counters (increment qty_available)
+        repo.releaseLotCountersByOrderId(orderId);
+        // 2. Release copies (status -> AVAILABLE)
+        repo.releaseAllCopiesByOrderId(orderId);
+        // 3. Clear picks and copy assignments in order_items
+        repo.clearAllPicksByOrderId(orderId);
+    }
+
     private String normalize(String value) {
         if (value == null) return null;
         String s = value.trim();
