@@ -47,15 +47,10 @@ public class AdjustmentRepository {
             ps.setObject(3, req.getCopyId());
             ps.setInt(4, Math.abs(req.getQuantity())); // Must be strictly positive for CK_it_qty
 
-            // Pack both TYPE and DIRECTION into DB REASON to preserve them
-            String typeStr = req.getType() != null ? req.getType() : "DAMAGE";
-            // FOUND = IN (nhập vào), các loại khác = OUT (xuất ra)
-            String dirStr;
-            if (req.getDirection() != null && !req.getDirection().isBlank()) {
-                dirStr = req.getDirection();
-            } else {
-                dirStr = "FOUND".equalsIgnoreCase(typeStr) ? "IN" : "OUT";
-            }
+            // Pack both TYPE and DIRECTION into DB REASON
+            // Direction đã được AdjustmentService set đúng trước khi gọi insert()
+            String typeStr = req.getType() != null ? req.getType().toUpperCase() : "DAMAGE";
+            String dirStr  = "FOUND".equals(typeStr) ? "IN" : "OUT"; // Double-check ở tầng repo
             ps.setString(5, typeStr + "_" + dirStr);
 
             String customNote = req.getReason() != null ? req.getReason() : "";

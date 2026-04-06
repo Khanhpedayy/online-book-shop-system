@@ -28,11 +28,11 @@ public class AdjustmentService {
         if (req.getType() == null || req.getType().isBlank())
             throw new IllegalArgumentException("Type is required");
 
-        // Tự động xác định chiều dựa theo loại điều chỉnh (business rule)
-        // FOUND (tìm thấy) = IN (nhập vào); DAMAGE/LOST = OUT (xuất ra)
-        if (req.getDirection() == null || req.getDirection().isBlank()) {
-            req.setDirection("FOUND".equalsIgnoreCase(req.getType()) ? "IN" : "OUT");
-        }
+        // Luôn xác định chiều dựa theo loại — không dùng direction từ frontend (dễ sai)
+        // FOUND (tìm thấy lại) = IN (↑ nhập vào kho)
+        // DAMAGE, LOST, WRITE_OFF, TRANSFER = OUT (↓ xuất ra)
+        String type = req.getType().toUpperCase();
+        req.setDirection("FOUND".equals(type) ? "IN" : "OUT");
 
         Long id = repo.insert(req);
 
