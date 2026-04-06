@@ -30,6 +30,8 @@
             margin: 0 auto 6px;
         }
         .circle.active { background: #15803d; }
+        .circle.pending { background: #ea580c; }
+        .circle.muted { background: #e2e8f0; }
     </style>
 </head>
 <body class="shop-page">
@@ -60,7 +62,8 @@
         <div id="orderItems"></div>
     </div>
     <div class="card">
-        <h3 style="margin-top:0;">Order status</h3>
+        <h3 style="margin-top:0;">Progress</h3>
+        <p class="shop-muted" style="margin:0 0 12px;font-size:0.9rem;">Payment and shipment are tracked separately. PayOS orders show payment first, then warehouse steps.</p>
         <div class="timeline" id="timeline"></div>
     </div>
 </main>

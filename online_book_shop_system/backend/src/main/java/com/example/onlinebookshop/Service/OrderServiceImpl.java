@@ -207,7 +207,8 @@ public class OrderServiceImpl implements OrderService {
         if (ps != null
                 && !"PENDING".equalsIgnoreCase(ps)
                 && !"UNPAID".equalsIgnoreCase(ps)
-                && !"CANCELLED".equalsIgnoreCase(ps)) {
+                && !"CANCELLED".equalsIgnoreCase(ps)
+                && !"FAILED".equalsIgnoreCase(ps)) {
             throw new IllegalStateException("Order is not eligible for payment.");
         }
         if (order.getId() == null) {

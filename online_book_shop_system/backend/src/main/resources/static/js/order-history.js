@@ -138,7 +138,7 @@ function payAgainEligible(o) {
     if (st === "CANCELLED") return false;
     const ps = paymentStatusLabel(o);
     const pm = paymentMethodLabel(o);
-    return pm === "PAYOS" && (ps === "PENDING" || ps === "UNPAID" || ps === "CANCELLED");
+    return pm === "PAYOS" && (ps === "PENDING" || ps === "UNPAID" || ps === "CANCELLED" || ps === "FAILED");
 }
 
 /* ===== VIEW DETAIL ===== */
