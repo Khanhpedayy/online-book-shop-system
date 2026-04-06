@@ -79,10 +79,20 @@ public class LotService {
             throw new RuntimeException("Lot not found: " + lotId);
         if (lot.getQtyReceived() <= 0)
             throw new IllegalArgumentException("Lot has no quantity to generate copies");
+
+        // Kiểm tra số bản sao đã tồn tại
+        int existingCount = repo.countCopiesByLot(lotId);
+        int remaining = lot.getQtyReceived() - existingCount;
+
+        if (remaining <= 0)
+            throw new IllegalArgumentException(
+                "Lô hàng này đã có đủ " + lot.getQtyReceived() + " bản sao. Không thể tạo thêm.");
+
         String prefix = req.getPrefix() != null ? req.getPrefix() : lot.getLotCode() + "-";
         String condition = req.getConditionGrade() != null ? req.getConditionGrade() : lot.getConditionDefault();
-        return repo.generateCopies(lotId, lot.getVariantId(), lot.getQtyReceived(), prefix, req.getDefaultLocation(),
-                condition);
+        // Chỉ generate số bản sao còn thiếu (bắt đầu đánh số từ existingCount + 1)
+        return repo.generateCopiesFrom(lotId, lot.getVariantId(), existingCount + 1,
+                existingCount + remaining, prefix, req.getDefaultLocation(), condition);
     }
 
     @Transactional

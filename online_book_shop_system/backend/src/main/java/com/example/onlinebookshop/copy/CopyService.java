@@ -58,11 +58,25 @@ public class CopyService {
             throw new IllegalArgumentException(
                     "Invalid status: " + validStatus + ". Must be DAMAGED, LOST, or AVAILABLE.");
         }
+
+        String oldStatus = c.getStatus();
         repo.updateStatus(id, validStatus);
 
-        // Update lot qty
+        // Cập nhật số lượng lô khi trạng thái thay đổi
+        if ((validStatus.equals("DAMAGED") || validStatus.equals("LOST"))
+                && !oldStatus.equals("DAMAGED") && !oldStatus.equals("LOST")) {
+            // Bản sao mới bị hỏng/mất: trừ qty_received, qty_available, tăng qty_damaged
+            repo.deductLotQtyOnDamageOrLost(c.getLotId());
+        } else if (validStatus.equals("AVAILABLE")
+                && (oldStatus.equals("DAMAGED") || oldStatus.equals("LOST"))) {
+            // Tìm thấy lại bản sao: cộng qty_available, giảm qty_damaged
+            repo.restoreLotQtyOnFound(c.getLotId());
+        }
+
+        // Log transaction
         String reason = validStatus.equals("AVAILABLE") ? "FOUND" : validStatus;
-        repo.logTransaction("ADJUST", c.getVariantId(), c.getLotId(), id, 1,
+        String movementType = validStatus.equals("AVAILABLE") ? "IN" : "OUT";
+        repo.logTransaction(movementType, c.getVariantId(), c.getLotId(), id, 1,
                 null, null, "ADJUSTMENT", null, reason, req.getNote());
         return repo.findById(id);
     }

@@ -57,8 +57,9 @@
                                             <th style="width:120px">ISBN</th>
                                             <th style="width:120px">Danh mục</th>
                                             <th style="width:100px">Trạng thái</th>
-                                            <th style="width:120px">Tồn kho</th>
-                                            <th style="width:200px">Hành động</th>
+                                            <th style="width:110px">Tồn kho</th>
+                                            <th style="width:110px">Hư hỏng/Mất</th>
+                                            <th style="width:170px">Hành động</th>
                                         </tr>
                                     </thead>
                                     <tbody id="stockBody">
@@ -104,71 +105,6 @@
         </div>
     </div>
 
-    <!-- Set Stock Modal -->
-    <div class="modal fade" id="setStockModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title fw-bold"><i class="bi bi-pencil-square me-1"></i>Cập nhật Tồn kho</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <p class="fw-semibold mb-3" id="setStockBookTitle"></p>
-                    <div class="mb-3">
-                        <label class="form-label">Số lượng tồn kho <span class="text-danger">*</span></label>
-                        <input type="number" class="form-control" id="f_setQty" min="0" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Ghi chú</label>
-                        <textarea class="form-control" id="f_setNote" rows="2" placeholder="Lý do cập nhật"></textarea>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="button" class="btn btn-primary" onclick="saveSetStock()">Cập nhật</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Adjust Stock Modal -->
-    <div class="modal fade" id="adjustModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title fw-bold"><i class="bi bi-arrow-down-up me-1"></i>Điều chỉnh Tồn kho</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <p class="fw-semibold mb-3" id="adjustBookTitle"></p>
-                    <div class="mb-3">
-                        <label class="form-label">Loại điều chỉnh <span class="text-danger">*</span></label>
-                        <select class="form-select" id="f_adjType" required>
-                            <option value="">Chọn loại</option>
-                            <option value="IMPORT">📦 Nhập hàng</option>
-                            <option value="EXPORT">📤 Xuất hàng</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Số lượng <span class="text-danger">*</span></label>
-                        <input type="number" class="form-control" id="f_adjQty" min="1" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Lý do</label>
-                        <input type="text" class="form-control" id="f_adjReason" placeholder="VD: Nhập lô mới từ NXB">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Ghi chú</label>
-                        <textarea class="form-control" id="f_adjNote" rows="2"></textarea>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="button" class="btn btn-primary" onclick="saveAdjustStock()">Xác nhận</button>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../js/api.js"></script>
@@ -209,13 +145,14 @@
         function renderKPI() {
             const total = stockItems.length;
             const totalQty = stockItems.reduce((s, b) => s + (b.stockQuantity || 0), 0);
+            const totalDamaged = stockItems.reduce((s, b) => s + (b.damagedQuantity || 0), 0);
             const outOfStock = stockItems.filter(b => (b.stockQuantity || 0) === 0).length;
             const lowStock = stockItems.filter(b => b.stockQuantity > 0 && b.stockQuantity <= 5).length;
             document.getElementById('kpiCards').innerHTML = `
                 <div class="col-md-3"><div class="stats-card"><div class="stats-icon" style="background:#eef2ff;color:#4f46e5"><i class="bi bi-book"></i></div><div class="stats-label">Tổng sách</div><div class="stats-value">${total}</div></div></div>
                 <div class="col-md-3"><div class="stats-card"><div class="stats-icon" style="background:#ecfdf5;color:#059669"><i class="bi bi-box-seam"></i></div><div class="stats-label">Tổng tồn kho</div><div class="stats-value">${totalQty.toLocaleString()}</div></div></div>
                 <div class="col-md-3"><div class="stats-card"><div class="stats-icon" style="background:#fef2f2;color:#dc2626"><i class="bi bi-exclamation-circle"></i></div><div class="stats-label">Hết hàng</div><div class="stats-value">${outOfStock}</div></div></div>
-                <div class="col-md-3"><div class="stats-card"><div class="stats-icon" style="background:#fffbeb;color:#d97706"><i class="bi bi-exclamation-triangle"></i></div><div class="stats-label">Sắp hết (≤5)</div><div class="stats-value">${lowStock}</div></div></div>`;
+                <div class="col-md-3"><div class="stats-card"><div class="stats-icon" style="background:#fef9c3;color:#b45309"><i class="bi bi-bandaid"></i></div><div class="stats-label">Hư hỏng / Mất</div><div class="stats-value" style="color:#b45309">${totalDamaged}</div></div></div>`;
         }
 
         function renderStock() {
@@ -224,11 +161,12 @@
                 || (b.isbn13 || '').toLowerCase().includes(q));
             const tbody = document.getElementById('stockBody');
             if (filtered.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" class="text-center py-5 text-muted">Không tìm thấy sách nào</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center py-5 text-muted">Không tìm thấy sách nào</td></tr>';
                 return;
             }
             tbody.innerHTML = filtered.map(b => {
                 const qty = b.stockQuantity || 0;
+                const damaged = b.damagedQuantity || 0;
                 let badgeClass = 'success', label = qty.toLocaleString();
                 if (qty === 0) { badgeClass = 'danger'; label = 'Hết hàng'; }
                 else if (qty <= 5) { badgeClass = 'warning'; }
@@ -245,8 +183,10 @@
                     <td>${b.categoryName || '—'}</td>
                     <td><span class="badge bg-${b.status === 'ACTIVE' ? 'success' : 'secondary'}">${b.status}</span></td>
                     <td><span class="badge bg-${badgeClass} fs-6">${label}</span></td>
+                    <td>${damaged > 0 ? `<span class="badge bg-danger">${damaged}</span>` : `<span class="text-muted small">—</span>`}</td>
                     <td>
-                        <button class="btn btn-sm btn-outline-success" title="Nhập/Xuất" onclick="openAdjust(${b.bookId})"><i class="bi bi-arrow-down-up me-1"></i>Điều chỉnh</button>
+                        <a href="lots.html" class="btn btn-sm btn-outline-primary" title="Xem lô hàng"><i class="bi bi-box-seam me-1"></i>Xem lô</a>
+                        <a href="stocktaking.html" class="btn btn-sm btn-outline-secondary" title="Kiểm kê"><i class="bi bi-clipboard-check me-1"></i>Kiểm kê</a>
                     </td>
                 </tr>`;
             }).join('');
@@ -271,66 +211,6 @@
                 <td class="small text-muted">${a.note || '—'}</td>
             </tr>`).join('');
         }
-
-        /* ═══ SET STOCK ═══ */
-
-        function openSetStock(bookId) {
-            const b = stockItems.find(x => x.bookId === bookId);
-            if (!b) return;
-            editingBookId = bookId;
-            document.getElementById('setStockBookTitle').textContent = b.title;
-            document.getElementById('f_setQty').value = b.stockQuantity || 0;
-            document.getElementById('f_setNote').value = '';
-            new bootstrap.Modal(document.getElementById('setStockModal')).show();
-        }
-
-        async function saveSetStock() {
-            const qty = parseInt(document.getElementById('f_setQty').value);
-            if (isNaN(qty) || qty < 0) { showToast('Số lượng không hợp lệ', 'warning'); return; }
-            const payload = { quantity: qty, note: document.getElementById('f_setNote').value.trim() || null };
-            try {
-                await api.put(`/management/stock/${editingBookId}`, payload);
-                showToast('Cập nhật tồn kho thành công', 'success');
-                bootstrap.Modal.getInstance(document.getElementById('setStockModal')).hide();
-                stockItems = await api.get('/management/stock');
-                renderKPI(); renderStock();
-            } catch (e) { showToast(e.message || 'Lỗi cập nhật', 'danger'); }
-        }
-
-        /* ═══ ADJUST STOCK ═══ */
-
-        function openAdjust(bookId) {
-            const b = stockItems.find(x => x.bookId === bookId);
-            if (!b) return;
-            editingBookId = bookId;
-            document.getElementById('adjustBookTitle').textContent = `${b.title} (Tồn kho hiện tại: ${b.stockQuantity || 0})`;
-            document.getElementById('f_adjType').value = '';
-            document.getElementById('f_adjQty').value = '';
-            document.getElementById('f_adjReason').value = '';
-            document.getElementById('f_adjNote').value = '';
-            new bootstrap.Modal(document.getElementById('adjustModal')).show();
-        }
-
-        async function saveAdjustStock() {
-            const type = document.getElementById('f_adjType').value;
-            const qty = parseInt(document.getElementById('f_adjQty').value);
-            if (!type) { showToast('Vui lòng chọn loại điều chỉnh', 'warning'); return; }
-            if (isNaN(qty) || qty <= 0) { showToast('Số lượng phải lớn hơn 0', 'warning'); return; }
-            const payload = {
-                type, quantity: qty,
-                reason: document.getElementById('f_adjReason').value.trim() || null,
-                note: document.getElementById('f_adjNote').value.trim() || null,
-            };
-            try {
-                await api.post(`/management/stock/${editingBookId}/adjust`, payload);
-                const typeLabels = { IMPORT: 'Nhập hàng', EXPORT: 'Xuất hàng' };
-                showToast(`${typeLabels[type] || type} thành công: ${qty} cuốn`, 'success');
-                bootstrap.Modal.getInstance(document.getElementById('adjustModal')).hide();
-                stockItems = await api.get('/management/stock');
-                renderKPI(); renderStock();
-            } catch (e) { showToast(e.message || 'Lỗi điều chỉnh', 'danger'); }
-        }
-
         document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>

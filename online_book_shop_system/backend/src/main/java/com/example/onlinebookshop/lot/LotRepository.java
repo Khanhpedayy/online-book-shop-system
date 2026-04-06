@@ -130,16 +130,32 @@ public class LotRepository {
         return kh.getKey().longValue();
     }
 
-    /* â”€â”€ Generate copies â”€â”€ */
+    /* ── Count existing copies of a lot ── */
+    public int countCopiesByLot(Long lotId) {
+        Integer count = jdbc.queryForObject(
+                "SELECT COUNT(*) FROM copies WHERE lot_id = ? AND deleted_at IS NULL",
+                Integer.class, lotId);
+        return count != null ? count : 0;
+    }
+
+    /* ── Generate copies ── */
     public int generateCopies(Long lotId, Long variantId, int count, String prefix, String location,
                               String conditionGrade) {
+        return generateCopiesFrom(lotId, variantId, 1, count, prefix, location, conditionGrade);
+    }
+
+    /* ── Generate copies with index range (fromIndex to toIndex inclusive) ── */
+    public int generateCopiesFrom(Long lotId, Long variantId, int fromIndex, int toIndex,
+                                  String prefix, String location, String conditionGrade) {
         String sql = "INSERT INTO copies (copy_code, lot_id, variant_id, location, condition_grade) VALUES (?, ?, ?, ?, ?)";
-        for (int i = 1; i <= count; i++) {
+        int generated = 0;
+        for (int i = fromIndex; i <= toIndex; i++) {
             String code = prefix + String.format("%04d", i);
             jdbc.update(sql, code, lotId, variantId, location != null ? location : "A1-01",
                     conditionGrade != null ? conditionGrade : "NEW");
+            generated++;
         }
-        return count;
+        return generated;
     }
 
     /* â”€â”€ Lock / Unlock â”€â”€ */

@@ -15,6 +15,8 @@ class StockItemDTO {
     private String status;
     private String coverImageUrl;
     private int stockQuantity;
+    private int damagedQuantity;
+    private int receivedQuantity;
 }
 
 /* ═══ Stock Adjustment Record ═══ */

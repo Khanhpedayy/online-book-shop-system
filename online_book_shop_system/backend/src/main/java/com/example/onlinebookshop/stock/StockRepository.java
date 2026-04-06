@@ -14,17 +14,33 @@ public class StockRepository {
         this.jdbc = jdbc;
     }
 
-    /* ══ Subquery tính tổng qty_available từ lots theo book ══ */
-    private static final String LOT_STOCK_SUBQUERY =
-            "(SELECT ISNULL(SUM(l.qty_available), 0) " +
+    /* ══ Subquery đếm có sẵn từ copies theo book (AVAILABLE) ══ */
+    private static final String COPY_AVAILABLE_SUBQUERY =
+            "(SELECT ISNULL(COUNT(*), 0) " +
+            " FROM copies c " +
+            " JOIN book_variants v ON v.id = c.variant_id " +
+            " WHERE v.book_id = b.id AND c.status = 'AVAILABLE' AND c.deleted_at IS NULL)";
+
+    /* ══ Subquery đếm hư hỏng/mất từ copies theo book ══ */
+    private static final String COPY_DAMAGED_SUBQUERY =
+            "(SELECT ISNULL(COUNT(*), 0) " +
+            " FROM copies c " +
+            " JOIN book_variants v ON v.id = c.variant_id " +
+            " WHERE v.book_id = b.id AND c.status IN ('DAMAGED','LOST') AND c.deleted_at IS NULL)";
+
+    /* ══ Subquery tổng SL đã nhận từ lots theo book (lịch sử) ══ */
+    private static final String LOT_RECEIVED_SUBQUERY =
+            "(SELECT ISNULL(SUM(l.qty_received), 0) " +
             " FROM lots l " +
             " JOIN book_variants v ON v.id = l.variant_id " +
             " WHERE v.book_id = b.id AND l.deleted_at IS NULL)";
 
-    /* ═══ LIST STOCK (aggregate từ lots) ═══ */
+    /* ══ LIST STOCK (tính từ copies table - chính xác thực tế) ══ */
     public List<StockItemDTO> findAllStock() {
         String sql = "SELECT b.id AS book_id, b.title, b.isbn13, c.name AS category_name, b.status, "
-                + LOT_STOCK_SUBQUERY + " AS stock_quantity, "
+                + COPY_AVAILABLE_SUBQUERY + " AS stock_quantity, "
+                + COPY_DAMAGED_SUBQUERY + " AS damaged_quantity, "
+                + LOT_RECEIVED_SUBQUERY + " AS received_quantity, "
                 + "(SELECT TOP 1 bi.url FROM book_images bi "
                 + " WHERE bi.book_id = b.id AND bi.is_cover = 1 AND bi.deleted_at IS NULL "
                 + " ORDER BY bi.sort_order) AS cover_image_url "
@@ -40,6 +56,8 @@ public class StockRepository {
             d.setCategoryName(rs.getString("category_name"));
             d.setStatus(rs.getString("status"));
             d.setStockQuantity(rs.getInt("stock_quantity"));
+            d.setDamagedQuantity(rs.getInt("damaged_quantity"));
+            d.setReceivedQuantity(rs.getInt("received_quantity"));
             d.setCoverImageUrl(rs.getString("cover_image_url"));
             return d;
         });

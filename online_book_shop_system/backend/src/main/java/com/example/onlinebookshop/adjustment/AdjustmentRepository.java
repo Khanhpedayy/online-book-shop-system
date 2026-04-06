@@ -49,7 +49,13 @@ public class AdjustmentRepository {
 
             // Pack both TYPE and DIRECTION into DB REASON to preserve them
             String typeStr = req.getType() != null ? req.getType() : "DAMAGE";
-            String dirStr = req.getDirection() != null ? req.getDirection() : "OUT";
+            // FOUND = IN (nhập vào), các loại khác = OUT (xuất ra)
+            String dirStr;
+            if (req.getDirection() != null && !req.getDirection().isBlank()) {
+                dirStr = req.getDirection();
+            } else {
+                dirStr = "FOUND".equalsIgnoreCase(typeStr) ? "IN" : "OUT";
+            }
             ps.setString(5, typeStr + "_" + dirStr);
 
             String customNote = req.getReason() != null ? req.getReason() : "";
@@ -69,8 +75,16 @@ public class AdjustmentRepository {
     }
 
     public void updateLotQtyDamaged(Long lotId, int delta) {
-        jdbc.update("UPDATE lots SET qty_damaged = qty_damaged + ?, updated_at = SYSUTCDATETIME() WHERE id = ?", delta,
-                lotId);
+        if (delta >= 0) {
+            // Tăng qty_damaged (khi DAMAGE)
+            jdbc.update("UPDATE lots SET qty_damaged = qty_damaged + ?, updated_at = SYSUTCDATETIME() WHERE id = ?",
+                    delta, lotId);
+        } else {
+            // Giảm qty_damaged (khi FOUND) - không cho xuống dưới 0
+            jdbc.update("UPDATE lots SET qty_damaged = CASE WHEN qty_damaged + ? < 0 THEN 0 ELSE qty_damaged + ? END, "
+                    + "updated_at = SYSUTCDATETIME() WHERE id = ?",
+                    delta, delta, lotId);
+        }
     }
 
     private AdjustmentDTO mapDTO(java.sql.ResultSet rs) throws java.sql.SQLException {
