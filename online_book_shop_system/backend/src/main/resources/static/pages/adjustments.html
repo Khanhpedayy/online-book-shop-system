@@ -127,7 +127,14 @@
     <script src="../js/utils.js"></script>
     <script src="../js/layout.js"></script>
     <script>
-        const typeMap = { DAMAGE: { color: 'danger', icon: '<i class="bi bi-lightning me-1"></i>', label: 'Hư hỏng' }, CORRECTION: { color: 'info', icon: '<i class="bi bi-wrench me-1"></i>', label: 'Điều chỉnh' }, TRANSFER: { color: 'secondary', icon: '<i class="bi bi-arrow-repeat me-1"></i>', label: 'Luân chuyển' }, RETURN: { color: 'primary', icon: '', label: 'Trả hàng' }, WRITE_OFF: { color: 'dark', icon: '<i class="bi bi-pencil-square me-1"></i>', label: 'Hủy bỏ' } };
+        const typeMap = {
+            DAMAGE:     { color: 'danger',    icon: '<i class="bi bi-lightning me-1"></i>',     label: 'Hư hỏng',       dir: 'OUT' },
+            FOUND:      { color: 'success',   icon: '<i class="bi bi-search-heart me-1"></i>',  label: 'Tìm thấy lại', dir: 'IN'  },
+            CORRECTION: { color: 'info',      icon: '<i class="bi bi-wrench me-1"></i>',        label: 'Điều chỉnh',    dir: 'IN'  },
+            TRANSFER:   { color: 'secondary', icon: '<i class="bi bi-arrow-repeat me-1"></i>',  label: 'Luân chuyển',   dir: 'OUT' },
+            RETURN:     { color: 'primary',   icon: '',                                          label: 'Trả hàng',      dir: 'IN'  },
+            WRITE_OFF:  { color: 'dark',      icon: '<i class="bi bi-pencil-square me-1"></i>', label: 'Hủy bỏ',       dir: 'OUT' },
+        };
         const statusMap = { APPROVED: 'Đã duyệt', PENDING: 'Chờ duyệt', REJECTED: 'Từ chối' };
         let adjustments = [];
 
@@ -156,7 +163,7 @@
             <td><span class="font-monospace small fw-bold">${a.adjustmentCode || a.id}</span>${a.variantSku ? `<div class="text-muted" style="font-size:10px">${a.variantSku}</div>` : ''}</td>
             <td><span class="badge bg-${t.color}">${t.icon} ${t.label}</span></td>
             <td class="fw-bold">${a.quantity}</td>
-            <td>${a.direction === 'IN' ? '<span class="text-success fw-bold">▲ NHẬP</span>' : '<span class="text-danger fw-bold">▼ XUẤT</span>'}</td>
+            <td>${(() => { const dirIn = typeMap[a.type] ? typeMap[a.type].dir === 'IN' : a.direction === 'IN'; return dirIn ? '<span class="text-success fw-bold">▲ NHẬP</span>' : '<span class="text-danger fw-bold">▼ XUẤT</span>'; })()}</td>
             <td class="text-truncate" style="max-width:200px">${a.reason || '—'}</td>
             <td><span class="badge bg-${a.status === 'APPROVED' ? 'success' : a.status === 'PENDING' ? 'warning' : 'secondary'}">${st || '—'}</span></td>
             <td class="small text-muted">${a.createdAt ? new Date(a.createdAt).toLocaleString('vi-VN') : '—'}</td>

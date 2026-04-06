@@ -41,9 +41,7 @@ const Layout = {
             items: [
                 { label: 'Bảng điều khiển', href: 'staff-dashboard.html', icon: 'bi-speedometer2' },
                 { label: 'Đơn hàng', href: 'staff-orders.html', icon: 'bi-bag' },
-                { label: 'Nhận trả hàng', href: 'staff-returns.html', icon: 'bi-arrow-return-left' },
                 { label: 'Xử lý Trả hàng', href: 'returns.html', icon: 'bi-arrow-return-left' },
-                { label: 'Sự cố', href: 'staff-incidents.html', icon: 'bi-exclamation-triangle' },
             ],
         },
         {

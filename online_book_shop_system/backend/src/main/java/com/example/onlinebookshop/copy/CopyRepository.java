@@ -167,6 +167,26 @@ public class CopyRepository {
                 imagesJson, id);
     }
 
+    /* ── Update lot qty when copy is DAMAGED or LOST ── */
+    // Chỉ trừ qty_available, tăng qty_damaged. qty_received KHÔNG thay đổi (số lịch sử)
+    public void deductLotQtyOnDamageOrLost(Long lotId) {
+        jdbc.update(
+                "UPDATE lots SET qty_available = qty_available - 1, "
+                + "qty_damaged = qty_damaged + 1, updated_at = SYSUTCDATETIME() "
+                + "WHERE id = ? AND qty_available > 0",
+                lotId);
+    }
+
+    /* â”€â”€ Restore lot qty when copy is recovered to AVAILABLE â”€â”€ */
+    // Cộng qty_available, giảm qty_damaged
+    public void restoreLotQtyOnFound(Long lotId) {
+        jdbc.update(
+                "UPDATE lots SET qty_available = qty_available + 1, "
+                + "qty_damaged = CASE WHEN qty_damaged > 0 THEN qty_damaged - 1 ELSE 0 END, "
+                + "updated_at = SYSUTCDATETIME() WHERE id = ?",
+                lotId);
+    }
+
     /* â”€â”€ Log transaction â”€â”€ */
     public void logTransaction(String movementType, Long variantId, Long lotId, Long copyId,
                                int qty, String fromLoc, String toLoc, String refType, Long refId, String reason, String note) {

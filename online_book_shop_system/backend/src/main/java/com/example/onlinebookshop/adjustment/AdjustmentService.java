@@ -28,14 +28,25 @@ public class AdjustmentService {
         if (req.getType() == null || req.getType().isBlank())
             throw new IllegalArgumentException("Type is required");
 
+        // Luôn xác định chiều dựa theo loại — không dùng direction từ frontend (dễ sai)
+        // FOUND (tìm thấy lại) = IN (↑ nhập vào kho)
+        // DAMAGE, LOST, WRITE_OFF, TRANSFER = OUT (↓ xuất ra)
+        String type = req.getType().toUpperCase();
+        req.setDirection("FOUND".equals(type) ? "IN" : "OUT");
+
         Long id = repo.insert(req);
-        // Update lot quantities based on direction and type
+
+        // Cập nhật số lượng lô
         if (req.getLotId() != null) {
             int signedQty = "OUT".equals(req.getDirection()) ? -Math.abs(req.getQuantity()) : Math.abs(req.getQuantity());
             repo.updateLotQtyAvailable(req.getLotId(), signedQty);
-            if ("DAMAGE".equals(req.getType()) && signedQty < 0) {
-                // If damaged and moving out, increase qtyDamaged in lot
+
+            if ("DAMAGE".equalsIgnoreCase(req.getType()) && signedQty < 0) {
+                // Hỏng/xuất: tăng qty_damaged
                 repo.updateLotQtyDamaged(req.getLotId(), Math.abs(signedQty));
+            } else if ("FOUND".equalsIgnoreCase(req.getType()) && signedQty > 0) {
+                // Tìm thấy lại: giảm qty_damaged (nếu có)
+                repo.updateLotQtyDamaged(req.getLotId(), -Math.abs(signedQty));
             }
         }
         return id;
