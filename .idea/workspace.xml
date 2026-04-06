@@ -6,14 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="634e8fec-2e29-47dc-a295-d1d0284ed318" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/controller/ManagerOrderController.java" beforeDir="false" afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/controller/ManagerOrderController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/dto/OrderItemRow.java" beforeDir="false" afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/dto/OrderItemRow.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/repo/StaffOrderQueryRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/repo/StaffOrderQueryRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/repo/StaffPickingRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/repo/StaffPickingRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/service/StaffOrderService.java" beforeDir="false" afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/service/StaffOrderService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/service/StaffPickingService.java" beforeDir="false" afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/service/StaffPickingService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/resources/static/pages/manager-confirm.html" beforeDir="false" afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/resources/static/pages/manager-confirm.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/resources/templates/staff/order-detail.html" beforeDir="false" afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/resources/templates/staff/order-detail.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
