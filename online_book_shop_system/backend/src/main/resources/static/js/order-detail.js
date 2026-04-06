@@ -55,7 +55,7 @@ async function loadOrder(){
         renderOrderInfo(o);
         const rawItems = o.items != null ? o.items : [];
         renderItems(rawItems);
-        renderTimeline(o.status);
+        renderTimeline(o);
 
     }catch(e){
         console.error(e);
@@ -79,15 +79,61 @@ function displayPaymentStatus(o) {
     return "—";
 }
 
+function normalizeFulfillmentStatus(status) {
+    return (status == null ? "" : String(status)).trim().toUpperCase();
+}
+
+const FULFILLMENT_LABELS = {
+    NEW: "New — awaiting shop confirmation",
+    CONFIRMED: "Confirmed — preparing your order",
+    PACKED: "Packed — ready to ship",
+    SHIPPED: "Shipped — on the way",
+    DELIVERED: "Delivered",
+    COMPLETED: "Completed",
+    CANCELLED: "Cancelled"
+};
+
+function fulfillmentLabel(code) {
+    const c = normalizeFulfillmentStatus(code);
+    return FULFILLMENT_LABELS[c] || c || "—";
+}
+
+function isPayOsPaymentComplete(o) {
+    const ps = displayPaymentStatus(o);
+    return ps === "PAID";
+}
+
+function canCancelCustomerOrder(o) {
+    return normalizeFulfillmentStatus(o.status) === "NEW";
+}
+
+function canRepayPayOs(o) {
+    if (normalizeFulfillmentStatus(o.status) === "CANCELLED") {
+        return false;
+    }
+    if (displayPaymentMethod(o) !== "PAYOS") {
+        return false;
+    }
+    const ps = displayPaymentStatus(o);
+    return ps === "PENDING" || ps === "UNPAID" || ps === "CANCELLED" || ps === "FAILED";
+}
+
 /* ===== ORDER INFO ===== */
 function renderOrderInfo(o){
     const div = document.getElementById("orderInfo");
     const addr = [o.shipLine1, o.shipLine2].filter(Boolean).join(", ");
+    const fulfillCode = normalizeFulfillmentStatus(o.status);
+    const payMethod = displayPaymentMethod(o);
+    const payNote =
+        payMethod === "PAYOS" && !isPayOsPaymentComplete(o) && fulfillCode !== "CANCELLED"
+            ? `<p class="shop-muted" style="margin-top:8px;font-size:0.9rem;">Complete online payment below. Shipment steps unlock after payment is <b>PAID</b>.</p>`
+            : "";
 
     div.innerHTML = `
         <h3>Order #${escapeHtml(String(o.orderCode || o.id))}</h3>
-        <p>Status: <b>${escapeHtml(String(o.status || "—"))}</b></p>
-        <p>Payment: <b>${escapeHtml(displayPaymentMethod(o))}</b> (${escapeHtml(displayPaymentStatus(o))})</p>
+        <p>Shipment / fulfillment: <b>${escapeHtml(fulfillmentLabel(o.status))}</b> <span class="shop-muted">(${escapeHtml(fulfillCode || "—")})</span></p>
+        <p>Payment: <b>${escapeHtml(payMethod)}</b> (${escapeHtml(displayPaymentStatus(o))})</p>
+        ${payNote}
         <p>Total: ${formatMoney(o.totalAmount)}</p>
 
         <hr>
@@ -97,13 +143,11 @@ function renderOrderInfo(o){
         <p><b>Address:</b> ${escapeHtml(addr || "—")}</p>
 
         <div style="margin-top:10px;">
-            ${o.status === "NEW" ?
+            ${canCancelCustomerOrder(o) ?
         `<button type="button" class="shop-btn shop-btn--secondary" onclick="cancelOrder(${o.id})">Cancel order</button>` : ""
     }
 
-            ${String(o.status || "").toUpperCase() !== "CANCELLED"
-        && (displayPaymentStatus(o) === "PENDING" || displayPaymentStatus(o) === "UNPAID" || displayPaymentStatus(o) === "CANCELLED")
-        && displayPaymentMethod(o) === "PAYOS" ?
+            ${canRepayPayOs(o) ?
         `<button type="button" class="shop-btn" onclick="repay(${o.id})">Pay again</button>` : ""
     }
         </div>
@@ -161,8 +205,8 @@ function lineTotal(i) {
 }
 
 /* ===== TIMELINE ===== */
-function renderTimeline(status){
-    const s = (status || "").toString().toUpperCase();
+function renderTimeline(o) {
+    const s = normalizeFulfillmentStatus(o && o.status);
     const container = document.getElementById("timeline");
 
     container.innerHTML = "";
@@ -176,9 +220,33 @@ function renderTimeline(status){
         return;
     }
 
+    const payMethod = displayPaymentMethod(o);
+    const payComplete = payMethod !== "PAYOS" || isPayOsPaymentComplete(o);
+    const payFailed = displayPaymentStatus(o) === "FAILED";
+
+    /* PayOS: payment step must align with payment_status before fulfillment steps */
+    if (payMethod === "PAYOS") {
+        let payCircleClass = "muted";
+        let payLabel = "Payment pending";
+        if (isPayOsPaymentComplete(o)) {
+            payCircleClass = "active";
+            payLabel = "Paid online";
+        } else if (payFailed) {
+            payCircleClass = "pending";
+            payLabel = "Payment failed";
+        } else {
+            payCircleClass = "pending";
+        }
+        container.innerHTML += `
+            <div class="step">
+                <div class="circle ${payCircleClass}"></div>
+                <div>${payLabel}</div>
+            </div>`;
+    }
+
     /* Align with staff workflow: NEW → CONFIRMED → PACKED → SHIPPED → DELIVERED → COMPLETED */
     const steps = [
-        { code: "NEW", label: "New" },
+        { code: "NEW", label: "Order placed" },
         { code: "CONFIRMED", label: "Confirmed" },
         { code: "PACKED", label: "Packed" },
         { code: "SHIPPED", label: "Shipping" },
@@ -190,18 +258,24 @@ function renderTimeline(status){
     if (idx < 0) {
         idx = 0;
     }
-    const activeIdx = idx;
 
     steps.forEach((step, i) => {
-        const active = i <= activeIdx;
+        const active = payComplete && i <= idx;
 
         container.innerHTML += `
             <div class="step">
-                <div class="circle ${active ? "active" : ""}"></div>
+                <div class="circle ${active ? "active" : "muted"}"></div>
                 <div>${step.label}</div>
             </div>
         `;
     });
+
+    if (!payComplete && payMethod === "PAYOS") {
+        container.innerHTML += `
+            <p class="shop-muted" style="flex-basis:100%;width:100%;margin:12px 0 0;font-size:0.88rem;">
+                Shipment steps stay inactive until payment is successful (PAID).
+            </p>`;
+    }
 }
 
 /* ===== CANCEL ===== */

@@ -114,7 +114,8 @@ public class OrderController {
         if (ps != null
                 && !"PENDING".equalsIgnoreCase(ps)
                 && !"UNPAID".equalsIgnoreCase(ps)
-                && !"CANCELLED".equalsIgnoreCase(ps)) {
+                && !"CANCELLED".equalsIgnoreCase(ps)
+                && !"FAILED".equalsIgnoreCase(ps)) {
             throw new IllegalStateException("Order already paid or not eligible for repay.");
         }
 
