@@ -39,10 +39,6 @@ public class StaffWorkspaceController {
 
     @GetMapping("/staff/workspace/dashboard")
     public String dashboard(Model model, Authentication authentication) {
-        String username = authentication != null ? authentication.getName() : "STAFF";
-
-        model.addAttribute("role", "STAFF");
-        model.addAttribute("username", username);
         model.addAttribute("stats", new StaffDashboardStats(0, 0, 0, 0, 0));
         model.addAttribute("todoOrders", Collections.emptyList());
         model.addAttribute("dbError", null);
@@ -80,14 +76,10 @@ public class StaffWorkspaceController {
             Model model,
             Authentication authentication
     ) {
-        String username = authentication != null ? authentication.getName() : "STAFF";
-
         Map<String, Object> filter = new LinkedHashMap<>();
         filter.put("q", q);
         filter.put("status", status);
 
-        model.addAttribute("role", "STAFF");
-        model.addAttribute("username", username);
         model.addAttribute("filter", filter);
         model.addAttribute("q", q);
         model.addAttribute("status", status);
@@ -118,10 +110,6 @@ public class StaffWorkspaceController {
             @RequestParam(name = "status", required = false, defaultValue = "") String status,
             Model model, Authentication authentication) {
 
-        String username = authentication != null ? authentication.getName() : "STAFF";
-
-        model.addAttribute("role", "STAFF");
-        model.addAttribute("username", username);
         model.addAttribute("q", q);
         model.addAttribute("status", status);
 
