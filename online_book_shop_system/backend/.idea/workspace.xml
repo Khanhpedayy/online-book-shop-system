@@ -4,24 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b0cef7af-9eae-4572-a7cc-fd78853d29dd" name="Changes" comment="final fix">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/Entity/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/Entity/User.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/payos/PayOSClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/payos/PayOSClient.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/payos/PayOSWebhookService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/payos/PayOSWebhookService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/staff/controller/StaffWorkspaceController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/staff/controller/StaffWorkspaceController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/staff/repo/StaffOrderQueryRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/staff/repo/StaffOrderQueryRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/staff/service/StaffNotificationService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/staff/service/StaffNotificationService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/staff/service/StaffOrderService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/onlinebookshop/staff/service/StaffOrderService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/admin.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/admin.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/js/admin-core.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/js/admin-core.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/js/layout.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/js/layout.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/js/profile.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/js/profile.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/profile.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/profile.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/staff/workspace-dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/staff/workspace-dashboard.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/staff/workspace-delivery-return.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/staff/workspace-delivery-return.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/staff/workspace-fragments.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/staff/workspace-fragments.html" afterDir="false" />
-    </list>
+    <list default="true" id="b0cef7af-9eae-4572-a7cc-fd78853d29dd" name="Changes" comment="final fix" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -82,7 +65,7 @@
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "Spring Boot.OnlineBookShopApplication.executor": "Run",
     "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "return__process",
+    "git-widget-placeholder": "main",
     "junie.onboarding.icon.badge.shown": "true",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "D:/SWP391_GRP6/online-book-shop-system/online_book_shop_system/online-book-shop-system/online_book_shop_system/backend/pom.xml",

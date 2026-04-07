@@ -75,6 +75,7 @@ class CreateLotRequest {
     private String receivedAt;
     private Double unitCost;
     private int qtyReceived;
+    private String conditionDefault;
     private String note;
 }
 
