@@ -49,9 +49,9 @@ public class StaffWorkspaceController {
                 model.addAttribute("stats", stats);
             }
 
-            // 🔥 FIX Ở ĐÂY
+            // 🔥 FIX Ở ĐÂY: Unify với màn Allocate
             OrderFilter filter = new OrderFilter();
-            filter.setStage("confirmed"); // chỉ lấy CONFIRMED
+            filter.setStage("allocate");
 
             List<OrderListRow> todoOrders = orderService.getAll(filter);
 

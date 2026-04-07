@@ -53,8 +53,8 @@ public class StaffOrderQueryRepository {
             if (notBlank(filter.getStage())) {
                 switch (filter.getStage().trim().toLowerCase()) {
                     case "confirmed" -> sql.append(" AND o.status = 'CONFIRMED' ");
-                    case "allocate" -> sql.append(" AND o.status = 'CONFIRMED' AND COALESCE(agg.allocated_count, 0) < COALESCE(agg.item_count, 0) ");
-                    case "packing" -> sql.append(" AND o.status = 'CONFIRMED' AND COALESCE(agg.item_count, 0) > 0 AND COALESCE(agg.picked_count, 0) = COALESCE(agg.item_count, 0) ");
+                    case "allocate" -> sql.append(" AND o.status = 'CONFIRMED' AND NOT EXISTS (SELECT 1 FROM dbo.stock_outs so WHERE so.order_id = o.id AND so.status = 'PICKED' AND so.deleted_at IS NULL) ");
+                    case "packing" -> sql.append(" AND o.status = 'CONFIRMED' AND EXISTS (SELECT 1 FROM dbo.stock_outs so WHERE so.order_id = o.id AND so.status = 'PICKED' AND so.deleted_at IS NULL) ");
                     case "shipping" -> sql.append(" AND o.status = 'PACKED' ");
                     case "delivery-return" -> sql.append(" AND (o.status IN ('SHIPPED','COMPLETED','CANCELLED','DELIVERY_FAILED') OR o.shipped_at IS NOT NULL OR o.delivered_at IS NOT NULL) ");
                     default -> { }

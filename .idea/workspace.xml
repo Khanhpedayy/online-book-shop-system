@@ -6,11 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="634e8fec-2e29-47dc-a295-d1d0284ed318" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/controller/StaffShippingController.java" beforeDir="false" afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/controller/StaffShippingController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/controller/StaffWorkspaceController.java" beforeDir="false" afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/controller/StaffWorkspaceController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/resources/templates/staff/workspace-delivery-return.html" beforeDir="false" afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/resources/templates/staff/workspace-delivery-return.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/resources/templates/staff/workspace-fragments.html" beforeDir="false" afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/resources/templates/staff/workspace-fragments.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/online_book_shop_system/database/databasebansach.sql" beforeDir="false" afterPath="$PROJECT_DIR$/online_book_shop_system/database/databasebansach.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/repo/StaffOrderQueryRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/online_book_shop_system/backend/src/main/java/com/example/onlinebookshop/staff/repo/StaffOrderQueryRepository.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -28,7 +25,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="main" />
+        <entry key="$PROJECT_DIR$" value="add-staff-name" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -73,7 +70,7 @@
     "Spring Boot.OnlineBookShopApplication (1).executor": "Run",
     "Spring Boot.OnlineBookShopApplication.executor": "Run",
     "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "add-staff-name",
+    "git-widget-placeholder": "main",
     "ignore.virus.scanning.warn.message": "true",
     "junie.onboarding.icon.badge.shown": "true",
     "kotlin-language-version-configured": "true",
