@@ -37,13 +37,12 @@
                                         <th style="width:80px">SL</th>
                                         <th style="width:100px">Chiều</th>
                                         <th>Lý do</th>
-                                        <th style="width:100px">Trạng thái</th>
                                         <th style="width:140px">Ngày tạo</th>
                                     </tr>
                                 </thead>
                                 <tbody id="tableBody">
                                     <tr>
-                                        <td colspan="7" class="text-center py-5 text-muted">Đang tải…</td>
+                                        <td colspan="6" class="text-center py-5 text-muted">Đang tải…</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -155,7 +154,7 @@
 
         function render() {
             const tbody = document.getElementById('tableBody');
-            if (!adjustments.length) { tbody.innerHTML = '<tr><td colspan="7" class="text-center py-5 text-muted">Không có điều chỉnh nào</td></tr>'; return; }
+            if (!adjustments.length) { tbody.innerHTML = '<tr><td colspan="6" class="text-center py-5 text-muted">Không có điều chỉnh nào</td></tr>'; return; }
             tbody.innerHTML = adjustments.map(a => {
                 const t = typeMap[a.type] || { color: 'secondary', icon: '', label: a.type };
                 const st = statusMap[a.status] || a.status;
@@ -165,7 +164,7 @@
             <td class="fw-bold">${a.quantity}</td>
             <td>${(() => { const dirIn = typeMap[a.type] ? typeMap[a.type].dir === 'IN' : a.direction === 'IN'; return dirIn ? '<span class="text-success fw-bold">▲ NHẬP</span>' : '<span class="text-danger fw-bold">▼ XUẤT</span>'; })()}</td>
             <td class="text-truncate" style="max-width:200px">${a.reason || '—'}</td>
-            <td><span class="badge bg-${a.status === 'APPROVED' ? 'success' : a.status === 'PENDING' ? 'warning' : 'secondary'}">${st || '—'}</span></td>
+
             <td class="small text-muted">${a.createdAt ? new Date(a.createdAt).toLocaleString('vi-VN') : '—'}</td>
         </tr>`;
             }).join('');

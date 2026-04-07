@@ -89,7 +89,7 @@ public class LotService {
                 "Lô hàng này đã có đủ " + lot.getQtyReceived() + " bản sao. Không thể tạo thêm.");
 
         String prefix = req.getPrefix() != null ? req.getPrefix() : lot.getLotCode() + "-";
-        String condition = req.getConditionGrade() != null ? req.getConditionGrade() : lot.getConditionDefault();
+        String condition = req.getConditionGrade() != null ? req.getConditionGrade() : "NEW";
         // Chỉ generate số bản sao còn thiếu (bắt đầu đánh số từ existingCount + 1)
         return repo.generateCopiesFrom(lotId, lot.getVariantId(), existingCount + 1,
                 existingCount + remaining, prefix, req.getDefaultLocation(), condition);
