@@ -15,7 +15,7 @@ public class ReviewRepository {
     }
 
     /**
-     * Lấy danh sách sách đã mua (COMPLETED orders) của user,
+     * Lấy danh sách sách đã mua (đơn DELIVERED hoặc COMPLETED) của user,
      * kèm trạng thái đã review chưa.
      */
     public List<ReviewDTOs.PurchasedBookDTO> findPurchasedBooks(Long userId) {
@@ -32,7 +32,7 @@ public class ReviewRepository {
             "JOIN book_variants bv ON oi.variant_id = bv.id " +
             "JOIN books b ON bv.book_id = b.id " +
             "LEFT JOIN reviews r ON r.book_id = b.id AND r.user_id = ? AND r.deleted_at IS NULL " +
-            "WHERE o.user_id = ? AND o.status = 'COMPLETED' " +
+            "WHERE o.user_id = ? AND o.status IN ('DELIVERED','COMPLETED') " +
             "ORDER BY reviewed ASC, b.title ASC";
 
         return jdbc.query(sql, (rs, i) -> {
@@ -140,13 +140,13 @@ public class ReviewRepository {
         return count != null && count > 0;
     }
 
-    /** Kiểm tra đã mua sách này chưa (order COMPLETED) */
+    /** Kiểm tra đã mua sách này chưa (đơn DELIVERED hoặc COMPLETED) */
     public boolean hasPurchased(Long userId, Long bookId) {
         Integer count = jdbc.queryForObject(
             "SELECT COUNT(*) FROM order_items oi " +
             "JOIN orders o ON oi.order_id = o.id " +
             "JOIN book_variants bv ON oi.variant_id = bv.id " +
-            "WHERE o.user_id=? AND bv.book_id=? AND o.status='COMPLETED'",
+            "WHERE o.user_id=? AND bv.book_id=? AND o.status IN ('DELIVERED','COMPLETED')",
             Integer.class, userId, bookId
         );
         return count != null && count > 0;

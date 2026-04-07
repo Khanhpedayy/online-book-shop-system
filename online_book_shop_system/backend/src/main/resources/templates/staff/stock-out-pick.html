@@ -105,16 +105,16 @@
                 <form method="post"
                       th:action="@{/staff/stock-outs/{stockOutId}/missing/{itemId}(stockOutId=${stockOut.id}, itemId=${item.id})}">
                   <div class="input-group input-group-sm">
-                    <input type="text"
-                           name="note"
-                           class="form-control"
-                           placeholder="Ghi chú thiếu hàng"
-                           th:value="${item.missingNote}">
-                    <button type="submit"
-                            class="btn btn-outline-danger"
-                            th:disabled="${item.pickedAt != null or item.missingReported}">
-                      Không tìm thấy
-                    </button>
+<!--                    <input type="text"-->
+<!--                           name="note"-->
+<!--                           class="form-control"-->
+<!--                           placeholder="Ghi chú thiếu hàng"-->
+<!--                           th:value="${item.missingNote}">-->
+<!--                    <button type="submit"-->
+<!--                            class="btn btn-outline-danger"-->
+<!--                            th:disabled="${item.pickedAt != null or item.missingReported}">-->
+<!--                      Không tìm thấy-->
+<!--                    </button>-->
                   </div>
                 </form>
               </div>
