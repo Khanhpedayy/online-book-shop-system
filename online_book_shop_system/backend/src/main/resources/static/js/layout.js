@@ -41,17 +41,17 @@ const Layout = {
             items: [
                 { label: 'Bảng điều khiển', href: 'staff-dashboard.html', icon: 'bi-speedometer2' },
                 { label: 'Đơn hàng', href: 'staff-orders.html', icon: 'bi-bag' },
-                { label: 'Xử lý Trả hàng', href: 'returns.html', icon: 'bi-arrow-return-left' },
+               // { label: 'Xử lý Trả hàng', href: 'returns.html', icon: 'bi-arrow-return-left' },
             ],
         },
-        {
-            title: 'Hệ thống',
-            items: [
-                { label: 'Báo cáo', href: 'reports.html', icon: 'bi-bar-chart' },
-                { label: 'Support Tickets', href: 'support-tickets.html', icon: 'bi-headset' },
-                { label: 'Yêu cầu rút tiền', href: 'withdrawals.html', icon: 'bi-cash-coin' },
-            ],
-        },
+        //{
+            //title: 'Hệ thống',
+            //items: [
+               // { label: 'Báo cáo', href: 'reports.html', icon: 'bi-bar-chart' },
+               // { label: 'Support Tickets', href: 'support-tickets.html', icon: 'bi-headset' },
+               // { label: 'Yêu cầu rút tiền', href: 'withdrawals.html', icon: 'bi-cash-coin' },
+           // ],
+       // },
     ],
 
     getCurrentPage() {

@@ -71,7 +71,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/me/review-reports").authenticated()
                         .requestMatchers("/api/me/support-tickets/**").authenticated()
 
-                        .requestMatchers("/staff/**").hasAnyRole("STAFF")
+                        .requestMatchers("/staff/**").hasAnyRole("STAFF", "ADMIN", "MANAGER")
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/management/**").hasAnyRole("MANAGER", "ADMIN")
                         .requestMatchers("/api/staff/**").hasAnyRole("STAFF", "ADMIN", "MANAGER")
